@@ -1,4 +1,4 @@
-package com.vcardsmart.vcardsmart
+package com.vcardsmart.app
 
 import io.flutter.embedding.android.FlutterActivity
 

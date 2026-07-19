@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     id("kotlin-android")
@@ -7,7 +9,7 @@ plugins {
 android {
     namespace = "com.vcardsmart.app"
     compileSdk = flutter.compileSdkVersion
-    ndkVersion = flutter.ndkVersion
+    ndkVersion = "27.0.12077973"
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
@@ -30,7 +32,7 @@ android {
         create("release") {
             val keystoreFile = rootProject.file("key.properties")
             if (keystoreFile.exists()) {
-                val properties = java.util.Properties()
+                val properties = Properties()
                 keystoreFile.inputStream().use { properties.load(it) }
                 storeFile = file(properties.getProperty("storeFile", "keystore.jks"))
                 storePassword = properties.getProperty("storePassword", "")
