@@ -7,14 +7,11 @@ import '../../domain/usecases/create_profile_usecase.dart';
 import '../../domain/usecases/update_profile_usecase.dart';
 import '../../domain/usecases/delete_profile_usecase.dart';
 import '../../data/repositories/local_profile_repository.dart';
-import '../../data/datasources/profile_local_datasource.dart';
-
-final profileDataSourceProvider = Provider<ProfileDataSource>((ref) {
-  throw UnimplementedError('Override in main.dart with Hive box');
-});
+import '../../data/datasources/hive_profile_datasource.dart';
+import '../../../../core/database/hive_service.dart';
 
 final profileRepositoryProvider = Provider<ProfileRepository>((ref) {
-  final dataSource = ref.read(profileDataSourceProvider);
+  final dataSource = HiveProfileDataSource(HiveService.profileBox);
   return LocalProfileRepository(dataSource);
 });
 

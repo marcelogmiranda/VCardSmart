@@ -212,7 +212,7 @@ class _ActionCard extends StatelessWidget {
               Text(
                 subtitle,
                 style: TextStyle(
-                  color: iconColor.withOpacity(0.7),
+                  color: iconColor.withValues(alpha: 0.7),
                   fontSize: 12,
                 ),
               ),

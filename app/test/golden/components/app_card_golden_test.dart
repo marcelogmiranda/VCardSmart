@@ -9,11 +9,11 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           theme: AppTheme.light(),
-          home: Scaffold(
+          home: const Scaffold(
             body: Padding(
-              padding: const EdgeInsets.all(16),
+              padding: EdgeInsets.all(16),
               child: AppCard(
-                child: const Text('Card content'),
+                child: Text('Card content'),
               ),
             ),
           ),
@@ -30,11 +30,11 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           theme: AppTheme.dark(),
-          home: Scaffold(
+          home: const Scaffold(
             body: Padding(
-              padding: const EdgeInsets.all(16),
+              padding: EdgeInsets.all(16),
               child: AppCard(
-                child: const Text('Card content'),
+                child: Text('Card content'),
               ),
             ),
           ),
@@ -51,12 +51,12 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           theme: AppTheme.light(),
-          home: Scaffold(
+          home: const Scaffold(
             body: Padding(
-              padding: const EdgeInsets.all(16),
+              padding: EdgeInsets.all(16),
               child: AppCard(
-                padding: const EdgeInsets.all(32),
-                child: const Text('Custom padding'),
+                padding: EdgeInsets.all(32),
+                child: Text('Custom padding'),
               ),
             ),
           ),

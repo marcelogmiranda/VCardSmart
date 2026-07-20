@@ -5,6 +5,7 @@ import '../../domain/usecases/get_contacts_usecase.dart';
 import '../../data/repositories/local_contact_repository.dart';
 import '../../domain/entities/contact.dart';
 import '../../domain/repositories/contact_repository.dart';
+import '../../../../core/database/hive_service.dart';
 
 enum ContactStatus { idle, loading, success, error }
 
@@ -33,7 +34,7 @@ class ContactListStatus {
 }
 
 final contactRepositoryProvider = Provider<ContactRepository>((ref) {
-  return LocalContactRepository();
+  return LocalContactRepository(HiveService.contactBox);
 });
 
 final getContactsUseCaseProvider = Provider((ref) {

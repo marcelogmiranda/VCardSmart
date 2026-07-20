@@ -1,37 +1,32 @@
 import 'dart:convert';
+import 'package:hive/hive.dart';
 import '../../domain/entities/contact.dart';
 import '../../domain/repositories/contact_repository.dart';
+import '../../../../core/database/hive_boxes.dart';
 
 class LocalContactRepository implements ContactRepository {
-  final List<Contact> _contacts = [];
+  final Box<Contact> _box;
+
+  LocalContactRepository([Box<Contact>? box]) : _box = box ?? Hive.box<Contact>(HiveBoxes.contacts);
 
   @override
   Future<List<Contact>> getAllContacts() async {
-    return List.unmodifiable(_contacts);
+    return _box.values.toList();
   }
 
   @override
   Future<Contact?> getContact(String id) async {
-    try {
-      return _contacts.firstWhere((c) => c.id == id);
-    } catch (_) {
-      return null;
-    }
+    return _box.get(id);
   }
 
   @override
   Future<void> saveContact(Contact contact) async {
-    final index = _contacts.indexWhere((c) => c.id == contact.id);
-    if (index >= 0) {
-      _contacts[index] = contact;
-    } else {
-      _contacts.add(contact);
-    }
+    await _box.put(contact.id, contact);
   }
 
   @override
   Future<void> deleteContact(String id) async {
-    _contacts.removeWhere((c) => c.id == id);
+    await _box.delete(id);
   }
 
   @override

@@ -132,7 +132,7 @@ void main() {
       await expectLater(
         find.byType(AppButton),
         matchesGoldenFile(
-            'golden_files/components/primary_button_with_icon_light.png'),
+            'golden_files/components/primary_button_with_icon_light.png',),
       );
     });
 
@@ -140,7 +140,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           theme: AppTheme.light(),
-          home: Scaffold(
+          home: const Scaffold(
             body: Center(
               child: AppButton(
                 label: 'Salvar',

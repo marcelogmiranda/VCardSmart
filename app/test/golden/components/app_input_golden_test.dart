@@ -9,9 +9,9 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           theme: AppTheme.light(),
-          home: Scaffold(
+          home: const Scaffold(
             body: Padding(
-              padding: const EdgeInsets.all(16),
+              padding: EdgeInsets.all(16),
               child: AppInput(
                 label: 'Nome',
                 hint: 'Digite seu nome',
@@ -31,9 +31,9 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           theme: AppTheme.dark(),
-          home: Scaffold(
+          home: const Scaffold(
             body: Padding(
-              padding: const EdgeInsets.all(16),
+              padding: EdgeInsets.all(16),
               child: AppInput(
                 label: 'Nome',
                 hint: 'Digite seu nome',
@@ -53,9 +53,9 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           theme: AppTheme.light(),
-          home: Scaffold(
+          home: const Scaffold(
             body: Padding(
-              padding: const EdgeInsets.all(16),
+              padding: EdgeInsets.all(16),
               child: AppInput(
                 label: 'Email',
                 error: 'Email inválido',
@@ -75,9 +75,9 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           theme: AppTheme.light(),
-          home: Scaffold(
+          home: const Scaffold(
             body: Padding(
-              padding: const EdgeInsets.all(16),
+              padding: EdgeInsets.all(16),
               child: AppInput(
                 label: 'Campo desabilitado',
                 enabled: false,

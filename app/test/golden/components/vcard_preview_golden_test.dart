@@ -7,7 +7,7 @@ import 'package:vcardsmart/core/theme/app_theme.dart';
 void main() {
   group('VCardPreview Golden', () {
     testWidgets('full data light theme', (tester) async {
-      final data = VCardData(
+      const data = VCardData(
         firstName: 'João',
         lastName: 'Silva',
         title: 'Desenvolvedor',
@@ -22,7 +22,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           theme: AppTheme.light(),
-          home: Scaffold(
+          home: const Scaffold(
             body: SingleChildScrollView(
               child: VCardPreview(data: data),
             ),
@@ -37,7 +37,7 @@ void main() {
     });
 
     testWidgets('full data dark theme', (tester) async {
-      final data = VCardData(
+      const data = VCardData(
         firstName: 'João',
         lastName: 'Silva',
         title: 'Desenvolvedor',
@@ -52,7 +52,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           theme: AppTheme.dark(),
-          home: Scaffold(
+          home: const Scaffold(
             body: SingleChildScrollView(
               child: VCardPreview(data: data),
             ),
@@ -67,14 +67,14 @@ void main() {
     });
 
     testWidgets('minimal data light theme', (tester) async {
-      final data = VCardData(
+      const data = VCardData(
         firstName: 'Maria',
       );
 
       await tester.pumpWidget(
         MaterialApp(
           theme: AppTheme.light(),
-          home: Scaffold(
+          home: const Scaffold(
             body: SingleChildScrollView(
               child: VCardPreview(data: data),
             ),
