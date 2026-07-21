@@ -85,6 +85,10 @@ class NFCNotifier extends StateNotifier<NFCStatus> {
   void reset() {
     state = const NFCStatus();
   }
+
+  void setUnavailable() {
+    state = state.copyWith(isAvailable: false);
+  }
 }
 
 final nfcProvider = StateNotifierProvider<NFCNotifier, NFCStatus>((ref) {

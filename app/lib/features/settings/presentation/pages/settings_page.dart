@@ -54,6 +54,61 @@ class SettingsPage extends ConsumerWidget {
               ref.read(settingsProvider.notifier).updateAds(enabled);
             },
           ),
+          const Divider(),
+          _SectionHeader(title: 'Sobre'),
+          ListTile(
+            leading: const Icon(Icons.help_outline),
+            title: const Text('Como Funciona'),
+            subtitle: const Text('Passos para usar o app'),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => _showHowItWorks(context),
+          ),
+          ListTile(
+            leading: const Icon(Icons.info_outline),
+            title: const Text('Versao'),
+            subtitle: const Text('1.0.0'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showHowItWorks(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Como Funciona'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _StepRow(
+              step: '1',
+              title: 'Crie seu perfil',
+              description: 'Adicione seus dados de contato',
+              colorScheme: colorScheme,
+            ),
+            const SizedBox(height: 16),
+            _StepRow(
+              step: '2',
+              title: 'Gere seu QR Code',
+              description: 'Gere um QR Code com seu cartao',
+              colorScheme: colorScheme,
+            ),
+            const SizedBox(height: 16),
+            _StepRow(
+              step: '3',
+              title: 'Compartilhe',
+              description: 'Escaneie ou envie por mensagem',
+              colorScheme: colorScheme,
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Fechar'),
+          ),
         ],
       ),
     );
@@ -77,6 +132,59 @@ class _SectionHeader extends StatelessWidget {
           color: Theme.of(context).colorScheme.primary,
         ),
       ),
+    );
+  }
+}
+
+class _StepRow extends StatelessWidget {
+  final String step;
+  final String title;
+  final String description;
+  final ColorScheme colorScheme;
+
+  const _StepRow({
+    required this.step,
+    required this.title,
+    required this.description,
+    required this.colorScheme,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        CircleAvatar(
+          radius: 14,
+          backgroundColor: colorScheme.primaryContainer,
+          child: Text(
+            step,
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: colorScheme.onPrimaryContainer,
+              fontSize: 13,
+            ),
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: const TextStyle(fontWeight: FontWeight.w600),
+              ),
+              Text(
+                description,
+                style: TextStyle(
+                  color: colorScheme.onSurfaceVariant,
+                  fontSize: 13,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }

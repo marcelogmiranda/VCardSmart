@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:share_plus/share_plus.dart';
 import '../providers/profile_provider.dart';
 import '../widgets/profile_header.dart';
 import 'profile_edit_page.dart';
@@ -34,6 +36,30 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     }
   }
 
+  String _buildVCardData(dynamic profile) {
+    final sb = StringBuffer()
+      ..writeln('BEGIN:VCARD')
+      ..writeln('VERSION:3.0')
+      ..writeln('FN:${profile.name}');
+    if (profile.email != null && profile.email!.isNotEmpty) {
+      sb.writeln('EMAIL:${profile.email}');
+    }
+    if (profile.phone != null && profile.phone!.isNotEmpty) {
+      sb.writeln('TEL:${profile.phone}');
+    }
+    if (profile.linkedin != null && profile.linkedin!.isNotEmpty) {
+      sb.writeln('URL:${profile.linkedin}');
+    }
+    if (profile.website != null && profile.website!.isNotEmpty) {
+      sb.writeln('URL:${profile.website}');
+    }
+    if (profile.bio != null && profile.bio!.isNotEmpty) {
+      sb.writeln('NOTE:${profile.bio}');
+    }
+    sb.writeln('END:VCARD');
+    return sb.toString();
+  }
+
   @override
   Widget build(BuildContext context) {
     final profileAsync = ref.watch(profileProvider);
@@ -44,17 +70,38 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
         actions: [
           profileAsync.when(
             data: (profile) => profile != null
-                ? IconButton(
-                    icon: const Icon(Icons.edit),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              ProfileEditPage(profile: profile),
-                        ),
-                      );
-                    },
+                ? Row(
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.qr_code),
+                        tooltip: 'Meu QR Code',
+                        onPressed: () => context.push('/qr/share'),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.share),
+                        tooltip: 'Compartilhar',
+                        onPressed: () {
+                          final vCard = _buildVCardData(profile);
+                          Share.share(
+                            vCard,
+                            subject: '${profile.name} - Cartao VCardSmart',
+                          );
+                        },
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.edit),
+                        tooltip: 'Editar',
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  ProfileEditPage(profile: profile),
+                            ),
+                          );
+                        },
+                      ),
+                    ],
                   )
                 : const SizedBox.shrink(),
             loading: () => const SizedBox.shrink(),

@@ -36,15 +36,6 @@ class HomePage extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             _ActionGrid(colorScheme: colorScheme),
-            const SizedBox(height: 24),
-            Text(
-              'Como Funciona',
-              style: theme.textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 12),
-            _HowItWorksCard(colorScheme: colorScheme),
           ],
         ),
       ),
@@ -68,45 +59,49 @@ class _ProfileCard extends StatelessWidget {
           width: 1,
         ),
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Row(
-          children: [
-            CircleAvatar(
-              radius: 32,
-              backgroundColor: colorScheme.primaryContainer,
-              child: Icon(
-                Icons.person,
-                size: 32,
-                color: colorScheme.onPrimaryContainer,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(16),
+        onTap: () => context.push('/profile'),
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Row(
+            children: [
+              CircleAvatar(
+                radius: 32,
+                backgroundColor: colorScheme.primaryContainer,
+                child: Icon(
+                  Icons.person,
+                  size: 32,
+                  color: colorScheme.onPrimaryContainer,
+                ),
               ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Meu Cartao',
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    'Crie e compartilhe seu cartao digital',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: colorScheme.onSurfaceVariant,
-                        ),
-                  ),
-                ],
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Meu Cartao',
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Crie e compartilhe seu cartao digital',
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            color: colorScheme.onSurfaceVariant,
+                          ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-            Icon(
-              Icons.chevron_right,
-              color: colorScheme.onSurfaceVariant,
-            ),
-          ],
+              Icon(
+                Icons.chevron_right,
+                color: colorScheme.onSurfaceVariant,
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -130,19 +125,19 @@ class _ActionGrid extends StatelessWidget {
       children: [
         _ActionCard(
           icon: Icons.qr_code,
-          title: 'QR Code',
-          subtitle: 'Gerar ou escanear',
+          title: 'Meu QR Code',
+          subtitle: 'Gerar para compartilhar',
           color: colorScheme.primaryContainer,
           iconColor: colorScheme.onPrimaryContainer,
-          onTap: () => context.push('/qr/scan'),
+          onTap: () => context.push('/qr/share'),
         ),
         _ActionCard(
-          icon: Icons.nfc,
-          title: 'NFC',
-          subtitle: 'Compartilhar por NFC',
+          icon: Icons.qr_code_scanner,
+          title: 'Escanear',
+          subtitle: 'Ler QR Code',
           color: colorScheme.secondaryContainer,
           iconColor: colorScheme.onSecondaryContainer,
-          onTap: () => context.push('/nfc/receive'),
+          onTap: () => context.push('/qr/scan'),
         ),
         _ActionCard(
           icon: Icons.file_upload_outlined,
@@ -158,10 +153,17 @@ class _ActionGrid extends StatelessWidget {
           subtitle: 'Enviar meu cartao',
           color: colorScheme.errorContainer,
           iconColor: colorScheme.onErrorContainer,
-          onTap: () => context.push('/profile'),
+          onTap: () => _shareProfile(context),
         ),
       ],
     );
+  }
+
+  void _shareProfile(BuildContext context) async {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Crie seu perfil primeiro')),
+    );
+    context.push('/profile');
   }
 }
 
@@ -224,102 +226,4 @@ class _ActionCard extends StatelessWidget {
   }
 }
 
-class _HowItWorksCard extends StatelessWidget {
-  final ColorScheme colorScheme;
 
-  const _HowItWorksCard({required this.colorScheme});
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: BorderSide(
-          color: colorScheme.outlineVariant,
-          width: 1,
-        ),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            _StepRow(
-              step: '1',
-              title: 'Crie seu perfil',
-              description: 'Adicione seus dados de contato',
-              colorScheme: colorScheme,
-            ),
-            const Divider(height: 24),
-            _StepRow(
-              step: '2',
-              title: 'Gere seu QR Code',
-              description: 'Gere um QR Code com seu cartao',
-              colorScheme: colorScheme,
-            ),
-            const Divider(height: 24),
-            _StepRow(
-              step: '3',
-              title: 'Compartilhe',
-              description: 'Escaneie, use NFC ou envie por mensagem',
-              colorScheme: colorScheme,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _StepRow extends StatelessWidget {
-  final String step;
-  final String title;
-  final String description;
-  final ColorScheme colorScheme;
-
-  const _StepRow({
-    required this.step,
-    required this.title,
-    required this.description,
-    required this.colorScheme,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        CircleAvatar(
-          radius: 14,
-          backgroundColor: colorScheme.primaryContainer,
-          child: Text(
-            step,
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              color: colorScheme.onPrimaryContainer,
-              fontSize: 13,
-            ),
-          ),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: const TextStyle(fontWeight: FontWeight.w600),
-              ),
-              Text(
-                description,
-                style: TextStyle(
-                  color: colorScheme.onSurfaceVariant,
-                  fontSize: 13,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-}

@@ -4,6 +4,7 @@ import '../../../features/home/presentation/pages/home_page.dart';
 import '../../../features/profile/presentation/pages/profile_page.dart';
 import '../../../features/profile/presentation/pages/profile_edit_page.dart';
 import '../../../features/qr_code/presentation/pages/qr_scan_page.dart';
+import '../../../features/qr_code/presentation/pages/qr_share_page.dart';
 import '../../../features/nfc/presentation/pages/nfc_receive_page.dart';
 import '../../../features/contacts/presentation/pages/contacts_page.dart';
 import '../../../features/contacts/presentation/pages/import_page.dart';
@@ -42,6 +43,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '${AppConstants.profileRoute}/edit',
         builder: (context, state) => const ProfileEditPage(),
+      ),
+      GoRoute(
+        path: AppConstants.qrShareRoute,
+        builder: (context, state) => const QRSharePage(),
       ),
       GoRoute(
         path: AppConstants.qrScanRoute,
