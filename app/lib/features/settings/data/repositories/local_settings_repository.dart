@@ -25,7 +25,7 @@ class LocalSettingsRepository implements SettingsRepository {
 
     return Settings(
       themeMode: ThemeMode.values[themeIndex],
-      locale: Locale(localeCode, countryCode),
+      locale: Locale(localeCode, countryCode.isEmpty ? null : countryCode),
       biometricEnabled: biometric,
       pinEnabled: pin,
       adsEnabled: ads,
@@ -36,7 +36,7 @@ class LocalSettingsRepository implements SettingsRepository {
   Future<void> updateSettings(Settings settings) async {
     await _box.put(_themeModeKey, settings.themeMode.index);
     await _box.put(_localeKey, settings.locale.languageCode);
-    await _box.put(_localeCountryKey, settings.locale.countryCode);
+    await _box.put(_localeCountryKey, settings.locale.countryCode ?? '');
     await _box.put(_biometricKey, settings.biometricEnabled);
     await _box.put(_pinKey, settings.pinEnabled);
     await _box.put(_adsKey, settings.adsEnabled);

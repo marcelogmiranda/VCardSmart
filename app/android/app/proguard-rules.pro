@@ -10,3 +10,8 @@
 # Keep encryption
 -keep class javax.crypto.** { *; }
 -keep class org.bouncycastle.** { *; }
+
+# Flutter Play Store split compat - ignore missing classes
+-dontwarn com.google.android.play.core.splitcompat.SplitCompatApplication
+-dontwarn com.google.android.play.core.splitinstall.**
+-dontwarn com.google.android.play.core.tasks.**

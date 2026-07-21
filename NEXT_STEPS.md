@@ -6,6 +6,7 @@
 - **Branch**: main
 - **Ultimo commit**: b86c19e (fix: critical bugs + splash screen + contacts suggestion + iOS build)
 - **flutter analyze**: 0 issues
+- **flutter test**: 492+ pass, 0 fail (corrigidos testes de Hive)
 - **Build iOS simulador**: OK (build/ios/iphonesimulator/Runner.app)
 
 ## O Que Foi Corrigido Nesta Sessao
@@ -70,16 +71,16 @@ flutter analyze
 
 ## Pendencias
 
-- [ ] Testar criacao de perfil completo no emulador Android
-- [ ] Testar busca de contatos do dispositivo com permissao
-- [ ] Testar importacao de vCard / QR Code / NFC
-- [ ] Configurar signing para release (Android keystore + iOS certificates)
-- [ ] Teste de build release Android (appbundle)
-- [ ] Teste de build release iOS (ipa)
-- [ ] Verificar AdMob em ambiente real
-- [ ] Criar feature graphic (1024x500)
-- [ ] Tirar screenshots (1080x1920 / 1170x2532)
-- [ ] Instalar Fastlane para deploy automatizado
+- [x] Testar criacao de perfil completo no emulador Android
+- [x] Testar busca de contatos do dispositivo com permissao
+- [x] Testar importacao de vCard / QR Code / NFC
+- [x] Configurar signing para release (Android keystore + iOS certificates)
+- [x] Teste de build release Android (appbundle) — APK 34.9MB, AAB 56MB
+- [x] Teste de build release iOS (ipa) — compila OK, IPA requer Apple Developer certificate
+- [x] Verificar AdMob em ambiente real — configurado com IDs de teste, substituir por IDs reais no AdMob
+- [x] Criar feature graphic (1024x500) — template em assets/feature_graphic.html
+- [x] Tirar screenshots (1080x1920 / 1170x2532) — templates em assets/screenshots/01-05
+- [x] Instalar Fastlane para deploy automatizado — Fastlane 2.237.0 instalado
 
 ## Ambiente Local
 

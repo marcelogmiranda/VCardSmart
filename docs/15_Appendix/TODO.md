@@ -1,21 +1,21 @@
-☐ Criar Workspace
+☑ Criar Workspace
 
-☐ Criar Flutter
+☑ Criar Flutter
 
-☐ Criar Tema
+☑ Criar Tema
 
-☐ Criar Hive
+☑ Criar Hive
 
-☐ Criar Models
+☑ Criar Models
 
-☐ Criar NFC
+☑ Criar NFC
 
-☐ Criar QR
+☑ Criar QR
 
-☐ Criar vCard
+☑ Criar vCard
 
-☐ Criar Ads
+☑ Criar Ads
 
-☐ Criar Testes
+☑ Criar Testes
 
 ☐ Criar Deploy

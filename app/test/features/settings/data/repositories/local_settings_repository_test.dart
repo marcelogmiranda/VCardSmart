@@ -1,13 +1,22 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 import 'package:vcardsmart/features/settings/data/repositories/local_settings_repository.dart';
 import 'package:vcardsmart/features/settings/domain/entities/settings.dart';
+import 'package:vcardsmart/core/database/hive_boxes.dart';
 
 void main() {
   late LocalSettingsRepository repository;
 
-  setUp(() {
+  setUpAll(() async {
+    Hive.init('__test_settings_hive__');
+    await Hive.openBox(HiveBoxes.settings);
     repository = LocalSettingsRepository();
+  });
+
+  tearDownAll(() async {
+    await Hive.deleteBoxFromDisk(HiveBoxes.settings);
+    await Hive.deleteFromDisk();
   });
 
   group('getSettings', () {

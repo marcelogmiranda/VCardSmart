@@ -1,0 +1,23 @@
+json_key_file("") # Path to the json secret file - follow the setup instructions
+
+# Android
+android_package_name("com.vcardsmart.app")
+android_app_name("VCardSmart")
+android_sdk_dir("")
+android_gradle_dir("android")
+android_build_tools_version("35.0.0")
+
+# iOS
+# ios_project("ios/Runner.xcodeproj")
+
+# Metadata
+metadata_path("fastlane/metadata")
+
+# Output
+output_directory("fastlane/output")
+
+# Skip
+skip_upload_changelogs(false)
+
+# Screenshots
+# screenshot_groups(["phone"])

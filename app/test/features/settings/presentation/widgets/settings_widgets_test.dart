@@ -2,12 +2,14 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hive/hive.dart';
 import 'package:vcardsmart/l10n/app_localizations.dart';
 import 'package:vcardsmart/features/settings/presentation/widgets/theme_toggle.dart';
 import 'package:vcardsmart/features/settings/presentation/widgets/language_selector.dart';
 import 'package:vcardsmart/features/settings/presentation/widgets/security_settings.dart';
 import 'package:vcardsmart/features/settings/presentation/widgets/privacy_settings.dart';
 import 'package:vcardsmart/features/settings/presentation/pages/settings_page.dart';
+import 'package:vcardsmart/core/database/hive_boxes.dart';
 
 MaterialApp testApp(Widget child) {
   return MaterialApp(
@@ -30,6 +32,15 @@ const _localizationDelegates = [
 ];
 
 void main() {
+  setUpAll(() async {
+    Hive.init('__test_settings_widgets_hive__');
+    await Hive.openBox(HiveBoxes.settings);
+  });
+
+  tearDownAll(() async {
+    await Hive.deleteBoxFromDisk(HiveBoxes.settings);
+    await Hive.deleteFromDisk();
+  });
   group('ThemeToggle', () {
     testWidgets('should display theme title', (tester) async {
       await tester.pumpWidget(

@@ -1,0 +1,86 @@
+default_platform(:android)
+
+platform :android do
+  desc "Build and deploy to Google Play Internal"
+  lane :deploy_play_store do
+    gradle(
+      task: "bundle",
+      build_type: "Release",
+      project_dir: "android"
+    )
+
+    upload_to_play_store(
+      track: "internal",
+      skip_upload_metadata: false,
+      skip_upload_images: false,
+      skip_upload_screenshots: false,
+      skip_upload_changelogs: false,
+      aab: "android/app/build/outputs/bundle/release/app-release.aab"
+    )
+  end
+
+  desc "Build release APK"
+  lane :build_apk do
+    gradle(
+      task: "assembleRelease",
+      project_dir: "android"
+    )
+  end
+
+  desc "Build release AAB"
+  lane :build_aab do
+    gradle(
+      task: "bundleRelease",
+      project_dir: "android"
+    )
+  end
+
+  desc "Run tests"
+  lane :test do
+    sh("cd .. && flutter test")
+  end
+
+  error do |lane, exception|
+    Slack::Notify.new(
+      message: "#{lane} failed: #{exception.message}"
+    ) if ENV["SLACK_WEBHOOK_URL"]
+  end
+end
+
+platform :ios do
+  desc "Build and deploy to App Store Connect"
+  lane :deploy_app_store do
+    match(type: "appstore")
+    build_ios_app(
+      project: "ios/Runner.xcodeproj",
+      scheme: "Runner",
+      export_method: "app-store",
+      output_directory: "../build/ios"
+    )
+    upload_to_app_store(
+      skip_metadata: false,
+      skip_screenshots: false
+    )
+  end
+
+  desc "Build for testing"
+  lane :build_testflight do
+    match(type: "appstore")
+    build_ios_app(
+      project: "ios/Runner.xcodeproj",
+      scheme: "Runner",
+      export_method: "app-store"
+    )
+    upload_to_app_store(
+      skip_metadata: true,
+      skip_screenshots: true,
+      submit_for_review: false
+    )
+  end
+
+  error do |lane, exception|
+    Slack::Notify.new(
+      message: "#{lane} failed: #{exception.message}"
+    ) if ENV["SLACK_WEBHOOK_URL"]
+  end
+end

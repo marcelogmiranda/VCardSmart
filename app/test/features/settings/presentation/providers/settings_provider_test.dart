@@ -1,19 +1,25 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hive/hive.dart';
 import 'package:vcardsmart/features/settings/presentation/providers/settings_provider.dart';
+import 'package:vcardsmart/core/database/hive_boxes.dart';
 
 void main() {
   late ProviderContainer container;
 
-  setUp(() {
+  setUpAll(() async {
+    Hive.init('__test_settings_provider_hive__');
+    await Hive.openBox(HiveBoxes.settings);
     container = ProviderContainer();
-    // Trigger notifier creation so _load() starts
     container.read(settingsProvider.notifier);
+    await Future<void>.delayed(Duration.zero);
   });
 
-  tearDown(() {
+  tearDownAll(() async {
     container.dispose();
+    await Hive.deleteBoxFromDisk(HiveBoxes.settings);
+    await Hive.deleteFromDisk();
   });
 
   /// Wait for async _load() microtask to complete

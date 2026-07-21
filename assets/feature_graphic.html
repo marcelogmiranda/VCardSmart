@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { 
+    width: 1024px; 
+    height: 500px; 
+    overflow: hidden;
+    font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+  }
+  .container {
+    width: 1024px;
+    height: 500px;
+    background: linear-gradient(135deg, #1976D2 0%, #1565C0 50%, #0D47A1 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 80px;
+    position: relative;
+  }
+  .content {
+    display: flex;
+    align-items: center;
+    gap: 60px;
+    width: 100%;
+  }
+  .logo-area {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .logo-box {
+    width: 160px;
+    height: 160px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(10px);
+    border: 2px solid rgba(255,255,255,0.2);
+  }
+  .logo-icon {
+    font-size: 72px;
+    color: white;
+  }
+  .text-area {
+    flex: 1;
+  }
+  .main-title {
+    font-size: 48px;
+    font-weight: 800;
+    color: white;
+    line-height: 1.1;
+    margin-bottom: 12px;
+    letter-spacing: -1px;
+  }
+  .subtitle {
+    font-size: 22px;
+    color: rgba(255,255,255,0.85);
+    font-weight: 400;
+    margin-bottom: 36px;
+  }
+  .features {
+    display: flex;
+    gap: 32px;
+  }
+  .feature {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: rgba(255,255,255,0.9);
+    font-size: 17px;
+    font-weight: 500;
+  }
+  .feature-icon {
+    width: 40px;
+    height: 40px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+  }
+  .badge {
+    position: absolute;
+    bottom: 30px;
+    right: 60px;
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 20px;
+    padding: 8px 20px;
+    color: rgba(255,255,255,0.8);
+    font-size: 14px;
+    font-weight: 500;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="content">
+    <div class="logo-area">
+      <div class="logo-box">
+        <div class="logo-icon">&#x1F4B3;</div>
+      </div>
+    </div>
+    <div class="text-area">
+      <div class="main-title">VCardSmart</div>
+      <div class="subtitle">Seu cartao de visita digital</div>
+      <div class="features">
+        <div class="feature">
+          <div class="feature-icon">&#x1F4F1;</div>
+          <span>QR Code</span>
+        </div>
+        <div class="feature">
+          <div class="feature-icon">&#x1F4F2;</div>
+          <span>NFC</span>
+        </div>
+        <div class="feature">
+          <div class="feature-icon">&#x1F512;</div>
+          <span>Privacidade</span>
+        </div>
+        <div class="feature">
+          <div class="feature-icon">&#x2601;</div>
+          <span>Offline</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="badge">100% Offline &amp; Seguro</div>
+</div>
+</body>
+</html>
