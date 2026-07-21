@@ -1,2 +1,49 @@
+# IDE
 .vscode/
+.idea/
+*.iml
+
+# macOS
+.DS_Store
+
+# Flutter/Dart
+app/.dart_tool/
+app/.flutter-plugins
+app/.flutter-plugins-dependencies
+app/build/
+app/.metadata
+
+# Android build
+app/android/.gradle/
+app/android/app/build/
+app/android/local.properties
+app/android/key.properties
+
+# iOS build
+app/ios/Pods/
+app/ios/.symlinks/
+app/ios/Flutter/Flutter.framework
+app/ios/Flutter/Flutter.podspec
+app/ios/Flutter/Generated.xcconfig
+app/ios/Flutter/ephemeral/
+app/ios/Flutter/app.flx
+app/ios/Flutter/app.zip
+app/ios/Flutter/flutter_assets/
+app/ios/Flutter/flutter_export_environment.sh
+app/ios/ServiceDefinitions.json
+
+# Web
+app/build/web/
+
+# Test artifacts
 app/test/golden/screens/failures/
+app/__test_*__/
+
+# Coverage
+coverage/
+
+# Fastlane
+app/fastlane/report.xml
+app/fastlane/Preview.html
+app/fastlane/screenshots
+app/fastlane/test_output
