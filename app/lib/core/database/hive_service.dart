@@ -81,13 +81,14 @@ class _ProfileAdapter extends TypeAdapter<Profile> {
       photoPath: fields[7] as String?,
       createdAt: fields[8] as DateTime,
       updatedAt: fields[9] as DateTime,
+      instagram: fields[10] as String?,
     );
   }
 
   @override
   void write(BinaryWriter writer, Profile obj) {
     writer
-      ..writeByte(10)
+      ..writeByte(11)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -107,7 +108,9 @@ class _ProfileAdapter extends TypeAdapter<Profile> {
       ..writeByte(8)
       ..write(obj.createdAt)
       ..writeByte(9)
-      ..write(obj.updatedAt);
+      ..write(obj.updatedAt)
+      ..writeByte(10)
+      ..write(obj.instagram);
   }
 
   @override
@@ -141,13 +144,14 @@ class _ContactAdapter extends TypeAdapter<Contact> {
       bio: fields[6] as String?,
       source: fields[7] as String,
       importedAt: fields[8] as DateTime,
+      instagram: fields[9] as String?,
     );
   }
 
   @override
   void write(BinaryWriter writer, Contact obj) {
     writer
-      ..writeByte(9)
+      ..writeByte(10)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -165,7 +169,9 @@ class _ContactAdapter extends TypeAdapter<Contact> {
       ..writeByte(7)
       ..write(obj.source)
       ..writeByte(8)
-      ..write(obj.importedAt);
+      ..write(obj.importedAt)
+      ..writeByte(9)
+      ..write(obj.instagram);
   }
 
   @override

@@ -47,6 +47,7 @@ class LocalContactRepository implements ContactRepository {
         email: json['email'] as String?,
         phone: json['phone'] as String?,
         linkedin: json['linkedin'] as String?,
+        instagram: json['instagram'] as String?,
         website: json['website'] as String?,
         bio: json['bio'] as String?,
         source: 'qr',
@@ -66,6 +67,7 @@ class LocalContactRepository implements ContactRepository {
         email: json['email'] as String?,
         phone: json['phone'] as String?,
         linkedin: json['linkedin'] as String?,
+        instagram: json['instagram'] as String?,
         website: json['website'] as String?,
         bio: json['bio'] as String?,
         source: 'nfc',
@@ -92,11 +94,14 @@ class LocalContactRepository implements ContactRepository {
     if (contact.website != null) {
       buffer.writeln('URL:${contact.website}');
     }
-    if (contact.bio != null) {
-      buffer.writeln('NOTE:${contact.bio}');
-    }
     if (contact.linkedin != null) {
       buffer.writeln('X-LINKEDIN:${contact.linkedin}');
+    }
+    if (contact.instagram != null) {
+      buffer.writeln('X-INSTAGRAM:${contact.instagram}');
+    }
+    if (contact.bio != null) {
+      buffer.writeln('NOTE:${contact.bio}');
     }
 
     buffer.writeln('END:VCARD');
@@ -124,6 +129,7 @@ class LocalContactRepository implements ContactRepository {
       String? phone;
       String? website;
       String? linkedin;
+      String? instagram;
       String? bio;
 
       for (final line in lines) {
@@ -138,6 +144,8 @@ class LocalContactRepository implements ContactRepository {
           website = trimmed.substring(4).trim();
         } else if (trimmed.startsWith('X-LINKEDIN:')) {
           linkedin = trimmed.substring(11).trim();
+        } else if (trimmed.startsWith('X-INSTAGRAM:')) {
+          instagram = trimmed.substring(12).trim();
         } else if (trimmed.startsWith('NOTE:')) {
           bio = trimmed.substring(5).trim();
         }
@@ -152,6 +160,7 @@ class LocalContactRepository implements ContactRepository {
         phone: phone,
         website: website,
         linkedin: linkedin,
+        instagram: instagram,
         bio: bio,
         source: 'vcard',
         importedAt: DateTime.now(),

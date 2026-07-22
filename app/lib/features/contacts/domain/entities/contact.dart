@@ -4,6 +4,7 @@ class Contact {
   final String? email;
   final String? phone;
   final String? linkedin;
+  final String? instagram;
   final String? website;
   final String? bio;
   final String source;
@@ -15,6 +16,7 @@ class Contact {
     this.email,
     this.phone,
     this.linkedin,
+    this.instagram,
     this.website,
     this.bio,
     required this.source,
@@ -27,6 +29,7 @@ class Contact {
     String? email,
     String? phone,
     String? linkedin,
+    String? instagram,
     String? website,
     String? bio,
     String? source,
@@ -38,6 +41,7 @@ class Contact {
       email: email ?? this.email,
       phone: phone ?? this.phone,
       linkedin: linkedin ?? this.linkedin,
+      instagram: instagram ?? this.instagram,
       website: website ?? this.website,
       bio: bio ?? this.bio,
       source: source ?? this.source,

@@ -4,6 +4,7 @@ class Profile {
   final String? email;
   final String? phone;
   final String? linkedin;
+  final String? instagram;
   final String? website;
   final String? bio;
   final String? photoPath;
@@ -16,6 +17,7 @@ class Profile {
     this.email,
     this.phone,
     this.linkedin,
+    this.instagram,
     this.website,
     this.bio,
     this.photoPath,
@@ -29,6 +31,7 @@ class Profile {
     String? email,
     String? phone,
     String? linkedin,
+    String? instagram,
     String? website,
     String? bio,
     String? photoPath,
@@ -41,6 +44,7 @@ class Profile {
       email: email ?? this.email,
       phone: phone ?? this.phone,
       linkedin: linkedin ?? this.linkedin,
+      instagram: instagram ?? this.instagram,
       website: website ?? this.website,
       bio: bio ?? this.bio,
       photoPath: photoPath ?? this.photoPath,

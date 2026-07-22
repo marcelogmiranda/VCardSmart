@@ -1,3 +1,5 @@
+import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -40,22 +42,36 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     final sb = StringBuffer()
       ..writeln('BEGIN:VCARD')
       ..writeln('VERSION:3.0')
-      ..writeln('FN:${profile.name}');
+      ..writeln('FN:${profile.name}')
+      ..writeln('N:${profile.name};;;;');
+
     if (profile.email != null && profile.email!.isNotEmpty) {
       sb.writeln('EMAIL:${profile.email}');
     }
     if (profile.phone != null && profile.phone!.isNotEmpty) {
       sb.writeln('TEL:${profile.phone}');
     }
-    if (profile.linkedin != null && profile.linkedin!.isNotEmpty) {
-      sb.writeln('URL:${profile.linkedin}');
-    }
     if (profile.website != null && profile.website!.isNotEmpty) {
       sb.writeln('URL:${profile.website}');
+    }
+    if (profile.linkedin != null && profile.linkedin!.isNotEmpty) {
+      sb.writeln('X-LINKEDIN:${profile.linkedin}');
+    }
+    if (profile.instagram != null && profile.instagram!.isNotEmpty) {
+      sb.writeln('X-INSTAGRAM:${profile.instagram}');
     }
     if (profile.bio != null && profile.bio!.isNotEmpty) {
       sb.writeln('NOTE:${profile.bio}');
     }
+    if (profile.photoPath != null && profile.photoPath!.isNotEmpty) {
+      final file = File(profile.photoPath!);
+      if (file.existsSync()) {
+        final bytes = file.readAsBytesSync();
+        final base64Photo = base64Encode(bytes);
+        sb.writeln('PHOTO;ENCODING=b64;TYPE=JPEG:$base64Photo');
+      }
+    }
+
     sb.writeln('END:VCARD');
     return sb.toString();
   }

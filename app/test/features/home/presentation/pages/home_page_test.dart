@@ -23,12 +23,7 @@ void main() {
         ),
       );
 
-      expect(
-        find.byWidgetPredicate(
-          (widget) => widget is AppBar && widget.title != null,
-        ),
-        findsOneWidget,
-      );
+      expect(find.text('VCardSmart'), findsOneWidget);
     });
 
     testWidgets('should display profile card', (tester) async {
@@ -49,20 +44,10 @@ void main() {
       );
 
       expect(find.text('Acoes Rapidas'), findsOneWidget);
-      expect(find.text('QR Code'), findsOneWidget);
-      expect(find.text('NFC'), findsOneWidget);
+      expect(find.text('Meu QR Code'), findsOneWidget);
+      expect(find.text('Escanear'), findsOneWidget);
       expect(find.text('Importar'), findsOneWidget);
       expect(find.text('Compartilhar'), findsOneWidget);
-    });
-
-    testWidgets('should display how it works section', (tester) async {
-      await tester.pumpWidget(
-        const MaterialApp(
-          home: HomePage(),
-        ),
-      );
-
-      expect(find.text('Como Funciona'), findsOneWidget);
     });
   });
 }

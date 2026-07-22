@@ -8,7 +8,8 @@ class QRPayload {
     final buffer = StringBuffer()
       ..writeln('BEGIN:VCARD')
       ..writeln('VERSION:3.0')
-      ..writeln('FN:${profile.name}');
+      ..writeln('FN:${profile.name}')
+      ..writeln('N:${profile.name};;;;');
     if (profile.email != null && profile.email!.isNotEmpty) {
       buffer.writeln('EMAIL:${profile.email}');
     }
@@ -20,6 +21,9 @@ class QRPayload {
     }
     if (profile.linkedin != null && profile.linkedin!.isNotEmpty) {
       buffer.writeln('X-LINKEDIN:${profile.linkedin}');
+    }
+    if (profile.instagram != null && profile.instagram!.isNotEmpty) {
+      buffer.writeln('X-INSTAGRAM:${profile.instagram}');
     }
     if (profile.bio != null && profile.bio!.isNotEmpty) {
       buffer.writeln('NOTE:${profile.bio}');
@@ -35,6 +39,7 @@ class QRPayload {
     String? phone;
     String? website;
     String? linkedin;
+    String? instagram;
     String? bio;
 
     for (final line in lines) {
@@ -49,6 +54,8 @@ class QRPayload {
         website = trimmed.substring(4);
       } else if (trimmed.startsWith('X-LINKEDIN:')) {
         linkedin = trimmed.substring(11);
+      } else if (trimmed.startsWith('X-INSTAGRAM:')) {
+        instagram = trimmed.substring(12);
       } else if (trimmed.startsWith('NOTE:')) {
         bio = trimmed.substring(5);
       }
@@ -66,6 +73,7 @@ class QRPayload {
       phone: phone,
       website: website,
       linkedin: linkedin,
+      instagram: instagram,
       bio: bio,
       createdAt: now,
       updatedAt: now,
