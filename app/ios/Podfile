@@ -41,4 +41,19 @@ post_install do |installer|
   installer.pods_project.targets.each do |target|
     flutter_additional_ios_build_settings(target)
   end
+
+  # Patch the frameworks script to clear extended attributes before codesigning.
+  # This fixes "resource fork, Finder information, or similar detritus not allowed"
+  # errors when building for iOS Simulator without a signing identity.
+  frameworks_script = File.join(installer.sandbox.root, 'Target Support Files', 'Pods-Runner', 'Pods-Runner-frameworks.sh')
+  if File.exist?(frameworks_script)
+    content = File.read(frameworks_script)
+    unless content.include?('xattr -cr')
+      patched = content.gsub(
+        'if [ -n "${EXPANDED_CODE_SIGN_IDENTITY:-}" -a "${CODE_SIGNING_REQUIRED:-}" != "NO" -a "${CODE_SIGNING_ALLOWED}" != "NO" ]; then',
+        'xattr -cr "$1"' + "\n" + '  if [ -n "${EXPANDED_CODE_SIGN_IDENTITY:-}" -a "${CODE_SIGNING_REQUIRED:-}" != "NO" -a "${CODE_SIGNING_ALLOWED}" != "NO" ]; then'
+      )
+      File.write(frameworks_script, patched)
+    end
+  end
 end
