@@ -22,8 +22,8 @@
 ## Marketing
 ☑ Feature graphic HTML template (1024x500)
 ☑ Screenshot HTML templates (1080x1920 / 1170x2532)
-☐ Capturar feature graphic PNG
-☐ Capturar screenshots PNG
+☑ Capturar feature graphic PNG
+☑ Capturar screenshots PNG
 ☑ Fastlane instalado (2.237.0)
 ☑ Google Play listing text (docs/12_Marketing/06_GooglePlayListing.md)
 

@@ -75,8 +75,8 @@ PATH=/usr/bin:$PATH flutter test
 ## Pendencias Antes de Publicar
 
 - [ ] **Substituir AdMob placeholder IDs** — `lib/core/ads/ad_units.dart` tem IDs de teste (`ca-app-pub-XXX/YYY`)
-- [ ] **Criar feature graphic** — template em `assets/feature_graphic.html` (1024x500)
-- [ ] **Tirar screenshots** — templates em `assets/screenshots/01-05` (1080x1920 / 1170x2532)
+- [x] **Criar feature graphic** — `docs/12_Marketing/feature_graphic_1024x500.png`
+- [x] **Tirar screenshots** — `docs/12_Marketing/screenshots/01-03`
 - [ ] **Testar em dispositivo fisico Android** — APK disponivel
 - [ ] **Testar em dispositivo fisico iOS** — precisa Apple Developer account + signing
 - [ ] **Criar listing Google Play** — usando docs/12_Marketing/06_GooglePlayListing.md
