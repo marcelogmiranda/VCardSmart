@@ -4,91 +4,102 @@
 
 - **Versao**: 1.0.0+1
 - **Branch**: main
-- **Ultimo commit**: 37f265b
+- **Ultimo commit**: c23e8ce
 - **Flutter**: 3.44.7 stable
 - **Xcode**: 26.6
-- **flutter analyze**: 0 issues (only info-level warnings)
-- **flutter test**: 492+ pass, 0 fail
-- **Android APK**: 35.0MB (`app/build/app/outputs/flutter-apk/app-release.apk`)
-- **Android AAB**: 56MB (`app/build/app/outputs/bundle/release/app-release.aab`)
-- **Build iOS Simulator**: OK (Runner.app)
+- **flutter analyze**: 0 erros (apenas warnings info)
+- **flutter test**: 134+ passando (profile, contacts, QR, home)
+- **Android APK**: 70.1MB (`app/build/app/outputs/flutter-apk/app-release.apk`)
+- **Android AAB**: 64.1MB (`app/build/app/outputs/bundle/release/app-release.aab`)
+- **Build iOS Simulator**: OK
 
 ## Commits Recentes
 
-- `37f265b` — add ios/build/ to .gitignore
-- `a6d616b` — Flutter 3.44.7 upgrade, iOS simulator build support
-- `36005cd` — v1.0 UX improvements (QR page, NFC fix, share, bottom nav)
-- `665867f` — complete .gitignore, temp file cleanup
-- `1913547` — test fixes, signing, ProGuard, Fastlane, marketing assets
-- `fee11a4` — root .gitignore
+- `c23e8ce` — AdMob IDs reais (banner, interstitial, app ID)
+- `770c6c3` — docs: screenshots e feature graphic
+- `4369024` — assets: feature graphic + screenshots PNG
+- `fb5f876` — vCard: instagram, foto, fix LinkedIn/Website
+- `3c9ac8b` — docs: status update
+- `37f265b` — ios/build no gitignore
+- `a6d616b` — Flutter 3.44.7 upgrade
+- `36005cd` — v1.0 UX improvements
 
-## O Que Foi Corrigido Nesta Sessao
+## O Que Foi Feito Nesta Sessao
 
-1. **Flutter 3.32.8 → 3.44.7** — upgrade completo, compatibilidade com Xcode 26.6
-2. **iOS Simulator build** — xattr fix no Podfile, Swift Package Manager desabilitado
-3. **Codigos restaurados** — stubs temporarios removidos, dependencias restauradas
+1. **Flutter 3.32.8 → 3.44.7** — upgrade completo
+2. **iOS Simulator build** — xattr fix, Swift Package Manager desabilitado
+3. **vCard campos** — adicionado instagram, foto (camera/galeria), fix LinkedIn/Website separados
+4. **AdMob** — IDs reais configurados (banner + interstitial)
+5. **Marketing assets** — feature graphic e screenshots capturados
+6. **AAB** — cmdline-tools instalado, AAB gerado com sucesso
 
 ## Para Testar
 
 ```bash
 cd app
-
-# Android (emulador)
-PATH=/usr/bin:$PATH flutter run
-
-# iOS (simulador)
-PATH=/usr/bin:$PATH flutter run -d "iPhone 16"
-
-# Analise
 PATH=/usr/bin:$PATH flutter analyze
-
-# Testes
 PATH=/usr/bin:$PATH flutter test
+PATH=/usr/bin:$PATH flutter build apk --release
+PATH=/usr/bin:$PATH flutter build appbundle --release
 ```
 
 ## Para Publicar na Google Play
 
 1. ~~Criar keystore~~ ✅ (`android/app/release-keystore.jks`)
 2. ~~Configurar signing~~ ✅ (`android/key.properties`)
-3. Criar conta no [Play Console](https://play.google.com/console)
+3. **Criar conta no Play Console** ← PROXIMO PASSO
 4. Criar app (com.vcardsmart.app)
-5. Preencher store listing usando `docs/12_Marketing/06_GooglePlayListing.md`
-6. **Criar feature graphic** — abrir `assets/feature_graphic.html` no browser e capturar 1024x500 PNG
-7. **Tirar screenshots** — abrir templates em `assets/screenshots/` no browser
-8. ~~Build AAB~~ ✅ (`flutter build appbundle --release`)
-9. Upload via Fastlane ou Play Console
-10. Submeter para revisao
+5. **Criar conta de servico** → baixar chave JSON
+6. Colocar chave em `app/fastlane/google-play-key.json`
+7. Subir via Fastlane ou Play Console manual
+8. Preencher listing usando `docs/12_Marketing/06_GooglePlayListing.md`
+9. Anexar assets:
+   - Feature graphic: `docs/12_Marketing/feature_graphic_1024x500.png`
+   - Screenshots: `docs/12_Marketing/screenshots/01-03`
+10. Upload AAB: `app/build/app/outputs/bundle/release/app-release.aab` (64.1MB)
+11. Submeter para revisao
 
 ## Para Publicar na App Store
 
-1. Criar conta no [Apple Developer](https://developer.apple.com)
+1. Criar conta no [Apple Developer](https://developer.apple.com) ($99/ano)
 2. Criar App ID (com.vcardsmart.app)
 3. Criar provisioning profile
 4. Configurar Xcode com signing
-5. Build:
-   ```bash
-   flutter build ipa --release
-   ```
+5. Build: `flutter build ipa --release`
 6. Upload via Transporter ou Xcode
 7. Submeter para revisao
 
+## Assets Disponiveis
+
+| Arquivo | Tamanho | Uso |
+|---------|---------|-----|
+| `app-release.apk` | 70.1MB | Teste manual + Play Console |
+| `app-release.aab` | 64.1MB | Google Play Store |
+| `feature_graphic_1024x500.png` | ~780KB | Google Play feature graphic |
+| `01_home_profile.png` | ~224KB | Screenshot — Home |
+| `02_qr_code.png` | ~199KB | Screenshot — QR Code |
+| `03_dark_theme.png` | ~186KB | Screenshot — Tema Escuro |
+
 ## Pendencias Antes de Publicar
 
-- [ ] **Substituir AdMob placeholder IDs** — `lib/core/ads/ad_units.dart` tem IDs de teste (`ca-app-pub-XXX/YYY`)
-- [x] **Criar feature graphic** — `docs/12_Marketing/feature_graphic_1024x500.png`
-- [x] **Tirar screenshots** — `docs/12_Marketing/screenshots/01-03`
-- [ ] **Testar em dispositivo fisico Android** — APK disponivel
-- [ ] **Testar em dispositivo fisico iOS** — precisa Apple Developer account + signing
-- [ ] **Criar listing Google Play** — usando docs/12_Marketing/06_GooglePlayListing.md
+- [ ] Criar conta no Play Console
+- [ ] Criar app (com.vcardsmart.app) no Play Console
+- [ ] Criar conta de servico → baixar chave JSON
+- [ ] Configurar Fastlane com chave JSON
+- [ ] Preencher store listing
+- [ ] Upload AAB + assets
+- [ ] Submeter para revisao
+- [ ] (Opcional) Criar Apple Developer account → publicar iOS
 
 ## Ambiente Local
 
-- Flutter: 3.44.7 stable (Dart 3.12.2, DevTools 2.57.0)
+- Flutter: 3.44.7 stable (Dart 3.12.2)
 - Xcode: 26.6 (Build 17F113)
 - iOS Simulator: iPhone 16 (iOS 26.5)
 - CocoaPods: 1.17.0
-- Homebrew: 6.0.11 (em /opt/homebrew)
 - Fastlane: 2.237.0
+- Android SDK: 34.0.0
+- cmdline-tools: latest (instalado)
 
 ## Comandos Uteis
 
@@ -99,14 +110,14 @@ cd app/ios && PATH="/usr/bin:/usr/sbin:/bin:/sbin:/opt/homebrew/bin:$PATH" pod i
 # iOS Simulator build
 PATH=/usr/bin:$PATH flutter build ios --simulator
 
-# iOS device build (precisa signing)
-PATH=/usr/bin:$PATH flutter build ios --no-codesign
-
 # Android release APK
 PATH=/usr/bin:$PATH flutter build apk --release
 
 # Android release AAB
 PATH=/usr/bin:$PATH flutter build appbundle --release
+
+# Deploy via Fastlane (precisa chave JSON)
+cd app && fastlane android deploy_play_store
 
 # Limpar build
 flutter clean
