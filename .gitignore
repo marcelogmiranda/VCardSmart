@@ -52,3 +52,6 @@ app/fastlane/test_output
 # iOS build output
 ios/build/
 app/ios/build/
+
+# Certificates (sensitive - never commit)
+certificates/
