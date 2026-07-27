@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { width: 2048px; height: 2732px; overflow: hidden; font-family: 'Segoe UI', Roboto, Arial, sans-serif; background: #F5F5F5; }
+  
+  .ipad-frame {
+    width: 2048px; height: 2732px; display: flex; flex-direction: column;
+    background: #F5F5F5; position: relative;
+  }
+  
+  .status-bar { height: 88px; background: #1976D2; display: flex; align-items: center; justify-content: space-between; padding: 0 48px; color: white; font-size: 28px; }
+  
+  .app-bar { height: 128px; background: #1976D2; display: flex; align-items: center; padding: 0 48px; color: white; }
+  .app-bar .title { font-size: 44px; font-weight: 500; }
+  
+  .content { flex: 1; padding: 48px 64px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 48px; }
+  
+  .qr-card {
+    background: white; border-radius: 24px; box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+    padding: 80px; display: flex; flex-direction: column; align-items: center; text-align: center;
+  }
+  .qr-title { font-size: 48px; font-weight: 600; color: #212121; margin-bottom: 48px; }
+  
+  .qr-code {
+    width: 400px; height: 400px; background: white; border: 8px solid #212121;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .qr-inner {
+    width: 320px; height: 320px; position: relative; background: white;
+  }
+  .qr-corner {
+    position: absolute; width: 80px; height: 80px; border: 8px solid #212121; background: white;
+  }
+  .qr-corner.top-left { top: 0; left: 0; border-right: none; border-bottom: none; }
+  .qr-corner.top-right { top: 0; right: 0; border-left: none; border-bottom: none; }
+  .qr-corner.bottom-left { bottom: 0; left: 0; border-right: none; border-top: none; }
+  .qr-corner.bottom-right { bottom: 0; right: 0; border-left: none; border-top: none; }
+  .qr-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 60px; height: 60px; background: #212121; }
+  .qr-dot { position: absolute; width: 16px; height: 16px; background: #212121; }
+  
+  .qr-subtitle { font-size: 32px; color: #757575; margin-top: 32px; }
+  
+  .share-options { display: flex; gap: 32px; margin-top: 32px; }
+  .share-btn {
+    display: flex; flex-direction: column; align-items: center; gap: 16px;
+    padding: 32px 48px; background: #E3F2FD; border-radius: 20px; min-width: 200px;
+  }
+  .share-btn .icon { font-size: 56px; }
+  .share-btn .label { font-size: 28px; color: #1976D2; font-weight: 500; }
+  
+  .caption-overlay {
+    position: absolute; bottom: 200px; left: 50%; transform: translateX(-50%);
+    background: rgba(0,0,0,0.7); color: white; padding: 24px 64px; border-radius: 40px;
+    font-size: 40px; font-weight: 500; white-space: nowrap;
+  }
+</style>
+</head>
+<body>
+<div class="ipad-frame">
+  <div class="status-bar">
+    <span>9:41</span>
+    <span>100%</span>
+  </div>
+  
+  <div class="app-bar">
+    <span class="title">QR Code</span>
+  </div>
+  
+  <div class="content">
+    <div class="qr-card">
+      <div class="qr-title">Seu QR Code</div>
+      <div class="qr-code">
+        <div class="qr-inner">
+          <div class="qr-corner top-left"></div>
+          <div class="qr-corner top-right"></div>
+          <div class="qr-corner bottom-left"></div>
+          <div class="qr-corner bottom-right"></div>
+          <div class="qr-center"></div>
+          <div class="qr-dot" style="top:100px;left:100px"></div>
+          <div class="qr-dot" style="top:100px;left:140px"></div>
+          <div class="qr-dot" style="top:100px;left:200px"></div>
+          <div class="qr-dot" style="top:140px;left:120px"></div>
+          <div class="qr-dot" style="top:180px;left:160px"></div>
+          <div class="qr-dot" style="top:200px;left:100px"></div>
+          <div class="qr-dot" style="top:220px;left:180px"></div>
+          <div class="qr-dot" style="top:160px;left:220px"></div>
+          <div class="qr-dot" style="top:240px;left:140px"></div>
+        </div>
+      </div>
+      <div class="qr-subtitle">Escaneie para compartilhar seu contato</div>
+    </div>
+    
+    <div class="share-options">
+      <div class="share-btn">
+        <div class="icon">&#128241;</div>
+        <div class="label">NFC</div>
+      </div>
+      <div class="share-btn">
+        <div class="icon">&#128229;</div>
+        <div class="label">Compartilhar</div>
+      </div>
+      <div class="share-btn">
+        <div class="icon">&#128190;</div>
+        <div class="label">Salvar</div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="caption-overlay">Compartilhe via QR Code</div>
+</div>
+</body>
+</html>

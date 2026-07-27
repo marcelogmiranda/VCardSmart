@@ -37,6 +37,7 @@ app/build/web/
 
 # Test artifacts
 app/test/golden/screens/failures/
+app/test/golden/components/failures/
 app/__test_*__/
 
 # Coverage
@@ -50,3 +51,4 @@ app/fastlane/test_output
 
 # iOS build output
 ios/build/
+app/ios/build/

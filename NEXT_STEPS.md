@@ -61,13 +61,19 @@ PATH=/usr/bin:$PATH flutter build appbundle --release
 
 ## Para Publicar na App Store
 
-1. Criar conta no [Apple Developer](https://developer.apple.com) ($99/ano)
-2. Criar App ID (com.vcardsmart.app)
-3. Criar provisioning profile
-4. Configurar Xcode com signing
-5. Build: `flutter build ipa --release`
-6. Upload via Transporter ou Xcode
-7. Submeter para revisao
+1. ~~Criar conta no [Apple Developer](https://developer.apple.com) ($99/ano)~~ ✅
+2. ~~Criar App ID (com.vcardsmart.app)~~ ✅
+3. ~~Criar provisioning profile~~ ✅
+4. ~~Configurar Xcode com signing~~ ✅
+5. ~~Build: `flutter build ipa --release`~~ ✅
+6. ~~Upload via Transporter~~ ✅ (aguardando processamento)
+7. Preencher listing no App Store Connect
+8. Submeter para revisao
+
+## URLs Importantes
+
+- **Suporte Apple**: https://sites.google.com/unigex.com.br/suporte/in%C3%ADcio
+- **Suporte Google Play**: https://sites.google.com/unigex.com.br/suporte/in%C3%ADcio
 
 ## Assets Disponiveis
 

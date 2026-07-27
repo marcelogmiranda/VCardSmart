@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { width: 2048px; height: 2732px; overflow: hidden; font-family: 'Segoe UI', Roboto, Arial, sans-serif; background: #121212; }
+  
+  .ipad-frame {
+    width: 2048px; height: 2732px; display: flex; flex-direction: column;
+    background: #121212; position: relative;
+  }
+  
+  .status-bar { height: 88px; background: #1E1E1E; display: flex; align-items: center; justify-content: space-between; padding: 0 48px; color: white; font-size: 28px; }
+  
+  .app-bar { height: 128px; background: #1E1E1E; display: flex; align-items: center; padding: 0 48px; color: white; }
+  .app-bar .menu-icon { font-size: 48px; margin-right: 32px; }
+  .app-bar .title { font-size: 44px; font-weight: 500; }
+  .app-bar .actions { margin-left: auto; display: flex; gap: 40px; font-size: 44px; }
+  
+  .content { flex: 1; padding: 48px 64px; display: flex; flex-direction: column; gap: 48px; }
+  
+  .profile-card {
+    background: #1E1E1E; border-radius: 24px; box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+    padding: 64px; display: flex; flex-direction: column; align-items: center; text-align: center;
+  }
+  .avatar { width: 240px; height: 240px; border-radius: 50%; background: #1976D2; display: flex; align-items: center; justify-content: center; color: white; font-size: 96px; font-weight: 600; margin-bottom: 32px; }
+  .name { font-size: 52px; font-weight: 600; color: #FFFFFF; }
+  .role { font-size: 36px; color: #B0B0B0; margin-top: 12px; }
+  .company { font-size: 32px; color: #808080; margin-top: 8px; }
+  
+  .social-links { display: flex; gap: 24px; justify-content: center; margin-top: 32px; }
+  .social-chip {
+    display: flex; align-items: center; gap: 12px; padding: 16px 32px;
+    border-radius: 32px; background: #2C2C2C; color: #64B5F6; font-size: 28px; font-weight: 500;
+  }
+  
+  .info-card {
+    background: #1E1E1E; border-radius: 24px; box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+    padding: 48px;
+  }
+  .info-card .card-title { font-size: 36px; font-weight: 600; color: #FFFFFF; margin-bottom: 32px; }
+  .info-row { display: flex; align-items: center; gap: 24px; padding: 20px 0; border-bottom: 2px solid #2C2C2C; }
+  .info-row:last-child { border: none; }
+  .info-row .icon { width: 80px; height: 80px; border-radius: 16px; background: #2C2C2C; display: flex; align-items: center; justify-content: center; font-size: 40px; }
+  .info-row .label { font-size: 28px; color: #B0B0B0; }
+  .info-row .value { font-size: 32px; color: #FFFFFF; }
+  
+  .fab {
+    position: absolute; bottom: 160px; right: 80px;
+    width: 144px; height: 144px; border-radius: 32px; background: #1976D2;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 8px 24px rgba(25,118,210,0.4); font-size: 72px; color: white;
+  }
+  
+  .bottom-nav {
+    height: 160px; background: #1E1E1E; border-top: 2px solid #2C2C2C;
+    display: flex; align-items: center; justify-content: space-around;
+  }
+  .nav-item { display: flex; flex-direction: column; align-items: center; gap: 8px; font-size: 24px; color: #808080; }
+  .nav-item.active { color: #64B5F6; }
+  .nav-item .nav-icon { font-size: 48px; }
+  
+  .caption-overlay {
+    position: absolute; bottom: 200px; left: 50%; transform: translateX(-50%);
+    background: rgba(255,255,255,0.15); color: white; padding: 24px 64px; border-radius: 40px;
+    font-size: 40px; font-weight: 500; white-space: nowrap;
+  }
+</style>
+</head>
+<body>
+<div class="ipad-frame">
+  <div class="status-bar">
+    <span>9:41</span>
+    <span>100%</span>
+  </div>
+  
+  <div class="app-bar">
+    <span class="menu-icon">&#9776;</span>
+    <span class="title">VCardSmart</span>
+    <div class="actions">
+      <span>&#128269;</span>
+      <span>&#8943;</span>
+    </div>
+  </div>
+  
+  <div class="content">
+    <div class="profile-card">
+      <div class="avatar">MC</div>
+      <div class="name">Maria Clara</div>
+      <div class="role">Desenvolvedora Full Stack</div>
+      <div class="company">Tech Solutions Ltda</div>
+      <div class="social-links">
+        <div class="social-chip">&#128279; LinkedIn</div>
+        <div class="social-chip">&#128231; Email</div>
+        <div class="social-chip">&#128222; Telefone</div>
+      </div>
+    </div>
+    
+    <div class="info-card">
+      <div class="card-title">Dados Profissionais</div>
+      <div class="info-row">
+        <div class="icon">&#128231;</div>
+        <div><div class="label">Email</div><div class="value">maria@techsolutions.com.br</div></div>
+      </div>
+      <div class="info-row">
+        <div class="icon">&#128222;</div>
+        <div><div class="label">Telefone</div><div class="value">+55 11 99999-0000</div></div>
+      </div>
+      <div class="info-row">
+        <div class="icon">&#128205;</div>
+        <div><div class="label">Localizacao</div><div class="value">Sao Paulo, SP</div></div>
+      </div>
+      <div class="info-row">
+        <div class="icon">&#127760;</div>
+        <div><div class="label">Website</div><div class="value">www.techsolutions.com.br</div></div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="fab">&#128279;</div>
+  
+  <div class="bottom-nav">
+    <div class="nav-item active"><span class="nav-icon">&#127968;</span><span>Inicio</span></div>
+    <div class="nav-item"><span class="nav-icon">&#128100;</span><span>Contatos</span></div>
+    <div class="nav-item"><span class="nav-icon">&#9881;</span><span>Config</span></div>
+  </div>
+  
+  <div class="caption-overlay">Tema escuro elegante</div>
+</div>
+</body>
+</html>
