@@ -1,4 +1,4 @@
-json_key_file("") # Path to the json secret file - follow the setup instructions
+json_key_file("fastlane/google-play-key.json") # Path to the json secret file - follow the setup instructions
 
 # Android
 android_package_name("com.vcardsmart.app")

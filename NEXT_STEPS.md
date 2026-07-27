@@ -47,17 +47,14 @@ PATH=/usr/bin:$PATH flutter build appbundle --release
 
 1. ~~Criar keystore~~ ✅ (`android/app/release-keystore.jks`)
 2. ~~Configurar signing~~ ✅ (`android/key.properties`)
-3. **Criar conta no Play Console** ← PROXIMO PASSO
-4. Criar app (com.vcardsmart.app)
-5. **Criar conta de servico** → baixar chave JSON
-6. Colocar chave em `app/fastlane/google-play-key.json`
-7. Subir via Fastlane ou Play Console manual
-8. Preencher listing usando `docs/12_Marketing/06_GooglePlayListing.md`
-9. Anexar assets:
-   - Feature graphic: `docs/12_Marketing/feature_graphic_1024x500.png`
-   - Screenshots: `docs/12_Marketing/screenshots/01-03`
-10. Upload AAB: `app/build/app/outputs/bundle/release/app-release.aab` (64.1MB)
-11. Submeter para revisao
+3. ~~Criar conta no Play Console~~ ✅ (mgm.consultoria50@gmail.com)
+4. ~~Criar app (com.vcardsmart.app)~~ ✅
+5. ~~Upload AAB v1.0.0+3~~ ✅ (teste fechado com 14 testadores)
+6. ~~Preencher store listing~~ ✅
+7. ~~Upload assets (icon, feature graphic, screenshots)~~ ✅
+8. ~~Adicionar permissao AD_ID~~ ✅
+9. Aguardar 14 dias de teste fechado
+10. Solicitar acesso a producao
 
 ## Para Publicar na App Store
 

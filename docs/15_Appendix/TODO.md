@@ -30,10 +30,17 @@
 ## Publicação
 ☑ Configurar signing Android (release-keystore.jks)
 ☑ Substituir AdMob placeholder IDs por IDs reais
-☐ Criar conta no Play Console ← PROXIMO PASSO
-☐ Criar app (com.vcardsmart.app) no Play Console
-☐ Criar conta de servico → baixar chave JSON
-☐ Configurar Fastlane com chave JSON
-☐ Publicar Google Play Store (Play Console)
-☐ Publicar Apple App Store (precisa Apple Developer account)
+☑ Criar conta no Play Console (mgm.consultoria50@gmail.com)
+☑ Criar app (com.vcardsmart.app) no Play Console
+☑ Upload AAB v1.0.0+3 (teste fechado com 14 testadores)
+☑ Preencher store listing (icon, feature graphic, screenshots)
+☑ Adicionar permissao AD_ID no AndroidManifest
+☐ Aguardar 14 dias de teste fechado
+☐ Solicitar acesso a producao
+☑ Criar conta Apple Developer ($99/ano)
+☑ Criar App ID (com.vcardsmart.app)
+☑ Criar provisioning profile
+☑ Configurar Xcode com signing
+☑ Build iOS IPA (v1.0.0)
+☑ Upload via Transporter (aguardando revisao Apple)
 ☑ Criar Deploy (Fastlane lanes prontas)
