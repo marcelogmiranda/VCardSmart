@@ -1,4 +1,5 @@
 import 'package:go_router/go_router.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../features/home/presentation/pages/home_page.dart';
 import '../../../features/profile/presentation/pages/profile_page.dart';
@@ -6,16 +7,47 @@ import '../../../features/profile/presentation/pages/profile_edit_page.dart';
 import '../../../features/qr_code/presentation/pages/qr_scan_page.dart';
 import '../../../features/qr_code/presentation/pages/qr_share_page.dart';
 import '../../../features/nfc/presentation/pages/nfc_receive_page.dart';
+import '../../../features/nfc/presentation/pages/nfc_share_page.dart';
 import '../../../features/contacts/presentation/pages/contacts_page.dart';
 import '../../../features/contacts/presentation/pages/import_page.dart';
 import '../../../features/settings/presentation/pages/settings_page.dart';
+import '../../../features/security/presentation/pages/auth_page.dart';
+import '../../../features/security/presentation/pages/pin_setup_page.dart';
+import '../../../features/security/presentation/providers/auth_provider.dart';
 import '../constants/app_constants.dart';
 import 'shell_page.dart';
 
+String? authRedirect(AuthStatus status, String location) {
+  final isAuthPage = location == AppConstants.authRoute;
+  if (status.state == AuthState.checking) {
+    return isAuthPage ? null : AppConstants.authRoute;
+  }
+  if (status.state == AuthState.authenticated) {
+    return isAuthPage ? AppConstants.homeRoute : null;
+  }
+  return isAuthPage ? null : AppConstants.authRoute;
+}
+
 final appRouterProvider = Provider<GoRouter>((ref) {
+  final authNotifier = ref.read(authProvider.notifier);
+  final refresh = ValueNotifier<int>(0);
+  void onAuthChanged(AuthStatus _) => refresh.value++;
+  final removeListener =
+      authNotifier.addListener(onAuthChanged, fireImmediately: false);
+  ref.onDispose(() {
+    removeListener();
+    refresh.dispose();
+  });
   return GoRouter(
     initialLocation: AppConstants.homeRoute,
+    redirect: (context, state) =>
+        authRedirect(ref.read(authProvider), state.matchedLocation),
+    refreshListenable: refresh,
     routes: [
+      GoRoute(
+        path: AppConstants.authRoute,
+        builder: (context, state) => const AuthPage(),
+      ),
       ShellRoute(
         builder: (context, state, child) => ShellPage(child: child),
         routes: [
@@ -57,8 +89,16 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const NFCReceivePage(),
       ),
       GoRoute(
+        path: AppConstants.nfcShareRoute,
+        builder: (context, state) => const NFCShareRoutePage(),
+      ),
+      GoRoute(
         path: AppConstants.importRoute,
         builder: (context, state) => const ImportPage(),
+      ),
+      GoRoute(
+        path: AppConstants.pinSetupRoute,
+        builder: (context, state) => const PinSetupPage(),
       ),
     ],
   );

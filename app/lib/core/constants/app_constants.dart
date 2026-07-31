@@ -18,4 +18,6 @@ class AppConstants {
   static const String nfcReceiveRoute = '/nfc/receive';
   static const String contactsRoute = '/contacts';
   static const String importRoute = '/contacts/import';
+  static const String authRoute = '/auth';
+  static const String pinSetupRoute = '/pin-setup';
 }

@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hive/hive.dart';
 import 'package:vcardsmart/features/contacts/presentation/providers/contact_provider.dart';
 import 'package:vcardsmart/features/contacts/presentation/pages/contacts_page.dart';
@@ -21,6 +22,40 @@ Widget wrap(Widget child, {List<Override>? overrides}) => ProviderScope(
   overrides: overrides ?? [],
   child: MaterialApp(home: Scaffold(body: child)),
 );
+
+Widget wrapWithRouter(Widget dialog) => ProviderScope(
+      child: MaterialApp.router(
+        routerConfig: GoRouter(
+          initialLocation: '/',
+          routes: [
+            GoRoute(
+              path: '/',
+              builder: (context, state) => Scaffold(
+                body: Builder(
+                  builder: (context) => Center(
+                    child: ElevatedButton(
+                      onPressed: () =>
+                          showDialog(context: context, builder: (_) => dialog),
+                      child: const Text('Open Dialog'),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            GoRoute(
+              path: '/qr/scan',
+              builder: (context, state) =>
+                  const Scaffold(body: Text('QR Scan Page')),
+            ),
+            GoRoute(
+              path: '/nfc/receive',
+              builder: (context, state) =>
+                  const Scaffold(body: Text('NFC Receive Page')),
+            ),
+          ],
+        ),
+      ),
+    );
 
 void main() {
   setUpAll(() async {
@@ -121,30 +156,24 @@ void main() {
       expect(find.text('Importar Contato'), findsOneWidget);
     });
 
-    testWidgets('should call onImport with qr source', (tester) async {
-      String? capturedSource;
-      final dialog = ImportDialog(
-        onImport: (data, source) {
-          capturedSource = source;
-        },
-      );
-      await tester.pumpWidget(wrap(dialog));
+    testWidgets('should navigate to QR scan on Via QR Code', (tester) async {
+      final dialog = ImportDialog(onImport: (data, source) {});
+      await tester.pumpWidget(wrapWithRouter(dialog));
+      await tester.tap(find.text('Open Dialog'));
+      await tester.pumpAndSettle();
       await tester.tap(find.text('Via QR Code'));
       await tester.pumpAndSettle();
-      expect(capturedSource, 'qr');
+      expect(find.text('QR Scan Page'), findsOneWidget);
     });
 
-    testWidgets('should call onImport with nfc source', (tester) async {
-      String? capturedSource;
-      final dialog = ImportDialog(
-        onImport: (data, source) {
-          capturedSource = source;
-        },
-      );
-      await tester.pumpWidget(wrap(dialog));
+    testWidgets('should navigate to NFC receive on Via NFC', (tester) async {
+      final dialog = ImportDialog(onImport: (data, source) {});
+      await tester.pumpWidget(wrapWithRouter(dialog));
+      await tester.tap(find.text('Open Dialog'));
+      await tester.pumpAndSettle();
       await tester.tap(find.text('Via NFC'));
       await tester.pumpAndSettle();
-      expect(capturedSource, 'nfc');
+      expect(find.text('NFC Receive Page'), findsOneWidget);
     });
 
     testWidgets('should open vCard import dialog', (tester) async {

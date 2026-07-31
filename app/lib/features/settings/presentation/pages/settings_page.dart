@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:vcardsmart/l10n/app_localizations.dart';
+import 'package:vcardsmart/core/constants/app_constants.dart';
+import 'package:vcardsmart/features/security/domain/usecases/set_pin_usecase.dart';
 import '../providers/settings_provider.dart';
 import '../widgets/theme_toggle.dart';
 import '../widgets/language_selector.dart';
@@ -43,7 +46,7 @@ class SettingsPage extends ConsumerWidget {
               ref.read(settingsProvider.notifier).updateBiometric(enabled);
             },
             onPinChanged: (enabled) {
-              ref.read(settingsProvider.notifier).updatePin(enabled);
+              _onPinChanged(context, ref, enabled);
             },
           ),
           const Divider(),
@@ -55,7 +58,7 @@ class SettingsPage extends ConsumerWidget {
             },
           ),
           const Divider(),
-          _SectionHeader(title: 'Sobre'),
+          const _SectionHeader(title: 'Sobre'),
           ListTile(
             leading: const Icon(Icons.help_outline),
             title: const Text('Como Funciona'),
@@ -63,14 +66,31 @@ class SettingsPage extends ConsumerWidget {
             trailing: const Icon(Icons.chevron_right),
             onTap: () => _showHowItWorks(context),
           ),
-          ListTile(
-            leading: const Icon(Icons.info_outline),
-            title: const Text('Versao'),
-            subtitle: const Text('1.0.0'),
+          const ListTile(
+            leading: Icon(Icons.info_outline),
+            title: Text('Versão'),
+            subtitle: Text(AppConstants.appVersion),
           ),
         ],
       ),
     );
+  }
+
+  Future<void> _onPinChanged(
+    BuildContext context,
+    WidgetRef ref,
+    bool enabled,
+  ) async {
+    if (enabled) {
+      final result =
+          await context.push<bool>(AppConstants.pinSetupRoute) ?? false;
+      if (result) {
+        ref.read(settingsProvider.notifier).updatePin(true);
+      }
+    } else {
+      await SetPinUseCase().removePin();
+      ref.read(settingsProvider.notifier).updatePin(false);
+    }
   }
 
   void _showHowItWorks(BuildContext context) {

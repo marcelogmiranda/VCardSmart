@@ -3,6 +3,7 @@ import '../../domain/usecases/authenticate_usecase.dart';
 import '../../domain/usecases/set_pin_usecase.dart';
 import '../../domain/usecases/verify_pin_usecase.dart';
 import '../../../../core/security/biometric_service.dart';
+import '../../../../core/security/auth_service.dart';
 
 enum AuthState { unauthenticated, authenticated, checking, error }
 
@@ -46,11 +47,6 @@ final verifyPinUseCaseProvider = Provider((ref) {
   return VerifyPinUseCase();
 });
 
-final isAuthenticatedProvider = FutureProvider<bool>((ref) async {
-  final useCase = ref.read(authenticateUseCaseProvider);
-  return await useCase.isCurrentlyAuthenticated();
-});
-
 class AuthNotifier extends StateNotifier<AuthStatus> {
   final AuthenticateUseCase _authenticate;
   final SetPinUseCase _setPin;
@@ -64,7 +60,8 @@ class AuthNotifier extends StateNotifier<AuthStatus> {
     try {
       final biometricAvailable = await BiometricService.isAvailable();
       final hasPin = await _authenticate.isRequired();
-      final isAuth = await _authenticate.isCurrentlyAuthenticated();
+      final isAuth = await _authenticate.isCurrentlyAuthenticated() ||
+          !hasPin && !biometricAvailable;
 
       state = state.copyWith(
         state: isAuth ? AuthState.authenticated : AuthState.unauthenticated,
@@ -98,6 +95,9 @@ class AuthNotifier extends StateNotifier<AuthStatus> {
     state = state.copyWith(state: AuthState.checking);
     try {
       final result = await _verifyPin(pin);
+      if (result) {
+        AuthService.markAuthenticated();
+      }
       state = state.copyWith(
         state: result ? AuthState.authenticated : AuthState.unauthenticated,
       );
@@ -112,13 +112,30 @@ class AuthNotifier extends StateNotifier<AuthStatus> {
   Future<void> setPin(String pin) async {
     try {
       await _setPin(pin);
-      await checkAuth();
+      state = state.copyWith(hasPin: true, error: null);
     } catch (e) {
       state = state.copyWith(
         state: AuthState.error,
         error: e.toString(),
       );
     }
+  }
+
+  Future<void> removePin() async {
+    try {
+      await _setPin.removePin();
+      state = state.copyWith(hasPin: false, error: null);
+    } catch (e) {
+      state = state.copyWith(
+        state: AuthState.error,
+        error: e.toString(),
+      );
+    }
+  }
+
+  void logout() {
+    AuthService.logout();
+    state = state.copyWith(state: AuthState.unauthenticated);
   }
 }
 

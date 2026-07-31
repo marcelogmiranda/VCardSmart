@@ -1,24 +1,28 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 import '../../../../core/ads/ad_config.dart';
 import '../../../../core/ads/ad_units.dart';
+import '../../../settings/presentation/providers/settings_provider.dart';
 
-class BannerAdWidget extends StatefulWidget {
+class BannerAdWidget extends ConsumerStatefulWidget {
   const BannerAdWidget({super.key});
 
   @override
-  State<BannerAdWidget> createState() => _BannerAdWidgetState();
+  ConsumerState<BannerAdWidget> createState() => _BannerAdWidgetState();
 }
 
-class _BannerAdWidgetState extends State<BannerAdWidget> {
+class _BannerAdWidgetState extends ConsumerState<BannerAdWidget> {
   BannerAd? _bannerAd;
   bool _isLoaded = false;
+  bool _loadFailed = false;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    if (!_isLoaded && AdConfig.showBanner) {
+    final adsEnabled = ref.watch(settingsProvider).adsEnabled;
+    if (adsEnabled && AdConfig.showBanner && !_isLoaded && !_loadFailed) {
       _loadAd();
     }
   }
@@ -39,6 +43,9 @@ class _BannerAdWidgetState extends State<BannerAdWidget> {
         },
         onAdFailedToLoad: (ad, error) {
           ad.dispose();
+          if (mounted) {
+            setState(() => _loadFailed = true);
+          }
         },
       ),
     ).load();
@@ -46,15 +53,14 @@ class _BannerAdWidgetState extends State<BannerAdWidget> {
 
   @override
   Widget build(BuildContext context) {
-    if (!AdConfig.showBanner) {
+    final adsEnabled = ref.watch(settingsProvider).adsEnabled;
+
+    if (!adsEnabled || !AdConfig.showBanner) {
       return const SizedBox.shrink();
     }
 
     if (!_isLoaded || _bannerAd == null) {
-      return const SizedBox(
-        height: 50,
-        child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
-      );
+      return const SizedBox(height: 50);
     }
 
     return SizedBox(

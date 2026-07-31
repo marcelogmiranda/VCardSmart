@@ -29,7 +29,8 @@ class _QRSharePageState extends ConsumerState<QRSharePage> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-              content: Text('Crie seu perfil primeiro para gerar QR Code')),
+            content: Text('Crie seu perfil primeiro para gerar QR Code'),
+          ),
         );
         Navigator.of(context).pop();
       }
@@ -87,10 +88,12 @@ class _QRSharePageState extends ConsumerState<QRSharePage> {
                     OutlinedButton.icon(
                       onPressed: () {
                         Clipboard.setData(
-                            ClipboardData(text: qrState.qrData!));
+                          ClipboardData(text: qrState.qrData!),
+                        );
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
-                              content: Text('Dados copiados!')),
+                            content: Text('Dados copiados!'),
+                          ),
                         );
                       },
                       icon: const Icon(Icons.copy, size: 18),

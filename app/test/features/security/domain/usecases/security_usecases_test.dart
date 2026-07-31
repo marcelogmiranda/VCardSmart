@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:vcardsmart/core/security/auth_service.dart';
 import 'package:vcardsmart/features/security/domain/usecases/set_pin_usecase.dart';
 import 'package:vcardsmart/features/security/domain/usecases/authenticate_usecase.dart';
 
@@ -21,10 +22,14 @@ void main() {
   });
 
   group('AuthenticateUseCase', () {
-    test('isCurrentlyAuthenticated should return true by default', () async {
+    setUp(() {
+      AuthService.logout();
+    });
+
+    test('isCurrentlyAuthenticated should return false by default', () async {
       final useCase = AuthenticateUseCase();
       final result = await useCase.isCurrentlyAuthenticated();
-      expect(result, true);
+      expect(result, false);
     });
   });
 }

@@ -100,7 +100,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                           final vCard = _buildVCardData(profile);
                           Share.share(
                             vCard,
-                            subject: '${profile.name} - Cartao VCardSmart',
+                            subject: '${profile.name} - Cartão VCardSmart',
                           );
                         },
                       ),
@@ -142,7 +142,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'Crie seu perfil para compartilhar seu cartao digital',
+                      'Crie seu perfil para compartilhar seu cartão digital',
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         color: Theme.of(context).colorScheme.onSurfaceVariant,
                       ),
@@ -168,7 +168,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text('Erro: $e'),
+              const Text('Não foi possível carregar seus dados'),
               const SizedBox(height: 16),
               ElevatedButton(
                 onPressed: () => _loadOrCreateProfile(),

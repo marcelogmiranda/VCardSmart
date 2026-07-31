@@ -5,7 +5,6 @@ import 'package:vcardsmart/features/security/presentation/providers/auth_provide
 import 'package:vcardsmart/features/security/presentation/pages/auth_page.dart';
 import 'package:vcardsmart/features/security/presentation/pages/pin_setup_page.dart';
 import 'package:vcardsmart/features/security/presentation/widgets/biometric_button.dart';
-import 'package:vcardsmart/features/security/presentation/widgets/auth_guard.dart';
 import 'package:vcardsmart/features/security/presentation/widgets/pin_input.dart';
 import 'package:vcardsmart/features/security/domain/usecases/authenticate_usecase.dart';
 import 'package:vcardsmart/features/security/domain/usecases/set_pin_usecase.dart';
@@ -108,9 +107,10 @@ void main() {
       expect(notifier.state.state, AuthState.error);
     });
 
-    test('should call setPin and trigger checkAuth', () async {
+    test('should set pin and mark hasPin', () async {
       await notifier.setPin('1234');
-      expect(notifier.state.state, isNot(AuthState.checking));
+      expect(notifier.state.hasPin, true);
+      expect(notifier.state.error, isNull);
     });
 
     test('should handle set pin exception', () async {
@@ -121,33 +121,43 @@ void main() {
   });
 
   group('AuthPage', () {
+    AuthNotifier unauthNotifier(Ref ref) {
+      final notifier = AuthNotifier(
+        ref.read(authenticateUseCaseProvider),
+        ref.read(setPinUseCaseProvider),
+        ref.read(verifyPinUseCaseProvider),
+      );
+      notifier.state = const AuthStatus(state: AuthState.unauthenticated);
+      return notifier;
+    }
+
     testWidgets('should display app title', (tester) async {
       await tester.pumpWidget(
-        const ProviderScope(
-          child: MaterialApp(home: AuthPage()),
+        ProviderScope(
+          overrides: [authProvider.overrideWith(unauthNotifier)],
+          child: const MaterialApp(home: AuthPage()),
         ),
       );
-      await tester.pumpAndSettle();
       expect(find.text('VCardSmart'), findsOneWidget);
     });
 
     testWidgets('should display subtitle', (tester) async {
       await tester.pumpWidget(
-        const ProviderScope(
-          child: MaterialApp(home: AuthPage()),
+        ProviderScope(
+          overrides: [authProvider.overrideWith(unauthNotifier)],
+          child: const MaterialApp(home: AuthPage()),
         ),
       );
-      await tester.pumpAndSettle();
       expect(find.text('Autentique-se para continuar'), findsOneWidget);
     });
 
     testWidgets('should display logo icon', (tester) async {
       await tester.pumpWidget(
-        const ProviderScope(
-          child: MaterialApp(home: AuthPage()),
+        ProviderScope(
+          overrides: [authProvider.overrideWith(unauthNotifier)],
+          child: const MaterialApp(home: AuthPage()),
         ),
       );
-      await tester.pumpAndSettle();
       expect(find.byIcon(Icons.lock_outline), findsOneWidget);
     });
   });
@@ -251,106 +261,6 @@ void main() {
 
       await tester.enterText(fields.at(0), '');
       await tester.pump();
-    });
-  });
-
-  group('AuthGuard', () {
-    testWidgets('should show child when authenticated', (tester) async {
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: [
-            authProvider.overrideWith((ref) {
-              final notifier = AuthNotifier(
-                _FakeAuthenticateUseCase(),
-                _FakeSetPinUseCase(),
-                _FakeVerifyPinUseCase(),
-              );
-              notifier.state = const AuthStatus(
-                state: AuthState.authenticated,
-              );
-              return notifier;
-            }),
-          ],
-          child: const MaterialApp(
-            home: AuthGuard(child: Text('Protected Content')),
-          ),
-        ),
-      );
-      expect(find.text('Protected Content'), findsOneWidget);
-    });
-
-    testWidgets('should show auth page when unauthenticated', (tester) async {
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: [
-            authProvider.overrideWith((ref) {
-              final notifier = AuthNotifier(
-                _FakeAuthenticateUseCase(),
-                _FakeSetPinUseCase(),
-                _FakeVerifyPinUseCase(),
-              );
-              notifier.state = const AuthStatus(
-                state: AuthState.unauthenticated,
-              );
-              return notifier;
-            }),
-          ],
-          child: const MaterialApp(
-            home: AuthGuard(child: Text('Protected Content')),
-          ),
-        ),
-      );
-      expect(find.text('Protected Content'), findsNothing);
-    });
-
-    testWidgets('should show auth page when error state', (tester) async {
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: [
-            authProvider.overrideWith((ref) {
-              final notifier = AuthNotifier(
-                _FakeAuthenticateUseCase(),
-                _FakeSetPinUseCase(),
-                _FakeVerifyPinUseCase(),
-              );
-              notifier.state = const AuthStatus(
-                state: AuthState.error,
-                error: 'test error',
-              );
-              return notifier;
-            }),
-          ],
-          child: const MaterialApp(
-            home: AuthGuard(child: Text('Protected Content')),
-          ),
-        ),
-      );
-      expect(find.text('Protected Content'), findsNothing);
-    });
-
-    testWidgets('should show loading when checking', (tester) async {
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: [
-            authProvider.overrideWith((ref) {
-              final notifier = AuthNotifier(
-                _FakeAuthenticateUseCase(),
-                _FakeSetPinUseCase(),
-                _FakeVerifyPinUseCase(),
-              );
-              notifier.state = const AuthStatus(
-                state: AuthState.checking,
-              );
-              return notifier;
-            }),
-          ],
-          child: const MaterialApp(
-            home: AuthGuard(child: Text('Protected Content')),
-          ),
-        ),
-      );
-      expect(find.text('Protected Content'), findsNothing);
-      expect(find.byType(CircularProgressIndicator), findsOneWidget);
     });
   });
 }

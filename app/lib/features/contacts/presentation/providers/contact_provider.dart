@@ -5,6 +5,7 @@ import '../../domain/usecases/get_contacts_usecase.dart';
 import '../../data/repositories/local_contact_repository.dart';
 import '../../domain/entities/contact.dart';
 import '../../domain/repositories/contact_repository.dart';
+import '../../../profile/domain/entities/profile.dart';
 import '../../../../core/database/hive_service.dart';
 
 enum ContactStatus { idle, loading, success, error }
@@ -86,6 +87,33 @@ class ContactListNotifier extends StateNotifier<ContactListStatus> {
         status: ContactStatus.error,
         error: e.toString(),
       );
+    }
+  }
+
+  Future<bool> saveProfileAsContact(Profile profile, String source) async {
+    final contact = Contact(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      name: profile.name,
+      email: profile.email,
+      phone: profile.phone,
+      linkedin: profile.linkedin,
+      instagram: profile.instagram,
+      website: profile.website,
+      bio: profile.bio,
+      source: source,
+      importedAt: DateTime.now(),
+    );
+
+    try {
+      await _repository.saveContact(contact);
+      await loadContacts();
+      return true;
+    } catch (e) {
+      state = state.copyWith(
+        status: ContactStatus.error,
+        error: e.toString(),
+      );
+      return false;
     }
   }
 

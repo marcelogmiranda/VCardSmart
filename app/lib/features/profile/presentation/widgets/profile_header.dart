@@ -46,8 +46,11 @@ class ProfileHeader extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.email_outlined,
-                    size: 16, color: Colors.grey[600]),
+                Icon(
+                  Icons.email_outlined,
+                  size: 16,
+                  color: Colors.grey[600],
+                ),
                 const SizedBox(width: 6),
                 Text(
                   profile.email!,
@@ -63,8 +66,11 @@ class ProfileHeader extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.phone_outlined,
-                    size: 16, color: Colors.grey[600]),
+                Icon(
+                  Icons.phone_outlined,
+                  size: 16,
+                  color: Colors.grey[600],
+                ),
                 const SizedBox(width: 6),
                 Text(
                   profile.phone!,
@@ -81,8 +87,11 @@ class ProfileHeader extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.work_outline,
-                    size: 16, color: Colors.grey[600]),
+                Icon(
+                  Icons.work_outline,
+                  size: 16,
+                  color: Colors.grey[600],
+                ),
                 const SizedBox(width: 6),
                 Text(
                   profile.linkedin!,
@@ -99,8 +108,11 @@ class ProfileHeader extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.camera_alt_outlined,
-                    size: 16, color: Colors.grey[600]),
+                Icon(
+                  Icons.camera_alt_outlined,
+                  size: 16,
+                  color: Colors.grey[600],
+                ),
                 const SizedBox(width: 6),
                 Text(
                   profile.instagram!,
@@ -117,8 +129,11 @@ class ProfileHeader extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.language,
-                    size: 16, color: Colors.grey[600]),
+                Icon(
+                  Icons.language,
+                  size: 16,
+                  color: Colors.grey[600],
+                ),
                 const SizedBox(width: 6),
                 Text(
                   profile.website!,

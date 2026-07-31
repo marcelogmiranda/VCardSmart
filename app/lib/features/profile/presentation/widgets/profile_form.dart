@@ -83,8 +83,10 @@ class _ProfileFormState extends State<ProfileForm> {
             if (_photoPath != null)
               ListTile(
                 leading: const Icon(Icons.delete, color: Colors.red),
-                title: const Text('Remover foto',
-                    style: TextStyle(color: Colors.red)),
+                title: const Text(
+                  'Remover foto',
+                  style: TextStyle(color: Colors.red),
+                ),
                 onTap: () {
                   Navigator.pop(context);
                   setState(() => _photoPath = null);
@@ -167,8 +169,11 @@ class _ProfileFormState extends State<ProfileForm> {
                 backgroundImage:
                     _photoPath != null ? FileImage(File(_photoPath!)) : null,
                 child: _photoPath == null
-                    ? Icon(Icons.camera_alt,
-                        size: 32, color: theme.colorScheme.primary)
+                    ? Icon(
+                        Icons.camera_alt,
+                        size: 32,
+                        color: theme.colorScheme.primary,
+                      )
                     : null,
               ),
             ),
@@ -192,8 +197,10 @@ class _ProfileFormState extends State<ProfileForm> {
                 children: [
                   Row(
                     children: [
-                      Icon(Icons.contact_phone,
-                          color: theme.colorScheme.primary),
+                      Icon(
+                        Icons.contact_phone,
+                        color: theme.colorScheme.primary,
+                      ),
                       const SizedBox(width: 8),
                       Text(
                         'Preencher do dispositivo',
@@ -232,7 +239,8 @@ class _ProfileFormState extends State<ProfileForm> {
                       constraints: const BoxConstraints(maxHeight: 200),
                       decoration: BoxDecoration(
                         border: Border.all(
-                            color: theme.colorScheme.outlineVariant),
+                          color: theme.colorScheme.outlineVariant,
+                        ),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: ListView.separated(
@@ -288,7 +296,7 @@ class _ProfileFormState extends State<ProfileForm> {
             ),
             validator: (value) {
               if (value == null || value.isEmpty) {
-                return 'Nome e obrigatorio';
+                return 'Nome é obrigatório';
               }
               return null;
             },

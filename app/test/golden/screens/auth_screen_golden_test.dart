@@ -12,11 +12,17 @@ void main() {
         ProviderScope(
           overrides: [
             authProvider.overrideWith(
-              (ref) => AuthNotifier(
-                ref.read(authenticateUseCaseProvider),
-                ref.read(setPinUseCaseProvider),
-                ref.read(verifyPinUseCaseProvider),
-              ),
+              (ref) {
+                final notifier = AuthNotifier(
+                  ref.read(authenticateUseCaseProvider),
+                  ref.read(setPinUseCaseProvider),
+                  ref.read(verifyPinUseCaseProvider),
+                );
+                notifier.state = const AuthStatus(
+                  state: AuthState.unauthenticated,
+                );
+                return notifier;
+              },
             ),
           ],
           child: MaterialApp(
@@ -37,11 +43,17 @@ void main() {
         ProviderScope(
           overrides: [
             authProvider.overrideWith(
-              (ref) => AuthNotifier(
-                ref.read(authenticateUseCaseProvider),
-                ref.read(setPinUseCaseProvider),
-                ref.read(verifyPinUseCaseProvider),
-              ),
+              (ref) {
+                final notifier = AuthNotifier(
+                  ref.read(authenticateUseCaseProvider),
+                  ref.read(setPinUseCaseProvider),
+                  ref.read(verifyPinUseCaseProvider),
+                );
+                notifier.state = const AuthStatus(
+                  state: AuthState.unauthenticated,
+                );
+                return notifier;
+              },
             ),
           ],
           child: MaterialApp(

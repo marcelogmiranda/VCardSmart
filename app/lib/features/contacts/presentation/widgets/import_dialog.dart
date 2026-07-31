@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class ImportDialog extends StatelessWidget {
   final void Function(String data, String source) onImport;
@@ -15,22 +16,25 @@ class ImportDialog extends StatelessWidget {
           ListTile(
             leading: const Icon(Icons.qr_code),
             title: const Text('Via QR Code'),
+            subtitle: const Text('Escanear um QR Code'),
             onTap: () {
               Navigator.of(context).pop();
-              onImport('', 'qr');
+              context.push('/qr/scan');
             },
           ),
           ListTile(
             leading: const Icon(Icons.nfc),
             title: const Text('Via NFC'),
+            subtitle: const Text('Aproximar outro dispositivo'),
             onTap: () {
               Navigator.of(context).pop();
-              onImport('', 'nfc');
+              context.push('/nfc/receive');
             },
           ),
           ListTile(
             leading: const Icon(Icons.description),
             title: const Text('Via vCard'),
+            subtitle: const Text('Colar conteúdo vCard'),
             onTap: () {
               Navigator.of(context).pop();
               _showVCardImport(context);

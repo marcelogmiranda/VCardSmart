@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../providers/contact_provider.dart';
 import '../widgets/import_dialog.dart';
 import '../../domain/usecases/import_contact_usecase.dart';
@@ -72,15 +73,11 @@ class ImportPage extends ConsumerWidget {
   }
 
   void _importViaQR(BuildContext context, WidgetRef ref) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Abrir leitor QR Code...')),
-    );
+    context.push('/qr/scan');
   }
 
   void _importViaNFC(BuildContext context, WidgetRef ref) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Abrir leitor NFC...')),
-    );
+    context.push('/nfc/receive');
   }
 
   void _importViaVCard(BuildContext context, WidgetRef ref) {

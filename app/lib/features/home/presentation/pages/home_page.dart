@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../profile/presentation/providers/profile_provider.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends ConsumerWidget {
   const HomePage({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
@@ -29,17 +31,35 @@ class HomePage extends StatelessWidget {
             _ProfileCard(colorScheme: colorScheme),
             const SizedBox(height: 24),
             Text(
-              'Acoes Rapidas',
+              'Ações Rápidas',
               style: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
             ),
             const SizedBox(height: 12),
-            _ActionGrid(colorScheme: colorScheme),
+            _ActionGrid(
+              colorScheme: colorScheme,
+              onShare: () => _shareProfile(context, ref),
+            ),
           ],
         ),
       ),
     );
+  }
+
+  Future<void> _shareProfile(BuildContext context, WidgetRef ref) async {
+    final profiles = await ref.read(getAllProfilesUseCaseProvider).call();
+    if (!context.mounted) return;
+
+    if (profiles.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Crie seu perfil primeiro')),
+      );
+      context.push('/profile');
+      return;
+    }
+
+    context.push('/qr/share');
   }
 }
 
@@ -81,14 +101,14 @@ class _ProfileCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Meu Cartao',
+                      'Meu Cartão',
                       style: Theme.of(context).textTheme.titleLarge?.copyWith(
                             fontWeight: FontWeight.bold,
                           ),
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'Crie e compartilhe seu cartao digital',
+                      'Crie e compartilhe seu cartão digital',
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                             color: colorScheme.onSurfaceVariant,
                           ),
@@ -110,8 +130,9 @@ class _ProfileCard extends StatelessWidget {
 
 class _ActionGrid extends StatelessWidget {
   final ColorScheme colorScheme;
+  final VoidCallback onShare;
 
-  const _ActionGrid({required this.colorScheme});
+  const _ActionGrid({required this.colorScheme, required this.onShare});
 
   @override
   Widget build(BuildContext context) {
@@ -150,20 +171,13 @@ class _ActionGrid extends StatelessWidget {
         _ActionCard(
           icon: Icons.share_outlined,
           title: 'Compartilhar',
-          subtitle: 'Enviar meu cartao',
+          subtitle: 'Enviar meu cartão',
           color: colorScheme.errorContainer,
           iconColor: colorScheme.onErrorContainer,
-          onTap: () => _shareProfile(context),
+          onTap: onShare,
         ),
       ],
     );
-  }
-
-  void _shareProfile(BuildContext context) async {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Crie seu perfil primeiro')),
-    );
-    context.push('/profile');
   }
 }
 

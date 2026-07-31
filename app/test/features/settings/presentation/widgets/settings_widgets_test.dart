@@ -2,14 +2,34 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hive/hive.dart';
+import 'package:go_router/go_router.dart';
 import 'package:vcardsmart/l10n/app_localizations.dart';
+import 'package:vcardsmart/core/constants/app_constants.dart';
 import 'package:vcardsmart/features/settings/presentation/widgets/theme_toggle.dart';
 import 'package:vcardsmart/features/settings/presentation/widgets/language_selector.dart';
 import 'package:vcardsmart/features/settings/presentation/widgets/security_settings.dart';
 import 'package:vcardsmart/features/settings/presentation/widgets/privacy_settings.dart';
 import 'package:vcardsmart/features/settings/presentation/pages/settings_page.dart';
-import 'package:vcardsmart/core/database/hive_boxes.dart';
+import 'package:vcardsmart/features/settings/presentation/providers/settings_provider.dart';
+import 'package:vcardsmart/features/settings/domain/repositories/settings_repository.dart';
+import 'package:vcardsmart/features/settings/domain/entities/settings.dart';
+
+class _FakeSettingsRepository implements SettingsRepository {
+  Settings _settings = const Settings();
+
+  @override
+  Future<Settings> getSettings() async => _settings;
+
+  @override
+  Future<void> updateSettings(Settings settings) async => _settings = settings;
+
+  @override
+  Future<void> resetSettings() async => _settings = const Settings();
+}
+
+final _settingsOverrides = [
+  settingsRepositoryProvider.overrideWith((ref) => _FakeSettingsRepository()),
+];
 
 MaterialApp testApp(Widget child) {
   return MaterialApp(
@@ -32,15 +52,6 @@ const _localizationDelegates = [
 ];
 
 void main() {
-  setUpAll(() async {
-    Hive.init('__test_settings_widgets_hive__');
-    await Hive.openBox(HiveBoxes.settings);
-  });
-
-  tearDownAll(() async {
-    await Hive.deleteBoxFromDisk(HiveBoxes.settings);
-    await Hive.deleteFromDisk();
-  });
   group('ThemeToggle', () {
     testWidgets('should display theme title', (tester) async {
       await tester.pumpWidget(
@@ -126,8 +137,9 @@ void main() {
   group('SettingsPage', () {
     testWidgets('should display appBar title', (tester) async {
       await tester.pumpWidget(
-        const ProviderScope(
-          child: MaterialApp(
+        ProviderScope(
+          overrides: _settingsOverrides,
+          child: const MaterialApp(
             locale: Locale('pt', 'BR'),
             localizationsDelegates: _localizationDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
@@ -141,8 +153,9 @@ void main() {
 
     testWidgets('should display section headers', (tester) async {
       await tester.pumpWidget(
-        const ProviderScope(
-          child: MaterialApp(
+        ProviderScope(
+          overrides: _settingsOverrides,
+          child: const MaterialApp(
             locale: Locale('pt', 'BR'),
             localizationsDelegates: _localizationDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
@@ -158,8 +171,9 @@ void main() {
 
     testWidgets('should display all settings widgets', (tester) async {
       await tester.pumpWidget(
-        const ProviderScope(
-          child: MaterialApp(
+        ProviderScope(
+          overrides: _settingsOverrides,
+          child: const MaterialApp(
             localizationsDelegates: _localizationDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
             home: SettingsPage(),
@@ -176,8 +190,9 @@ void main() {
 
     testWidgets('should toggle biometric switch', (tester) async {
       await tester.pumpWidget(
-        const ProviderScope(
-          child: MaterialApp(
+        ProviderScope(
+          overrides: _settingsOverrides,
+          child: const MaterialApp(
             localizationsDelegates: _localizationDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
             home: SettingsPage(),
@@ -194,20 +209,35 @@ void main() {
 
     testWidgets('should toggle pin switch', (tester) async {
       await tester.pumpWidget(
-        const ProviderScope(
-          child: MaterialApp(
+        ProviderScope(
+          overrides: _settingsOverrides,
+          child: MaterialApp.router(
             localizationsDelegates: _localizationDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
-            home: SettingsPage(),
+            routerConfig: GoRouter(
+              initialLocation: '/',
+              routes: [
+                GoRoute(
+                  path: '/',
+                  builder: (context, state) => const SettingsPage(),
+                ),
+                GoRoute(
+                  path: AppConstants.pinSetupRoute,
+                  builder: (context, state) =>
+                      const Scaffold(body: Text('Configurar PIN')),
+                ),
+              ],
+            ),
           ),
         ),
       );
 
-      final pinSwitch = find.byType(SwitchListTile).last;
+      final pinSwitch = find.widgetWithText(SwitchListTile, 'PIN');
       expect(pinSwitch, findsOneWidget);
 
       await tester.tap(pinSwitch);
       await tester.pumpAndSettle();
+      expect(find.text('Configurar PIN'), findsOneWidget);
     });
   });
 }

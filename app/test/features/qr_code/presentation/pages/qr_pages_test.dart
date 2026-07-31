@@ -37,7 +37,7 @@ void main() {
         ),
       );
       expect(find.text('Escanear QR Code'), findsNWidgets(2));
-      expect(find.text('Abrir Camera'), findsOneWidget);
+      expect(find.text('Abrir Câmera'), findsOneWidget);
     });
 
     testWidgets('should have scaffold structure', (tester) async {

@@ -3,6 +3,7 @@ import '../../domain/usecases/send_nfc_usecase.dart';
 import '../../domain/usecases/receive_nfc_usecase.dart';
 import '../../data/datasources/nfc_datasource.dart';
 import '../../data/repositories/local_nfc_repository.dart';
+import '../../domain/repositories/nfc_repository.dart';
 import '../../../profile/domain/entities/profile.dart';
 
 enum NFCState { idle, ready, sending, receiving, success, error }
@@ -55,11 +56,14 @@ final receiveNFCUseCaseProvider = Provider((ref) {
 class NFCNotifier extends StateNotifier<NFCStatus> {
   final SendNFCUseCase _sendNFC;
   final ReceiveNFCUseCase _receiveNFC;
+  final NFCRepository _repository;
 
-  NFCNotifier(this._sendNFC, this._receiveNFC) : super(const NFCStatus());
+  NFCNotifier(this._sendNFC, this._receiveNFC, this._repository)
+      : super(const NFCStatus());
 
   Future<void> checkAvailability() async {
-    state = state.copyWith(isAvailable: true);
+    final available = await _repository.isAvailable();
+    state = state.copyWith(isAvailable: available);
   }
 
   Future<void> send(Profile profile) async {
@@ -95,5 +99,6 @@ final nfcProvider = StateNotifierProvider<NFCNotifier, NFCStatus>((ref) {
   return NFCNotifier(
     ref.read(sendNFCUseCaseProvider),
     ref.read(receiveNFCUseCaseProvider),
+    ref.read(nfcRepositoryProvider),
   );
 });

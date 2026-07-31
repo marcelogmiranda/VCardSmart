@@ -4,6 +4,8 @@ import 'package:nfc_manager/nfc_manager.dart';
 import '../providers/nfc_provider.dart';
 import '../widgets/nfc_status_widget.dart';
 import '../widgets/nfc_instruction_widget.dart';
+import '../../../contacts/presentation/providers/contact_provider.dart';
+import '../../../profile/domain/entities/profile.dart';
 
 class NFCReceivePage extends ConsumerStatefulWidget {
   const NFCReceivePage({super.key});
@@ -21,7 +23,65 @@ class _NFCReceivePageState extends ConsumerState<NFCReceivePage> {
     _checkNFC();
   }
 
+  Future<void> _showProfileReceived(Profile profile) async {
+    await showDialog(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Perfil Recebido'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              profile.name,
+              style: Theme.of(context).textTheme.headlineSmall,
+            ),
+            if (profile.email != null) ...[
+              const SizedBox(height: 8),
+              Text(profile.email!),
+            ],
+            if (profile.phone != null) ...[
+              const SizedBox(height: 4),
+              Text(profile.phone!),
+            ],
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(),
+            child: const Text('Fechar'),
+          ),
+          FilledButton.icon(
+            onPressed: () async {
+              final saved = await ref
+                  .read(contactListProvider.notifier)
+                  .saveProfileAsContact(profile, 'nfc');
+              if (!dialogContext.mounted || !mounted) return;
+              Navigator.of(dialogContext).pop();
+              if (saved) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Contato salvo!')),
+                );
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Não foi possível salvar o contato'),
+                  ),
+                );
+              }
+              ref.read(nfcProvider.notifier).reset();
+            },
+            icon: const Icon(Icons.person_add, size: 18),
+            label: const Text('Salvar contato'),
+          ),
+        ],
+      ),
+    );
+    ref.read(nfcProvider.notifier).reset();
+  }
+
   Future<void> _checkNFC() async {
+    await ref.read(nfcProvider.notifier).checkAvailability();
     final available = await NfcManager.instance.isAvailable();
     if (mounted) {
       setState(() => _nfcAvailable = available);
@@ -38,42 +98,12 @@ class _NFCReceivePageState extends ConsumerState<NFCReceivePage> {
 
     ref.listen<NFCStatus>(nfcProvider, (previous, next) {
       if (next.state == NFCState.success && next.profile != null) {
-        showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: const Text('Perfil Recebido'),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  next.profile!.name,
-                  style: Theme.of(context).textTheme.headlineSmall,
-                ),
-                if (next.profile!.email != null) ...[
-                  const SizedBox(height: 8),
-                  Text(next.profile!.email!),
-                ],
-                if (next.profile!.phone != null) ...[
-                  const SizedBox(height: 4),
-                  Text(next.profile!.phone!),
-                ],
-              ],
-            ),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                  ref.read(nfcProvider.notifier).reset();
-                },
-                child: const Text('Fechar'),
-              ),
-            ],
-          ),
-        );
+        _showProfileReceived(next.profile!);
       } else if (next.state == NFCState.error) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(next.error ?? 'Erro desconhecido')),
+          const SnackBar(
+            content: Text('Não foi possível receber via NFC'),
+          ),
         );
       }
     });
@@ -101,12 +131,12 @@ class _NFCReceivePageState extends ConsumerState<NFCReceivePage> {
                 ),
                 const SizedBox(height: 24),
                 Text(
-                  'NFC nao disponivel',
+                  'NFC não disponível',
                   style: theme.textTheme.headlineSmall,
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Este dispositivo nao possui NFC ou esta desativado.\nAtive o NFC nas configuracoes do dispositivo.',
+                  'Este dispositivo não possui NFC ou está desativado.\nAtive o NFC nas configurações do dispositivo.',
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: theme.colorScheme.onSurfaceVariant,
                   ),

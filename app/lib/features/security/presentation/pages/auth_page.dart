@@ -16,55 +16,57 @@ class AuthPage extends ConsumerWidget {
         child: Center(
           child: Padding(
             padding: const EdgeInsets.all(32),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.lock_outline,
-                  size: 80,
-                  color: Theme.of(context).primaryColor,
-                ),
-                const SizedBox(height: 24),
-                const Text(
-                  'VCardSmart',
-                  style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
+            child: authStatus.state == AuthState.checking
+                ? const CircularProgressIndicator()
+                : Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.lock_outline,
+                        size: 80,
+                        color: Theme.of(context).primaryColor,
+                      ),
+                      const SizedBox(height: 24),
+                      const Text(
+                        'VCardSmart',
+                        style: TextStyle(
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      const Text(
+                        'Autentique-se para continuar',
+                        style: TextStyle(fontSize: 16, color: Colors.grey),
+                      ),
+                      const SizedBox(height: 48),
+                      if (authStatus.biometricAvailable) ...[
+                        const BiometricButton(),
+                        const SizedBox(height: 16),
+                      ],
+                      if (authStatus.hasPin) ...[
+                        PinInput(
+                          onCompleted: (pin) {
+                            ref.read(authProvider.notifier).verifyPin(pin);
+                          },
+                        ),
+                      ],
+                      if (!authStatus.biometricAvailable && !authStatus.hasPin) ...[
+                        const Text(
+                          'Nenhuma autenticação configurada',
+                          style: TextStyle(color: Colors.grey),
+                        ),
+                      ],
+                      if (authStatus.state == AuthState.error &&
+                          authStatus.error != null) ...[
+                        const SizedBox(height: 16),
+                        Text(
+                          authStatus.error!,
+                          style: const TextStyle(color: Colors.red),
+                        ),
+                      ],
+                    ],
                   ),
-                ),
-                const SizedBox(height: 8),
-                const Text(
-                  'Autentique-se para continuar',
-                  style: TextStyle(fontSize: 16, color: Colors.grey),
-                ),
-                const SizedBox(height: 48),
-                if (authStatus.biometricAvailable) ...[
-                  const BiometricButton(),
-                  const SizedBox(height: 16),
-                ],
-                if (authStatus.hasPin) ...[
-                  PinInput(
-                    onCompleted: (pin) {
-                      ref.read(authProvider.notifier).verifyPin(pin);
-                    },
-                  ),
-                ],
-                if (!authStatus.biometricAvailable && !authStatus.hasPin) ...[
-                  const Text(
-                    'Nenhuma autenticação configurada',
-                    style: TextStyle(color: Colors.grey),
-                  ),
-                ],
-                if (authStatus.state == AuthState.error &&
-                    authStatus.error != null) ...[
-                  const SizedBox(height: 16),
-                  Text(
-                    authStatus.error!,
-                    style: const TextStyle(color: Colors.red),
-                  ),
-                ],
-              ],
-            ),
           ),
         ),
       ),

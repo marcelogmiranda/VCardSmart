@@ -69,7 +69,7 @@ class _PinSetupPageState extends ConsumerState<PinSetupPage> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('PIN configurado com sucesso!')),
         );
-        Navigator.of(context).pop();
+        Navigator.of(context).pop(true);
       }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(

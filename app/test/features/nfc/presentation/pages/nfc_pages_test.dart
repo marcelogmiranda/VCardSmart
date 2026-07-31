@@ -8,7 +8,13 @@ import 'package:vcardsmart/features/nfc/presentation/widgets/nfc_status_widget.d
 import 'package:vcardsmart/features/nfc/presentation/widgets/nfc_instruction_widget.dart';
 import 'package:vcardsmart/features/profile/domain/entities/profile.dart';
 
+import '../../nfc_channel_mock.dart';
+
 void main() {
+  setUp(() {
+    TestWidgetsFlutterBinding.ensureInitialized();
+    NfcChannelMock().install();
+  });
   group('NFCStatus', () {
     test('should have default values', () {
       const status = NFCStatus();
@@ -93,6 +99,7 @@ void main() {
           child: MaterialApp(home: NFCReceivePage()),
         ),
       );
+      await tester.pumpAndSettle();
       expect(find.text('Receber via NFC'), findsOneWidget);
     });
 
@@ -102,6 +109,7 @@ void main() {
           child: MaterialApp(home: NFCReceivePage()),
         ),
       );
+      await tester.pumpAndSettle();
       expect(find.text('Iniciar recebimento'), findsOneWidget);
     });
 
@@ -111,6 +119,7 @@ void main() {
           child: MaterialApp(home: NFCReceivePage()),
         ),
       );
+      await tester.pumpAndSettle();
       final appBar = tester.widget<AppBar>(find.byType(AppBar));
       expect(appBar.centerTitle, isTrue);
     });
