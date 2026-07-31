@@ -11,7 +11,7 @@
 - **flutter test**: 495 passando + 23 goldens falham isoladas (pixel diff ~0.06%, ambientais)
 - **Build iOS IPA**: 33.4MB (`app/build/ios/ipa/VCardSmart.ipa`) — Version 1.0.0, Build 4
 - **Build iOS Simulator**: OK
-- **Status App Store**: aguardando re-teste — submissao 1.0.0 (build 1) rejeitada (Guideline 5.6, features enganosas); corrigido e build 4 pronto via Transporter
+- **Status App Store**: **In Review** — submissao 1.0.0 (build 1) rejeitada (Guideline 5.6, features enganosas); corrigido, build 4 enviado via Transporter com notas de revisao e re-submetido em 31/07/2026
 
 ## Commits Recentes
 
@@ -71,12 +71,12 @@ PATH=/usr/bin:$PATH flutter build appbundle --release
 5. ~~Build: `flutter build ipa --release`~~ ✅
 6. ~~Upload via Transporter~~ ✅ (build 4 / 1.0.0)
 7. ~~Preencher listing no App Store Connect~~ ✅
-8. **Re-submeter para revisao** — build 4 (re-teste pos correcoes 5.6)
-9. Incluir notas de revisao: QR/NFC/seguranca agora funcionam de verdade
+8. ~~Re-submeter para revisao~~ ✅ **In Review** (build 4 / 1.0.0)
+9. ~~Incluir notas de revisao~~ ✅ QR/NFC/seguranca agora funcionam de verdade
 
 ## Pendencias Antes de Publicar
 
-- [ ] Re-submeter build 4 na App Store e aguardar re-teste
+- [ ] (App Store) Aguardar veredito do re-teste (In Review) → release para producao
 - [ ] (Google Play) Aguardar 14 dias de teste fechado → solicitar producao
 - [ ] Achado 5 (baixo): mismatch QR vCard × importFromQR JSON (latente, sem conflito)
 - [ ] Achado 6 (baixo): interstitial nunca exibido / box de historico nao usado
