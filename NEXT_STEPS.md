@@ -2,19 +2,22 @@
 
 ## Status Atual
 
-- **Versao**: 1.0.0+1
+- **Versao**: 1.0.0+4
 - **Branch**: main
-- **Ultimo commit**: c23e8ce
+- **Ultimo commit**: 224c697
 - **Flutter**: 3.44.7 stable
 - **Xcode**: 26.6
-- **flutter analyze**: 0 erros (apenas warnings info)
-- **flutter test**: 134+ passando (profile, contacts, QR, home)
-- **Android APK**: 70.1MB (`app/build/app/outputs/flutter-apk/app-release.apk`)
-- **Android AAB**: 64.1MB (`app/build/app/outputs/bundle/release/app-release.aab`)
+- **flutter analyze**: 0 erros
+- **flutter test**: 495 passando + 23 goldens falham isoladas (pixel diff ~0.06%, ambientais)
+- **Build iOS IPA**: 33.4MB (`app/build/ios/ipa/VCardSmart.ipa`) — Version 1.0.0, Build 4
 - **Build iOS Simulator**: OK
+- **Status App Store**: aguardando re-teste — submissao 1.0.0 (build 1) rejeitada (Guideline 5.6, features enganosas); corrigido e build 4 pronto via Transporter
 
 ## Commits Recentes
 
+- `224c697` — App Store resubmission v1.0.0+4 — features reais (QR/NFC/seguranca)
+- `976321e` — chore: add certificates folder to gitignore
+- `7dd16b3` — feat: Google Play Store v1.0.0+3 - teste fechado
 - `c23e8ce` — AdMob IDs reais (banner, interstitial, app ID)
 - `770c6c3` — docs: screenshots e feature graphic
 - `4369024` — assets: feature graphic + screenshots PNG
@@ -26,12 +29,14 @@
 
 ## O Que Foi Feito Nesta Sessao
 
-1. **Flutter 3.32.8 → 3.44.7** — upgrade completo
-2. **iOS Simulator build** — xattr fix, Swift Package Manager desabilitado
-3. **vCard campos** — adicionado instagram, foto (camera/galeria), fix LinkedIn/Website separados
-4. **AdMob** — IDs reais configurados (banner + interstitial)
-5. **Marketing assets** — feature graphic e screenshots capturados
-6. **AAB** — cmdline-tools instalado, AAB gerado com sucesso
+1. **App Store v1.0.0 (build 1) rejeitada** — Guideline 5.6 (features enganosas)
+2. **Auditoria de features** — identificados 6 achados; corrigidos 4 criticos
+3. **QR scan salva contato** — botao "Salvar contato" no dialog Perfil Encontrado
+4. **NFC receive salva contato** — botao "Salvar contato" no dialog Perfil Recebido
+5. **Seguranca real** — sessao de autenticacao real, lock no router (redirect /auth), PIN em secure storage, biometria com isDeviceSupported, toggle PIN wired nas settings
+6. **ImportDialog real** — rotas reais /qr/scan e /nfc/receive + colar vCard
+7. **Removido AuthGuard** (dead code); adicionadas rotas /auth e /pin-setup
+8. **Testes** — novos: auth_service, auth_redirect; atualizados security/settings/Qr/Nfc/ImportDialog (495 passando)
 
 ## Para Testar
 
@@ -39,6 +44,7 @@
 cd app
 PATH=/usr/bin:$PATH flutter analyze
 PATH=/usr/bin:$PATH flutter test
+PATH=/usr/bin:$PATH flutter build ipa --release
 PATH=/usr/bin:$PATH flutter build apk --release
 PATH=/usr/bin:$PATH flutter build appbundle --release
 ```
@@ -63,9 +69,17 @@ PATH=/usr/bin:$PATH flutter build appbundle --release
 3. ~~Criar provisioning profile~~ ✅
 4. ~~Configurar Xcode com signing~~ ✅
 5. ~~Build: `flutter build ipa --release`~~ ✅
-6. ~~Upload via Transporter~~ ✅ (aguardando processamento)
-7. Preencher listing no App Store Connect
-8. Submeter para revisao
+6. ~~Upload via Transporter~~ ✅ (build 4 / 1.0.0)
+7. ~~Preencher listing no App Store Connect~~ ✅
+8. **Re-submeter para revisao** — build 4 (re-teste pos correcoes 5.6)
+9. Incluir notas de revisao: QR/NFC/seguranca agora funcionam de verdade
+
+## Pendencias Antes de Publicar
+
+- [ ] Re-submeter build 4 na App Store e aguardar re-teste
+- [ ] (Google Play) Aguardar 14 dias de teste fechado → solicitar producao
+- [ ] Achado 5 (baixo): mismatch QR vCard × importFromQR JSON (latente, sem conflito)
+- [ ] Achado 6 (baixo): interstitial nunca exibido / box de historico nao usado
 
 ## URLs Importantes
 
@@ -76,23 +90,12 @@ PATH=/usr/bin:$PATH flutter build appbundle --release
 
 | Arquivo | Tamanho | Uso |
 |---------|---------|-----|
-| `app-release.apk` | 70.1MB | Teste manual + Play Console |
 | `app-release.aab` | 64.1MB | Google Play Store |
+| `VCardSmart.ipa` | 33.4MB | App Store (1.0.0 build 4) |
 | `feature_graphic_1024x500.png` | ~780KB | Google Play feature graphic |
-| `01_home_profile.png` | ~224KB | Screenshot — Home |
-| `02_qr_code.png` | ~199KB | Screenshot — QR Code |
-| `03_dark_theme.png` | ~186KB | Screenshot — Tema Escuro |
-
-## Pendencias Antes de Publicar
-
-- [ ] Criar conta no Play Console
-- [ ] Criar app (com.vcardsmart.app) no Play Console
-- [ ] Criar conta de servico → baixar chave JSON
-- [ ] Configurar Fastlane com chave JSON
-- [ ] Preencher store listing
-- [ ] Upload AAB + assets
-- [ ] Submeter para revisao
-- [ ] (Opcional) Criar Apple Developer account → publicar iOS
+| `01_home_profile.png` | ~299KB | Screenshot — Home |
+| `02_qr_code.png` | ~220KB | Screenshot — QR Code |
+| `03_dark_theme.png` | ~218KB | Screenshot — Tema Escuro |
 
 ## Ambiente Local
 
