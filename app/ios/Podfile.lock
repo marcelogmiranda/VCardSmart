@@ -189,7 +189,7 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
-  flutter_contacts: 5383945387e7ca37cf963d4be57c21f2fc15ca9f
+  flutter_contacts: 2ec1d6b62ca2869c3bbb3871bd74d4e3ef157135
   flutter_secure_storage: 1ed9476fba7e7a782b22888f956cce43e2c62f13
   Google-Mobile-Ads-SDK: 58b4fda3f9758fc1ed210aa5cf7777b5eb55d47e
   google_mobile_ads: c49bca7ce6656c411965e56b4e24893466fef840
@@ -216,6 +216,6 @@ SPEC CHECKSUMS:
   share_plus: 50da8cb520a8f0f65671c6c6a99b3617ed10a58a
   webview_flutter_wkwebview: 8ebf4fded22593026f7dbff1fbff31ea98573c8d
 
-PODFILE CHECKSUM: 183350979313437c694c6089dc7461e4310d5196
+PODFILE CHECKSUM: d49c1c1e564a93f3ed3228bbc503f67d41e72940
 
 COCOAPODS: 1.17.0

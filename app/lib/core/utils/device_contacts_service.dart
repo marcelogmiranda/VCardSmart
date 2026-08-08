@@ -31,16 +31,21 @@ class DeviceContactsService {
     }
 
     try {
-      final contacts = await FlutterContacts.getContacts(
-        withProperties: true,
-        withThumbnail: false,
+      final contacts = await FlutterContacts.getAll(
+        properties: {
+          ContactProperty.name,
+          ContactProperty.email,
+          ContactProperty.phone,
+          ContactProperty.organization,
+        },
       );
 
       final results = <DeviceContactSuggestion>[];
       final queryLower = query.toLowerCase();
 
       for (final contact in contacts) {
-        if (contact.displayName.toLowerCase().contains(queryLower)) {
+        final displayName = contact.displayName ?? '';
+        if (displayName.toLowerCase().contains(queryLower)) {
           String? email;
           String? phone;
           String? org;
@@ -52,12 +57,12 @@ class DeviceContactsService {
             phone = contact.phones.first.number;
           }
           if (contact.organizations.isNotEmpty) {
-            org = contact.organizations.first.company;
+            org = contact.organizations.first.name;
           }
 
           results.add(
             DeviceContactSuggestion(
-              name: contact.displayName,
+              name: displayName,
               email: email,
               phone: phone,
               organization: org,
@@ -81,9 +86,13 @@ class DeviceContactsService {
     }
 
     try {
-      final contacts = await FlutterContacts.getContacts(
-        withProperties: true,
-        withThumbnail: false,
+      final contacts = await FlutterContacts.getAll(
+        properties: {
+          ContactProperty.name,
+          ContactProperty.email,
+          ContactProperty.phone,
+          ContactProperty.organization,
+        },
       );
 
       return contacts.take(50).map((contact) {
@@ -98,11 +107,11 @@ class DeviceContactsService {
           phone = contact.phones.first.number;
         }
         if (contact.organizations.isNotEmpty) {
-          org = contact.organizations.first.company;
+          org = contact.organizations.first.name;
         }
 
         return DeviceContactSuggestion(
-          name: contact.displayName,
+          name: contact.displayName ?? '',
           email: email,
           phone: phone,
           organization: org,
