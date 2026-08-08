@@ -4,6 +4,8 @@ import '../../domain/usecases/set_pin_usecase.dart';
 import '../../domain/usecases/verify_pin_usecase.dart';
 import '../../../../core/security/biometric_service.dart';
 import '../../../../core/security/auth_service.dart';
+import '../../../../core/security/pin_service.dart';
+import '../../../settings/domain/entities/settings.dart';
 
 enum AuthState { unauthenticated, authenticated, checking, error }
 
@@ -11,12 +13,16 @@ class AuthStatus {
   final AuthState state;
   final bool biometricAvailable;
   final bool hasPin;
+  final bool needsSetup;
+  final int pinLength;
   final String? error;
 
   const AuthStatus({
     this.state = AuthState.checking,
     this.biometricAvailable = false,
     this.hasPin = false,
+    this.needsSetup = false,
+    this.pinLength = 6,
     this.error,
   });
 
@@ -24,12 +30,16 @@ class AuthStatus {
     AuthState? state,
     bool? biometricAvailable,
     bool? hasPin,
+    bool? needsSetup,
+    int? pinLength,
     String? error,
   }) {
     return AuthStatus(
       state: state ?? this.state,
       biometricAvailable: biometricAvailable ?? this.biometricAvailable,
       hasPin: hasPin ?? this.hasPin,
+      needsSetup: needsSetup ?? this.needsSetup,
+      pinLength: pinLength ?? this.pinLength,
       error: error,
     );
   }
@@ -55,18 +65,24 @@ class AuthNotifier extends StateNotifier<AuthStatus> {
   AuthNotifier(this._authenticate, this._setPin, this._verifyPin)
       : super(const AuthStatus());
 
-  Future<void> checkAuth() async {
+  Future<void> checkAuth(Settings settings) async {
     state = state.copyWith(state: AuthState.checking);
     try {
-      final biometricAvailable = await BiometricService.isAvailable();
-      final hasPin = await _authenticate.isRequired();
+      final biometricEnabled = settings.biometricEnabled &&
+          await BiometricService.isAvailable();
+      final hasPin = settings.pinEnabled && await PinService.hasPin();
+      final needsSetup = !settings.securitySetupAsked &&
+          !biometricEnabled &&
+          !hasPin;
       final isAuth = await _authenticate.isCurrentlyAuthenticated() ||
-          !hasPin && !biometricAvailable;
+          !(hasPin || biometricEnabled);
 
       state = state.copyWith(
         state: isAuth ? AuthState.authenticated : AuthState.unauthenticated,
-        biometricAvailable: biometricAvailable,
+        biometricAvailable: biometricEnabled,
         hasPin: hasPin,
+        needsSetup: needsSetup,
+        pinLength: settings.pinLength,
       );
     } catch (e) {
       state = state.copyWith(
@@ -109,10 +125,10 @@ class AuthNotifier extends StateNotifier<AuthStatus> {
     }
   }
 
-  Future<void> setPin(String pin) async {
+  Future<void> setPin(String pin, {int length = 6}) async {
     try {
-      await _setPin(pin);
-      state = state.copyWith(hasPin: true, error: null);
+      await _setPin(pin, length: length);
+      state = state.copyWith(hasPin: true, needsSetup: false, error: null);
     } catch (e) {
       state = state.copyWith(
         state: AuthState.error,
@@ -144,5 +160,5 @@ final authProvider = StateNotifierProvider<AuthNotifier, AuthStatus>((ref) {
     ref.read(authenticateUseCaseProvider),
     ref.read(setPinUseCaseProvider),
     ref.read(verifyPinUseCaseProvider),
-  )..checkAuth();
+  );
 });

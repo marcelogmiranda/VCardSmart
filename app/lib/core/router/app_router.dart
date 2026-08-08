@@ -13,17 +13,25 @@ import '../../../features/contacts/presentation/pages/import_page.dart';
 import '../../../features/settings/presentation/pages/settings_page.dart';
 import '../../../features/security/presentation/pages/auth_page.dart';
 import '../../../features/security/presentation/pages/pin_setup_page.dart';
+import '../../../features/security/presentation/pages/security_setup_page.dart';
 import '../../../features/security/presentation/providers/auth_provider.dart';
+import '../../../features/settings/presentation/providers/settings_provider.dart';
 import '../constants/app_constants.dart';
 import 'shell_page.dart';
 
 String? authRedirect(AuthStatus status, String location) {
   final isAuthPage = location == AppConstants.authRoute;
+  final isSetupPage = location == AppConstants.securitySetupRoute;
   if (status.state == AuthState.checking) {
     return isAuthPage ? null : AppConstants.authRoute;
   }
+  if (status.needsSetup) {
+    return isSetupPage ? null : AppConstants.securitySetupRoute;
+  }
   if (status.state == AuthState.authenticated) {
-    return isAuthPage ? AppConstants.homeRoute : null;
+    return (isAuthPage || isSetupPage)
+        ? AppConstants.homeRoute
+        : null;
   }
   return isAuthPage ? null : AppConstants.authRoute;
 }
@@ -34,6 +42,13 @@ final appRouterProvider = Provider<GoRouter>((ref) {
   void onAuthChanged(AuthStatus _) => refresh.value++;
   final removeListener =
       authNotifier.addListener(onAuthChanged, fireImmediately: false);
+
+  Future<void> runCheckAuth() async {
+    final settings = await ref.read(getSettingsUseCaseProvider)();
+    await authNotifier.checkAuth(settings);
+  }
+  Future.microtask(runCheckAuth);
+
   ref.onDispose(() {
     removeListener();
     refresh.dispose();
@@ -47,6 +62,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: AppConstants.authRoute,
         builder: (context, state) => const AuthPage(),
+      ),
+      GoRoute(
+        path: AppConstants.securitySetupRoute,
+        builder: (context, state) => const SecuritySetupPage(),
       ),
       ShellRoute(
         builder: (context, state, child) => ShellPage(child: child),

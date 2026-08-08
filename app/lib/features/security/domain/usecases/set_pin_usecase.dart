@@ -1,9 +1,9 @@
 import '../../../../core/security/pin_service.dart';
 
 class SetPinUseCase {
-  Future<void> call(String pin) async {
-    if (pin.length < 4) {
-      throw Exception('PIN deve ter pelo menos 4 dígitos');
+  Future<void> call(String pin, {int length = 6}) async {
+    if (pin.length != length) {
+      throw Exception('O PIN deve ter $length dígitos');
     }
     await PinService.setPin(pin);
   }

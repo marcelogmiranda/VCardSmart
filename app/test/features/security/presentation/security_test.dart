@@ -9,6 +9,30 @@ import 'package:vcardsmart/features/security/presentation/widgets/pin_input.dart
 import 'package:vcardsmart/features/security/domain/usecases/authenticate_usecase.dart';
 import 'package:vcardsmart/features/security/domain/usecases/set_pin_usecase.dart';
 import 'package:vcardsmart/features/security/domain/usecases/verify_pin_usecase.dart';
+import 'package:vcardsmart/features/settings/domain/entities/settings.dart';
+import 'package:vcardsmart/features/settings/domain/repositories/settings_repository.dart';
+import 'package:vcardsmart/features/settings/presentation/providers/settings_provider.dart';
+
+class _FakeSettingsRepository implements SettingsRepository {
+  Settings _settings = const Settings();
+
+  @override
+  Future<Settings> getSettings() async => _settings;
+
+  @override
+  Future<void> updateSettings(Settings settings) async {
+    _settings = settings;
+  }
+
+  @override
+  Future<void> resetSettings() async {
+    _settings = const Settings();
+  }
+}
+
+final _pinSetupOverrides = [
+  settingsRepositoryProvider.overrideWithValue(_FakeSettingsRepository()),
+];
 
 void main() {
   group('AuthStatus', () {
@@ -165,8 +189,9 @@ void main() {
   group('PinSetupPage', () {
     testWidgets('should display title', (tester) async {
       await tester.pumpWidget(
-        const ProviderScope(
-          child: MaterialApp(home: PinSetupPage()),
+        ProviderScope(
+          overrides: _pinSetupOverrides,
+          child: const MaterialApp(home: PinSetupPage()),
         ),
       );
       expect(find.text('Configurar PIN'), findsOneWidget);
@@ -174,8 +199,9 @@ void main() {
 
     testWidgets('should display PIN input', (tester) async {
       await tester.pumpWidget(
-        const ProviderScope(
-          child: MaterialApp(home: PinSetupPage()),
+        ProviderScope(
+          overrides: _pinSetupOverrides,
+          child: const MaterialApp(home: PinSetupPage()),
         ),
       );
       expect(find.text('Digite o PIN'), findsOneWidget);
@@ -183,8 +209,9 @@ void main() {
 
     testWidgets('should display PIN icon', (tester) async {
       await tester.pumpWidget(
-        const ProviderScope(
-          child: MaterialApp(home: PinSetupPage()),
+        ProviderScope(
+          overrides: _pinSetupOverrides,
+          child: const MaterialApp(home: PinSetupPage()),
         ),
       );
       expect(find.byIcon(Icons.pin_outlined), findsOneWidget);
@@ -276,7 +303,7 @@ class _FakeAuthenticateUseCase extends AuthenticateUseCase {
   }
 
   @override
-  Future<bool> isRequired() async => true;
+  Future<bool> isRequired(Settings settings) async => true;
 
   @override
   Future<bool> isCurrentlyAuthenticated() async => true;
@@ -286,7 +313,7 @@ class _FakeSetPinUseCase extends SetPinUseCase {
   bool throwOnSet = false;
 
   @override
-  Future<void> call(String pin) async {
+  Future<void> call(String pin, {int length = 6}) async {
     if (throwOnSet) throw Exception('Set pin failed');
   }
 

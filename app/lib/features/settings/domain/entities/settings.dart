@@ -6,6 +6,8 @@ class Settings {
   final bool biometricEnabled;
   final bool pinEnabled;
   final bool adsEnabled;
+  final bool securitySetupAsked;
+  final int pinLength;
 
   const Settings({
     this.themeMode = ThemeMode.system,
@@ -13,6 +15,8 @@ class Settings {
     this.biometricEnabled = false,
     this.pinEnabled = false,
     this.adsEnabled = true,
+    this.securitySetupAsked = false,
+    this.pinLength = 6,
   });
 
   Settings copyWith({
@@ -21,6 +25,8 @@ class Settings {
     bool? biometricEnabled,
     bool? pinEnabled,
     bool? adsEnabled,
+    bool? securitySetupAsked,
+    int? pinLength,
   }) {
     return Settings(
       themeMode: themeMode ?? this.themeMode,
@@ -28,6 +34,8 @@ class Settings {
       biometricEnabled: biometricEnabled ?? this.biometricEnabled,
       pinEnabled: pinEnabled ?? this.pinEnabled,
       adsEnabled: adsEnabled ?? this.adsEnabled,
+      securitySetupAsked: securitySetupAsked ?? this.securitySetupAsked,
+      pinLength: pinLength ?? this.pinLength,
     );
   }
 }

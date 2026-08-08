@@ -1,3 +1,4 @@
+import '../../features/settings/domain/entities/settings.dart';
 import 'biometric_service.dart';
 import 'pin_service.dart';
 
@@ -25,10 +26,13 @@ class AuthService {
     return _isAuthenticated;
   }
 
-  static Future<bool> isAuthRequired() async {
-    final hasBiometric = await BiometricService.isAvailable();
-    final hasPin = await PinService.hasPin();
-    return hasBiometric || hasPin;
+  /// A trava deve ser exigida apenas pelo que o usuário realmente
+  /// configurou (toggles de Settings), não pela capacidade do aparelho.
+  static Future<bool> isAuthRequired(Settings settings) async {
+    final hasPin = settings.pinEnabled && await PinService.hasPin();
+    final hasBiometric =
+        settings.biometricEnabled && await BiometricService.isAvailable();
+    return hasPin || hasBiometric;
   }
 
   static void markAuthenticated() {

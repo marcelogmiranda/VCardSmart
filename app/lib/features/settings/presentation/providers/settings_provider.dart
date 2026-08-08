@@ -51,6 +51,16 @@ class SettingsNotifier extends StateNotifier<Settings> {
     await _updateSettings(state);
   }
 
+  Future<void> updatePinLength(int length) async {
+    state = state.copyWith(pinLength: length);
+    await _updateSettings(state);
+  }
+
+  Future<void> markSecurityAsked() async {
+    state = state.copyWith(securitySetupAsked: true);
+    await _updateSettings(state);
+  }
+
   Future<void> updateAds(bool enabled) async {
     state = state.copyWith(adsEnabled: enabled);
     await _updateSettings(state);

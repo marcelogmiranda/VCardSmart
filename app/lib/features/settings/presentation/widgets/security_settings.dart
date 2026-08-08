@@ -21,7 +21,7 @@ class SecuritySettings extends StatelessWidget {
         SwitchListTile(
           secondary: const Icon(Icons.fingerprint),
           title: const Text('Biometria'),
-          subtitle: const Text('Autenticar com impressão digital'),
+          subtitle: const Text('Usar Face ID / Touch ID do aparelho'),
           value: biometricEnabled,
           onChanged: onBiometricChanged,
         ),

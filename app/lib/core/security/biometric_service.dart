@@ -17,7 +17,8 @@ class BiometricService {
         localizedReason: 'Autentique-se para acessar',
         options: const AuthenticationOptions(
           stickyAuth: true,
-          biometricOnly: true,
+          biometricOnly: false,
+          useErrorDialogs: true,
         ),
       );
     } catch (_) {

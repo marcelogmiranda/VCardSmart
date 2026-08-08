@@ -20,4 +20,5 @@ class AppConstants {
   static const String importRoute = '/contacts/import';
   static const String authRoute = '/auth';
   static const String pinSetupRoute = '/pin-setup';
+  static const String securitySetupRoute = '/security-setup';
 }

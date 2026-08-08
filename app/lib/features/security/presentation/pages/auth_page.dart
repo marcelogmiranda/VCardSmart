@@ -46,12 +46,14 @@ class AuthPage extends ConsumerWidget {
                       ],
                       if (authStatus.hasPin) ...[
                         PinInput(
+                          length: authStatus.pinLength,
                           onCompleted: (pin) {
                             ref.read(authProvider.notifier).verifyPin(pin);
                           },
                         ),
                       ],
-                      if (!authStatus.biometricAvailable && !authStatus.hasPin) ...[
+                      if (!authStatus.biometricAvailable &&
+                          !authStatus.hasPin) ...[
                         const Text(
                           'Nenhuma autenticação configurada',
                           style: TextStyle(color: Colors.grey),

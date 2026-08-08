@@ -11,6 +11,8 @@ class LocalSettingsRepository implements SettingsRepository {
   static const String _biometricKey = 'biometricEnabled';
   static const String _pinKey = 'pinEnabled';
   static const String _adsKey = 'adsEnabled';
+  static const String _securityAskedKey = 'securitySetupAsked';
+  static const String _pinLengthKey = 'pinLength';
 
   Box get _box => HiveService.settingsBox;
 
@@ -22,6 +24,8 @@ class LocalSettingsRepository implements SettingsRepository {
     final biometric = _box.get(_biometricKey, defaultValue: false) as bool;
     final pin = _box.get(_pinKey, defaultValue: false) as bool;
     final ads = _box.get(_adsKey, defaultValue: true) as bool;
+    final securityAsked = _box.get(_securityAskedKey, defaultValue: false) as bool;
+    final pinLength = _box.get(_pinLengthKey, defaultValue: 6) as int;
 
     return Settings(
       themeMode: ThemeMode.values[themeIndex],
@@ -29,6 +33,8 @@ class LocalSettingsRepository implements SettingsRepository {
       biometricEnabled: biometric,
       pinEnabled: pin,
       adsEnabled: ads,
+      securitySetupAsked: securityAsked,
+      pinLength: pinLength,
     );
   }
 
@@ -40,6 +46,8 @@ class LocalSettingsRepository implements SettingsRepository {
     await _box.put(_biometricKey, settings.biometricEnabled);
     await _box.put(_pinKey, settings.pinEnabled);
     await _box.put(_adsKey, settings.adsEnabled);
+    await _box.put(_securityAskedKey, settings.securitySetupAsked);
+    await _box.put(_pinLengthKey, settings.pinLength);
   }
 
   @override

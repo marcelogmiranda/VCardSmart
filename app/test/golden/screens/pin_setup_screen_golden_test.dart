@@ -3,7 +3,27 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:vcardsmart/features/security/presentation/pages/pin_setup_page.dart';
 import 'package:vcardsmart/features/security/presentation/providers/auth_provider.dart';
+import 'package:vcardsmart/features/settings/domain/entities/settings.dart';
+import 'package:vcardsmart/features/settings/domain/repositories/settings_repository.dart';
+import 'package:vcardsmart/features/settings/presentation/providers/settings_provider.dart';
 import 'package:vcardsmart/core/theme/app_theme.dart';
+
+class _FakeSettingsRepository implements SettingsRepository {
+  Settings _settings = const Settings();
+
+  @override
+  Future<Settings> getSettings() async => _settings;
+
+  @override
+  Future<void> updateSettings(Settings settings) async {
+    _settings = settings;
+  }
+
+  @override
+  Future<void> resetSettings() async {
+    _settings = const Settings();
+  }
+}
 
 void main() {
   group('PinSetupPage Golden', () {
@@ -17,6 +37,9 @@ void main() {
                 ref.read(setPinUseCaseProvider),
                 ref.read(verifyPinUseCaseProvider),
               ),
+            ),
+            settingsRepositoryProvider.overrideWithValue(
+              _FakeSettingsRepository(),
             ),
           ],
           child: MaterialApp(
@@ -42,6 +65,9 @@ void main() {
                 ref.read(setPinUseCaseProvider),
                 ref.read(verifyPinUseCaseProvider),
               ),
+            ),
+            settingsRepositoryProvider.overrideWithValue(
+              _FakeSettingsRepository(),
             ),
           ],
           child: MaterialApp(

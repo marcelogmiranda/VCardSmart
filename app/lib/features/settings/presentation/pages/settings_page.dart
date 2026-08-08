@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:vcardsmart/l10n/app_localizations.dart';
 import 'package:vcardsmart/core/constants/app_constants.dart';
+import 'package:vcardsmart/core/security/biometric_service.dart';
 import 'package:vcardsmart/features/security/domain/usecases/set_pin_usecase.dart';
 import '../providers/settings_provider.dart';
 import '../widgets/theme_toggle.dart';
@@ -43,7 +44,7 @@ class SettingsPage extends ConsumerWidget {
             biometricEnabled: settings.biometricEnabled,
             pinEnabled: settings.pinEnabled,
             onBiometricChanged: (enabled) {
-              ref.read(settingsProvider.notifier).updateBiometric(enabled);
+              _onBiometricChanged(context, ref, enabled);
             },
             onPinChanged: (enabled) {
               _onPinChanged(context, ref, enabled);
@@ -74,6 +75,27 @@ class SettingsPage extends ConsumerWidget {
         ],
       ),
     );
+  }
+
+  Future<void> _onBiometricChanged(
+    BuildContext context,
+    WidgetRef ref,
+    bool enabled,
+  ) async {
+    if (enabled) {
+      final available = await BiometricService.isAvailable();
+      if (!available) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Biometria não disponível neste aparelho'),
+            ),
+          );
+        }
+        return;
+      }
+    }
+    ref.read(settingsProvider.notifier).updateBiometric(enabled);
   }
 
   Future<void> _onPinChanged(
