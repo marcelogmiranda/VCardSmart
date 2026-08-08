@@ -1,4 +1,5 @@
 import '../../../../core/security/auth_service.dart';
+import '../../../../core/security/biometric_service.dart';
 import '../../../settings/domain/entities/settings.dart';
 
 class AuthenticateUseCase {
@@ -12,5 +13,9 @@ class AuthenticateUseCase {
 
   Future<bool> isCurrentlyAuthenticated() async {
     return await AuthService.isAuthenticated();
+  }
+
+  Future<bool> isBiometricAvailable() async {
+    return await BiometricService.isAvailable();
   }
 }

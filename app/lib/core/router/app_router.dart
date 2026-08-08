@@ -22,17 +22,21 @@ import 'shell_page.dart';
 String? authRedirect(AuthStatus status, String location) {
   final isAuthPage = location == AppConstants.authRoute;
   final isSetupPage = location == AppConstants.securitySetupRoute;
+  final isPinSetupPage = location == AppConstants.pinSetupRoute;
+
+  if (status.needsSetup) {
+    final isSetupFlow = isSetupPage || isPinSetupPage;
+    return isSetupFlow ? null : AppConstants.securitySetupRoute;
+  }
+
   if (status.state == AuthState.checking) {
     return isAuthPage ? null : AppConstants.authRoute;
   }
-  if (status.needsSetup) {
-    return isSetupPage ? null : AppConstants.securitySetupRoute;
-  }
+
   if (status.state == AuthState.authenticated) {
-    return (isAuthPage || isSetupPage)
-        ? AppConstants.homeRoute
-        : null;
+    return (isAuthPage || isSetupPage) ? AppConstants.homeRoute : null;
   }
+
   return isAuthPage ? null : AppConstants.authRoute;
 }
 

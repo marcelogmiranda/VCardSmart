@@ -5,6 +5,7 @@ import '../../../../core/constants/app_constants.dart';
 import '../../../../core/security/biometric_service.dart';
 import '../../../settings/presentation/providers/settings_provider.dart';
 import '../../../../shared/widgets/app_button.dart';
+import '../providers/auth_provider.dart';
 
 class SecuritySetupPage extends ConsumerStatefulWidget {
   const SecuritySetupPage({super.key});
@@ -49,6 +50,8 @@ class _SecuritySetupPageState extends ConsumerState<SecuritySetupPage> {
       }
     }
     await settingsNotifier.markSecurityAsked();
+    final settings = ref.read(settingsProvider);
+    await ref.read(authProvider.notifier).checkAuth(settings);
     if (mounted) {
       context.go(AppConstants.homeRoute);
     }

@@ -1,9 +1,19 @@
+import 'package:flutter/foundation.dart';
 import '../../features/settings/domain/entities/settings.dart';
 import 'biometric_service.dart';
 import 'pin_service.dart';
 
 class AuthService {
   static bool _isAuthenticated = false;
+
+  @visibleForTesting
+  static Future<bool> Function()? debugIsAuthenticatedOverride;
+
+  @visibleForTesting
+  static void Function()? debugMarkAuthenticatedOverride;
+
+  @visibleForTesting
+  static void Function()? debugLogoutOverride;
 
   static Future<bool> authenticate() async {
     if (await BiometricService.isAvailable()) {
@@ -23,6 +33,9 @@ class AuthService {
   }
 
   static Future<bool> isAuthenticated() async {
+    if (debugIsAuthenticatedOverride != null) {
+      return await debugIsAuthenticatedOverride!();
+    }
     return _isAuthenticated;
   }
 
@@ -36,10 +49,18 @@ class AuthService {
   }
 
   static void markAuthenticated() {
+    if (debugMarkAuthenticatedOverride != null) {
+      debugMarkAuthenticatedOverride!();
+      return;
+    }
     _isAuthenticated = true;
   }
 
   static void logout() {
+    if (debugLogoutOverride != null) {
+      debugLogoutOverride!();
+      return;
+    }
     _isAuthenticated = false;
   }
 }

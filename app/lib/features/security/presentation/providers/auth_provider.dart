@@ -2,9 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../domain/usecases/authenticate_usecase.dart';
 import '../../domain/usecases/set_pin_usecase.dart';
 import '../../domain/usecases/verify_pin_usecase.dart';
-import '../../../../core/security/biometric_service.dart';
 import '../../../../core/security/auth_service.dart';
-import '../../../../core/security/pin_service.dart';
 import '../../../settings/domain/entities/settings.dart';
 
 enum AuthState { unauthenticated, authenticated, checking, error }
@@ -69,8 +67,8 @@ class AuthNotifier extends StateNotifier<AuthStatus> {
     state = state.copyWith(state: AuthState.checking);
     try {
       final biometricEnabled = settings.biometricEnabled &&
-          await BiometricService.isAvailable();
-      final hasPin = settings.pinEnabled && await PinService.hasPin();
+          await _authenticate.isBiometricAvailable();
+      final hasPin = settings.pinEnabled && await _setPin.hasPin();
       final needsSetup = !settings.securitySetupAsked &&
           !biometricEnabled &&
           !hasPin;
@@ -128,7 +126,7 @@ class AuthNotifier extends StateNotifier<AuthStatus> {
   Future<void> setPin(String pin, {int length = 6}) async {
     try {
       await _setPin(pin, length: length);
-      state = state.copyWith(hasPin: true, needsSetup: false, error: null);
+      state = state.copyWith(hasPin: true, error: null);
     } catch (e) {
       state = state.copyWith(
         state: AuthState.error,
