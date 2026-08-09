@@ -32,8 +32,10 @@ class _ProfileFormState extends State<ProfileForm> {
   late final TextEditingController _websiteController;
   late final TextEditingController _bioController;
   final TextEditingController _searchController = TextEditingController();
+  final FocusNode _searchFocusNode = FocusNode();
   List<DeviceContactSuggestion> _suggestions = [];
   bool _isSearching = false;
+  bool _permissionPrompted = false;
   String? _photoPath;
 
   @override
@@ -63,6 +65,7 @@ class _ProfileFormState extends State<ProfileForm> {
     );
     _bioController = TextEditingController(text: widget.profile?.bio ?? '');
     _photoPath = widget.profile?.photoPath;
+    _searchFocusNode.addListener(_onSearchFieldFocus);
   }
 
   @override
@@ -78,6 +81,7 @@ class _ProfileFormState extends State<ProfileForm> {
     _websiteController.dispose();
     _bioController.dispose();
     _searchController.dispose();
+    _searchFocusNode.dispose();
     super.dispose();
   }
 
@@ -237,6 +241,53 @@ class _ProfileFormState extends State<ProfileForm> {
         _suggestions = results;
         _isSearching = false;
       });
+      if (results.isEmpty && query.trim().length >= 2) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Nenhum contato encontrado no dispositivo'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+      }
+    }
+  }
+
+  void _onSearchFieldFocus() {
+    if (!_searchFocusNode.hasFocus) return;
+    _loadAllContacts();
+  }
+
+  Future<void> _loadAllContacts() async {
+    if (_searchController.text.trim().isNotEmpty) return;
+
+    setState(() => _isSearching = true);
+    final granted = await DeviceContactsService.requestPermission();
+    if (!mounted) return;
+    _permissionPrompted = true;
+
+    if (!granted) {
+      setState(() {
+        _suggestions = [];
+        _isSearching = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Permissão de contatos negada. '
+            'Habilite em Ajustes > Privacidade e Segurança > Contatos.',
+          ),
+          duration: Duration(seconds: 3),
+        ),
+      );
+      return;
+    }
+
+    final results = await DeviceContactsService.getAllContacts();
+    if (mounted) {
+      setState(() {
+        _suggestions = results;
+        _isSearching = false;
+      });
     }
   }
 
@@ -322,6 +373,7 @@ class _ProfileFormState extends State<ProfileForm> {
                   const SizedBox(height: 12),
                   TextField(
                     controller: _searchController,
+                    focusNode: _searchFocusNode,
                     decoration: InputDecoration(
                       hintText: 'Buscar contato no celular...',
                       prefixIcon: const Icon(Icons.search),
@@ -335,11 +387,22 @@ class _ProfileFormState extends State<ProfileForm> {
                                     CircularProgressIndicator(strokeWidth: 2),
                               ),
                             )
-                          : null,
+                          : IconButton(
+                              icon: const Icon(Icons.contacts_outlined),
+                              tooltip: 'Listar contatos',
+                              onPressed: _loadAllContacts,
+                            ),
                       border: const OutlineInputBorder(),
                       isDense: true,
                     ),
                     onChanged: _searchDeviceContacts,
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Toque no campo para listar os contatos do celular',
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.colorScheme.outline,
+                    ),
                   ),
                   if (_suggestions.isNotEmpty) ...[
                     const SizedBox(height: 8),
@@ -385,6 +448,18 @@ class _ProfileFormState extends State<ProfileForm> {
                                 _applySuggestion(suggestion),
                           );
                         },
+                      ),
+                    ),
+                  ],
+                  if (_isSearching == false &&
+                      _suggestions.isEmpty &&
+                      _searchController.text.trim().isEmpty &&
+                      _permissionPrompted) ...[
+                    const SizedBox(height: 8),
+                    Text(
+                      'Nenhum contato encontrado no dispositivo',
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.outline,
                       ),
                     ),
                   ],

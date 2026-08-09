@@ -15,6 +15,9 @@
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" image="LaunchBackground" translatesAutoresizingMaskIntoConstraints="NO" id="BG">
+                                <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+                            </imageView>
                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" image="AppIcon" translatesAutoresizingMaskIntoConstraints="NO" id="YRO-k0-Ey4">
                                 <rect key="frame" x="146.5" y="326" width="100" height="100"/>
                                 <constraints>
@@ -28,6 +31,10 @@
                         <constraints>
                             <constraint firstItem="YRO-k0-Ey4" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="1a2-6s-vTC"/>
                             <constraint firstItem="YRO-k0-Ey4" firstAttribute="centerY" secondItem="Ze5-6b-2t3" secondAttribute="centerY" id="4X2-HB-R7a"/>
+                            <constraint firstItem="BG" firstAttribute="top" secondItem="Ze5-6b-2t3" secondAttribute="top" id="b1"/>
+                            <constraint firstItem="BG" firstAttribute="bottom" secondItem="Ze5-6b-2t3" secondAttribute="bottom" id="b2"/>
+                            <constraint firstItem="BG" firstAttribute="leading" secondItem="Ze5-6b-2t3" secondAttribute="leading" id="b3"/>
+                            <constraint firstItem="BG" firstAttribute="trailing" secondItem="Ze5-6b-2t3" secondAttribute="trailing" id="b4"/>
                         </constraints>
                     </view>
                 </viewController>
@@ -38,5 +45,6 @@
     </scenes>
     <resources>
         <image name="AppIcon" width="1024" height="1024"/>
+        <image name="LaunchBackground" width="768" height="1344"/>
     </resources>
 </document>
