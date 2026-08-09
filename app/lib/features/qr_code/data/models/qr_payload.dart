@@ -25,6 +25,15 @@ class QRPayload {
     if (profile.instagram != null && profile.instagram!.isNotEmpty) {
       buffer.writeln('X-INSTAGRAM:${profile.instagram}');
     }
+    if (profile.facebook != null && profile.facebook!.isNotEmpty) {
+      buffer.writeln('X-FACEBOOK:${profile.facebook}');
+    }
+    if (profile.x != null && profile.x!.isNotEmpty) {
+      buffer.writeln('X-TWITTER:${profile.x}');
+    }
+    if (profile.social != null && profile.social!.isNotEmpty) {
+      buffer.writeln('X-SOCIAL:${profile.social}');
+    }
     if (profile.bio != null && profile.bio!.isNotEmpty) {
       buffer.writeln('NOTE:${profile.bio}');
     }
@@ -40,6 +49,9 @@ class QRPayload {
     String? website;
     String? linkedin;
     String? instagram;
+    String? facebook;
+    String? x;
+    String? social;
     String? bio;
 
     for (final line in lines) {
@@ -56,6 +68,12 @@ class QRPayload {
         linkedin = trimmed.substring(11);
       } else if (trimmed.startsWith('X-INSTAGRAM:')) {
         instagram = trimmed.substring(12);
+      } else if (trimmed.startsWith('X-FACEBOOK:')) {
+        facebook = trimmed.substring(11);
+      } else if (trimmed.startsWith('X-TWITTER:')) {
+        x = trimmed.substring(10);
+      } else if (trimmed.startsWith('X-SOCIAL:')) {
+        social = trimmed.substring(9);
       } else if (trimmed.startsWith('NOTE:')) {
         bio = trimmed.substring(5);
       }
@@ -74,6 +92,9 @@ class QRPayload {
       website: website,
       linkedin: linkedin,
       instagram: instagram,
+      facebook: facebook,
+      x: x,
+      social: social,
       bio: bio,
       createdAt: now,
       updatedAt: now,

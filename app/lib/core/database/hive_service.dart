@@ -82,13 +82,16 @@ class _ProfileAdapter extends TypeAdapter<Profile> {
       createdAt: fields[8] as DateTime,
       updatedAt: fields[9] as DateTime,
       instagram: fields[10] as String?,
+      facebook: fields[11] as String?,
+      x: fields[12] as String?,
+      social: fields[13] as String?,
     );
   }
 
   @override
   void write(BinaryWriter writer, Profile obj) {
     writer
-      ..writeByte(11)
+      ..writeByte(14)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -110,7 +113,13 @@ class _ProfileAdapter extends TypeAdapter<Profile> {
       ..writeByte(9)
       ..write(obj.updatedAt)
       ..writeByte(10)
-      ..write(obj.instagram);
+      ..write(obj.instagram)
+      ..writeByte(11)
+      ..write(obj.facebook)
+      ..writeByte(12)
+      ..write(obj.x)
+      ..writeByte(13)
+      ..write(obj.social);
   }
 
   @override

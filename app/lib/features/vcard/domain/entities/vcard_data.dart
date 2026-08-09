@@ -11,6 +11,9 @@ class VCardData {
   final String? note;
   final String? photo;
   final String? linkedin;
+  final String? facebook;
+  final String? x;
+  final String? social;
 
   const VCardData({
     this.version = '3.0',
@@ -25,6 +28,9 @@ class VCardData {
     this.note,
     this.photo,
     this.linkedin,
+    this.facebook,
+    this.x,
+    this.social,
   });
 
   String get fullName {
@@ -47,6 +53,9 @@ class VCardData {
     String? note,
     String? photo,
     String? linkedin,
+    String? facebook,
+    String? x,
+    String? social,
   }) {
     return VCardData(
       version: version ?? this.version,
@@ -61,6 +70,9 @@ class VCardData {
       note: note ?? this.note,
       photo: photo ?? this.photo,
       linkedin: linkedin ?? this.linkedin,
+      facebook: facebook ?? this.facebook,
+      x: x ?? this.x,
+      social: social ?? this.social,
     );
   }
 }

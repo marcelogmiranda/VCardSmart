@@ -60,6 +60,15 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     if (profile.instagram != null && profile.instagram!.isNotEmpty) {
       sb.writeln('X-INSTAGRAM:${profile.instagram}');
     }
+    if (profile.facebook != null && profile.facebook!.isNotEmpty) {
+      sb.writeln('X-FACEBOOK:${profile.facebook}');
+    }
+    if (profile.x != null && profile.x!.isNotEmpty) {
+      sb.writeln('X-TWITTER:${profile.x}');
+    }
+    if (profile.social != null && profile.social!.isNotEmpty) {
+      sb.writeln('X-SOCIAL:${profile.social}');
+    }
     if (profile.bio != null && profile.bio!.isNotEmpty) {
       sb.writeln('NOTE:${profile.bio}');
     }

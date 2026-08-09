@@ -12,6 +12,10 @@ void main() {
         phone: '123456',
         website: 'https://johndoe.com',
         linkedin: 'linkedin.com/in/johndoe',
+        instagram: '@johndoe',
+        facebook: 'facebook.com/johndoe',
+        x: 'x.com/johndoe',
+        social: 'https://johndoe.social',
         bio: 'Developer',
         createdAt: DateTime(2024),
         updatedAt: DateTime(2024),
@@ -23,11 +27,15 @@ void main() {
       expect(json, contains('"phone":"123456"'));
       expect(json, contains('"website":"https://johndoe.com"'));
       expect(json, contains('"linkedin":"linkedin.com/in/johndoe"'));
+      expect(json, contains('"instagram":"@johndoe"'));
+      expect(json, contains('"facebook":"facebook.com/johndoe"'));
+      expect(json, contains('"x":"x.com/johndoe"'));
+      expect(json, contains('"social":"https://johndoe.social"'));
       expect(json, contains('"bio":"Developer"'));
     });
 
     test('decodeProfile should parse JSON string into Profile', () {
-      const json = '{"name":"Jane","email":"jane@test.com","phone":"999","website":"https://jane.com","linkedin":"linkedin.com/in/jane","bio":"Designer"}';
+      const json = '{"name":"Jane","email":"jane@test.com","phone":"999","website":"https://jane.com","linkedin":"linkedin.com/in/jane","instagram":"@jane","facebook":"facebook.com/jane","x":"x.com/jane","social":"https://jane.social","bio":"Designer"}';
 
       final profile = NFCPayload.decodeProfile(json);
 
@@ -36,6 +44,10 @@ void main() {
       expect(profile.phone, '999');
       expect(profile.website, 'https://jane.com');
       expect(profile.linkedin, 'linkedin.com/in/jane');
+      expect(profile.instagram, '@jane');
+      expect(profile.facebook, 'facebook.com/jane');
+      expect(profile.x, 'x.com/jane');
+      expect(profile.social, 'https://jane.social');
       expect(profile.bio, 'Designer');
       expect(profile.id, isNotNull);
       expect(profile.createdAt, isNotNull);
@@ -52,6 +64,10 @@ void main() {
       expect(profile.phone, isNull);
       expect(profile.website, isNull);
       expect(profile.linkedin, isNull);
+      expect(profile.instagram, isNull);
+      expect(profile.facebook, isNull);
+      expect(profile.x, isNull);
+      expect(profile.social, isNull);
       expect(profile.bio, isNull);
     });
 

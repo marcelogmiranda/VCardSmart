@@ -12,6 +12,10 @@ class NFCPayload {
       'phone': profile.phone,
       'website': profile.website,
       'linkedin': profile.linkedin,
+      'instagram': profile.instagram,
+      'facebook': profile.facebook,
+      'x': profile.x,
+      'social': profile.social,
       'bio': profile.bio,
     };
     return jsonEncode(json);
@@ -27,6 +31,10 @@ class NFCPayload {
       phone: json['phone'] as String?,
       website: json['website'] as String?,
       linkedin: json['linkedin'] as String?,
+      instagram: json['instagram'] as String?,
+      facebook: json['facebook'] as String?,
+      x: json['x'] as String?,
+      social: json['social'] as String?,
       bio: json['bio'] as String?,
       createdAt: now,
       updatedAt: now,

@@ -6,6 +6,9 @@ class Profile {
   final String? linkedin;
   final String? instagram;
   final String? website;
+  final String? facebook;
+  final String? x;
+  final String? social;
   final String? bio;
   final String? photoPath;
   final DateTime createdAt;
@@ -19,6 +22,9 @@ class Profile {
     this.linkedin,
     this.instagram,
     this.website,
+    this.facebook,
+    this.x,
+    this.social,
     this.bio,
     this.photoPath,
     required this.createdAt,
@@ -33,6 +39,9 @@ class Profile {
     String? linkedin,
     String? instagram,
     String? website,
+    String? facebook,
+    String? x,
+    String? social,
     String? bio,
     String? photoPath,
     DateTime? createdAt,
@@ -46,6 +55,9 @@ class Profile {
       linkedin: linkedin ?? this.linkedin,
       instagram: instagram ?? this.instagram,
       website: website ?? this.website,
+      facebook: facebook ?? this.facebook,
+      x: x ?? this.x,
+      social: social ?? this.social,
       bio: bio ?? this.bio,
       photoPath: photoPath ?? this.photoPath,
       createdAt: createdAt ?? this.createdAt,

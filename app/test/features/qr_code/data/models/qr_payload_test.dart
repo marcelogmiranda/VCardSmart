@@ -14,6 +14,10 @@ void main() {
       phone: '+5511999999999',
       website: 'https://joao.com',
       linkedin: 'linkedin.com/in/joaosilva',
+      instagram: '@joaosilva',
+      facebook: 'facebook.com/joaosilva',
+      x: 'x.com/joaosilva',
+      social: 'https://joao.social',
       bio: 'Desenvolvedor Flutter',
       createdAt: DateTime(2024),
       updatedAt: DateTime(2024),
@@ -31,6 +35,10 @@ void main() {
         expect(vCard, contains('TEL:+5511999999999'));
         expect(vCard, contains('URL:https://joao.com'));
         expect(vCard, contains('X-LINKEDIN:linkedin.com/in/joaosilva'));
+        expect(vCard, contains('X-INSTAGRAM:@joaosilva'));
+        expect(vCard, contains('X-FACEBOOK:facebook.com/joaosilva'));
+        expect(vCard, contains('X-TWITTER:x.com/joaosilva'));
+        expect(vCard, contains('X-SOCIAL:https://joao.social'));
         expect(vCard, contains('NOTE:Desenvolvedor Flutter'));
         expect(vCard, contains('END:VCARD'));
       });
@@ -77,6 +85,10 @@ void main() {
             'TEL:+5511888888888\n'
             'URL:https://ana.com\n'
             'X-LINKEDIN:linkedin.com/in/anacosta\n'
+            'X-INSTAGRAM:@anacosta\n'
+            'X-FACEBOOK:facebook.com/anacosta\n'
+            'X-TWITTER:x.com/anacosta\n'
+            'X-SOCIAL:https://ana.social\n'
             'NOTE:Designer UX\n'
             'END:VCARD';
 
@@ -87,6 +99,10 @@ void main() {
         expect(profile.phone, '+5511888888888');
         expect(profile.website, 'https://ana.com');
         expect(profile.linkedin, 'linkedin.com/in/anacosta');
+        expect(profile.instagram, '@anacosta');
+        expect(profile.facebook, 'facebook.com/anacosta');
+        expect(profile.x, 'x.com/anacosta');
+        expect(profile.social, 'https://ana.social');
         expect(profile.bio, 'Designer UX');
       });
 

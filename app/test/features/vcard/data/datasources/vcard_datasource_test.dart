@@ -39,6 +39,9 @@ void main() {
           website: 'https://maria.com',
           address: 'Rua A, 123',
           linkedin: 'linkedin.com/in/maria',
+          facebook: 'facebook.com/maria',
+          x: 'x.com/maria',
+          social: 'https://maria.social',
           note: 'Important contact',
           photo: 'base64data',
         );
@@ -54,6 +57,9 @@ void main() {
         expect(result, contains('URL:https://maria.com'));
         expect(result, contains('ADR:;;Rua A, 123;;;'));
         expect(result, contains('X-LINKEDIN:linkedin.com/in/maria'));
+        expect(result, contains('X-FACEBOOK:facebook.com/maria'));
+        expect(result, contains('X-TWITTER:x.com/maria'));
+        expect(result, contains('X-SOCIAL:https://maria.social'));
         expect(result, contains('NOTE:Important contact'));
         expect(result, contains('PHOTO;ENCODING=b;TYPE=JPEG:base64data'));
       });
@@ -107,6 +113,9 @@ void main() {
             'URL:https://carlos.com\n'
             'ADR:;;Rua B, 456;;;;\n'
             'X-LINKEDIN:linkedin.com/in/carlos\n'
+            'X-FACEBOOK:facebook.com/carlos\n'
+            'X-TWITTER:x.com/carlos\n'
+            'X-SOCIAL:https://carlos.social\n'
             'NOTE:My note\n'
             'PHOTO;ENCODING=b;TYPE=JPEG:photodata\n'
             'END:VCARD';
@@ -123,6 +132,9 @@ void main() {
         expect(result.website, 'https://carlos.com');
         expect(result.address, contains('Rua B, 456'));
         expect(result.linkedin, 'linkedin.com/in/carlos');
+        expect(result.facebook, 'facebook.com/carlos');
+        expect(result.x, 'x.com/carlos');
+        expect(result.social, 'https://carlos.social');
         expect(result.note, 'My note');
         expect(result.photo, 'photodata');
       });

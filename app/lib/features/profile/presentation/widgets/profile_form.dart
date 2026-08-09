@@ -26,6 +26,9 @@ class _ProfileFormState extends State<ProfileForm> {
   late final TextEditingController _phoneController;
   late final TextEditingController _linkedinController;
   late final TextEditingController _instagramController;
+  late final TextEditingController _facebookController;
+  late final TextEditingController _xController;
+  late final TextEditingController _socialController;
   late final TextEditingController _websiteController;
   late final TextEditingController _bioController;
   final TextEditingController _searchController = TextEditingController();
@@ -41,12 +44,23 @@ class _ProfileFormState extends State<ProfileForm> {
         TextEditingController(text: widget.profile?.email ?? '');
     _phoneController =
         TextEditingController(text: widget.profile?.phone ?? '');
-    _linkedinController =
-        TextEditingController(text: widget.profile?.linkedin ?? '');
-    _instagramController =
-        TextEditingController(text: widget.profile?.instagram ?? '');
-    _websiteController =
-        TextEditingController(text: widget.profile?.website ?? '');
+    _linkedinController = TextEditingController(
+      text: _linkedinHandle(widget.profile?.linkedin),
+    );
+    _instagramController = TextEditingController(
+      text: _instagramHandle(widget.profile?.instagram),
+    );
+    _facebookController = TextEditingController(
+      text: _facebookHandle(widget.profile?.facebook),
+    );
+    _xController = TextEditingController(
+      text: _xHandle(widget.profile?.x),
+    );
+    _socialController =
+        TextEditingController(text: widget.profile?.social ?? '');
+    _websiteController = TextEditingController(
+      text: _websiteHost(widget.profile?.website),
+    );
     _bioController = TextEditingController(text: widget.profile?.bio ?? '');
     _photoPath = widget.profile?.photoPath;
   }
@@ -58,10 +72,104 @@ class _ProfileFormState extends State<ProfileForm> {
     _phoneController.dispose();
     _linkedinController.dispose();
     _instagramController.dispose();
+    _facebookController.dispose();
+    _xController.dispose();
+    _socialController.dispose();
     _websiteController.dispose();
     _bioController.dispose();
     _searchController.dispose();
     super.dispose();
+  }
+
+  static const _linkedinPrefix = 'linkedin.com/in/';
+
+  static String _linkedinHandle(String? value) {
+    if (value == null || value.isEmpty) return '';
+    final v = value.trim();
+    final match = RegExp(r'(?:https?://)?(?:www\.)?linkedin\.com/in/(.+)')
+        .firstMatch(v);
+    if (match != null) return match.group(1)!;
+    return v.replaceFirst(RegExp(r'^@'), '');
+  }
+
+  static String _fullLinkedin(String handle) {
+    final h = handle.trim();
+    if (h.isEmpty) return '';
+    if (h.startsWith('http://') || h.startsWith('https://')) return h;
+    if (h.startsWith('linkedin.com/in/')) return h;
+    return '$_linkedinPrefix$h';
+  }
+
+  static String _instagramHandle(String? value) {
+    if (value == null || value.isEmpty) return '';
+    return value.trim().replaceFirst(RegExp(r'^@'), '');
+  }
+
+  static String _fullInstagram(String handle) {
+    final h = handle.trim();
+    if (h.isEmpty) return '';
+    if (h.startsWith('@')) return h;
+    return '@$h';
+  }
+
+  static const _facebookPrefix = 'facebook.com/';
+
+  static String _facebookHandle(String? value) {
+    if (value == null || value.isEmpty) return '';
+    final v = value.trim();
+    final match = RegExp(r'(?:https?://)?(?:www\.)?facebook\.com/(.+)')
+        .firstMatch(v);
+    if (match != null) return match.group(1)!;
+    return v;
+  }
+
+  static String _fullFacebook(String handle) {
+    final h = handle.trim();
+    if (h.isEmpty) return '';
+    if (h.startsWith('http://') || h.startsWith('https://')) return h;
+    if (h.startsWith('facebook.com/')) return h;
+    return '$_facebookPrefix$h';
+  }
+
+  static const _xPrefix = 'x.com/';
+
+  static String _xHandle(String? value) {
+    if (value == null || value.isEmpty) return '';
+    final v = value.trim();
+    final match =
+        RegExp(r'(?:https?://)?(?:www\.)?(?:x|twitter)\.com/(.+)').firstMatch(v);
+    if (match != null) return match.group(1)!;
+    return v.replaceFirst(RegExp(r'^@'), '');
+  }
+
+  static String _fullX(String handle) {
+    final h = handle.trim();
+    if (h.isEmpty) return '';
+    if (h.startsWith('http://') || h.startsWith('https://')) return h;
+    if (h.startsWith('x.com/') || h.startsWith('twitter.com/')) return h;
+    return '$_xPrefix$h';
+  }
+
+  static String _fullSocial(String link) {
+    final l = link.trim();
+    if (l.isEmpty) return '';
+    if (l.startsWith('http://') || l.startsWith('https://')) return l;
+    return 'https://$l';
+  }
+
+  static String _websiteHost(String? value) {
+    if (value == null || value.isEmpty) return '';
+    return value
+        .trim()
+        .replaceFirst(RegExp(r'^https?://'), '')
+        .replaceFirst(RegExp(r'^www\.'), '');
+  }
+
+  static String _fullWebsite(String host) {
+    final h = host.trim();
+    if (h.isEmpty) return '';
+    if (h.startsWith('http://') || h.startsWith('https://')) return h;
+    return 'https://$h';
   }
 
   Future<void> _pickImage() async {
@@ -326,9 +434,10 @@ class _ProfileFormState extends State<ProfileForm> {
             controller: _linkedinController,
             decoration: const InputDecoration(
               labelText: 'LinkedIn',
-              hintText: 'linkedin.com/in/seuuser',
+              hintText: 'seuuser',
               border: OutlineInputBorder(),
               prefixIcon: Icon(Icons.work_outline),
+              prefixText: 'linkedin.com/in/',
             ),
             keyboardType: TextInputType.url,
           ),
@@ -337,19 +446,56 @@ class _ProfileFormState extends State<ProfileForm> {
             controller: _instagramController,
             decoration: const InputDecoration(
               labelText: 'Instagram',
-              hintText: '@seuuser',
+              hintText: 'seuuser',
               border: OutlineInputBorder(),
               prefixIcon: Icon(Icons.camera_alt_outlined),
+              prefixText: '@',
             ),
+          ),
+          const SizedBox(height: 16),
+          TextFormField(
+            controller: _facebookController,
+            decoration: const InputDecoration(
+              labelText: 'Facebook',
+              hintText: 'seupagina',
+              border: OutlineInputBorder(),
+              prefixIcon: Icon(Icons.facebook),
+              prefixText: 'facebook.com/',
+            ),
+            keyboardType: TextInputType.url,
+          ),
+          const SizedBox(height: 16),
+          TextFormField(
+            controller: _xController,
+            decoration: const InputDecoration(
+              labelText: 'X (Twitter)',
+              hintText: 'seuuser',
+              border: OutlineInputBorder(),
+              prefixIcon: Icon(Icons.alternate_email),
+              prefixText: 'x.com/',
+            ),
+            keyboardType: TextInputType.url,
+          ),
+          const SizedBox(height: 16),
+          TextFormField(
+            controller: _socialController,
+            decoration: const InputDecoration(
+              labelText: 'Outra Rede Social',
+              hintText: 'https://seulink.com',
+              border: OutlineInputBorder(),
+              prefixIcon: Icon(Icons.link),
+            ),
+            keyboardType: TextInputType.url,
           ),
           const SizedBox(height: 16),
           TextFormField(
             controller: _websiteController,
             decoration: const InputDecoration(
               labelText: 'Website',
-              hintText: 'https://seusite.com',
+              hintText: 'seusite.com',
               border: OutlineInputBorder(),
               prefixIcon: Icon(Icons.language),
+              prefixText: 'https://',
             ),
             keyboardType: TextInputType.url,
           ),
@@ -387,13 +533,20 @@ class _ProfileFormState extends State<ProfileForm> {
             _phoneController.text.isEmpty ? null : _phoneController.text,
         linkedin: _linkedinController.text.isEmpty
             ? null
-            : _linkedinController.text,
+            : _fullLinkedin(_linkedinController.text),
         instagram: _instagramController.text.isEmpty
             ? null
-            : _instagramController.text,
+            : _fullInstagram(_instagramController.text),
+        facebook: _facebookController.text.isEmpty
+            ? null
+            : _fullFacebook(_facebookController.text),
+        x: _xController.text.isEmpty ? null : _fullX(_xController.text),
+        social: _socialController.text.isEmpty
+            ? null
+            : _fullSocial(_socialController.text),
         website: _websiteController.text.isEmpty
             ? null
-            : _websiteController.text,
+            : _fullWebsite(_websiteController.text),
         bio:
             _bioController.text.isEmpty ? null : _bioController.text,
         photoPath: _photoPath,

@@ -50,6 +50,9 @@ void main() {
           address: 'São Paulo, BR',
           note: 'Dev Flutter',
           linkedin: 'linkedin.com/in/pedro',
+          facebook: 'facebook.com/pedro',
+          x: 'x.com/pedro',
+          social: 'https://pedro.social',
         );
 
         final result = VCardUtils.encode(data);
@@ -60,6 +63,9 @@ void main() {
         expect(result, contains('ADR:;;São Paulo, BR;;;'));
         expect(result, contains('NOTE:Dev Flutter'));
         expect(result, contains('X-LINKEDIN:linkedin.com/in/pedro'));
+        expect(result, contains('X-FACEBOOK:facebook.com/pedro'));
+        expect(result, contains('X-TWITTER:x.com/pedro'));
+        expect(result, contains('X-SOCIAL:https://pedro.social'));
       });
 
       test('should skip empty optional fields', () {
@@ -97,6 +103,9 @@ void main() {
             'URL:https://ana.com\n'
             'ADR:;;Rio de Janeiro, BR;;;\n'
             'X-LINKEDIN:linkedin.com/in/ana\n'
+            'X-FACEBOOK:facebook.com/ana\n'
+            'X-TWITTER:x.com/ana\n'
+            'X-SOCIAL:https://ana.social\n'
             'NOTE:UX Designer\n'
             'END:VCARD';
 
@@ -112,6 +121,9 @@ void main() {
         expect(data.website, 'https://ana.com');
         expect(data.address, 'Rio de Janeiro, BR');
         expect(data.linkedin, 'linkedin.com/in/ana');
+        expect(data.facebook, 'facebook.com/ana');
+        expect(data.x, 'x.com/ana');
+        expect(data.social, 'https://ana.social');
         expect(data.note, 'UX Designer');
       });
 

@@ -36,6 +36,15 @@ class VCardUtils {
     if (data.linkedin != null && data.linkedin!.isNotEmpty) {
       buffer.writeln('X-LINKEDIN:${data.linkedin}');
     }
+    if (data.facebook != null && data.facebook!.isNotEmpty) {
+      buffer.writeln('X-FACEBOOK:${data.facebook}');
+    }
+    if (data.x != null && data.x!.isNotEmpty) {
+      buffer.writeln('X-TWITTER:${data.x}');
+    }
+    if (data.social != null && data.social!.isNotEmpty) {
+      buffer.writeln('X-SOCIAL:${data.social}');
+    }
     if (data.note != null && data.note!.isNotEmpty) {
       buffer.writeln('NOTE:${data.note}');
     }
@@ -60,6 +69,9 @@ class VCardUtils {
     String? note;
     String? photo;
     String? linkedin;
+    String? facebook;
+    String? x;
+    String? social;
     String version = '3.0';
 
     for (final line in lines) {
@@ -96,6 +108,12 @@ class VCardUtils {
         address = addrParts.where((p) => p.trim().isNotEmpty).join(', ');
       } else if (trimmed.startsWith('X-LINKEDIN:')) {
         linkedin = trimmed.substring(11);
+      } else if (trimmed.startsWith('X-FACEBOOK:')) {
+        facebook = trimmed.substring(11);
+      } else if (trimmed.startsWith('X-TWITTER:')) {
+        x = trimmed.substring(10);
+      } else if (trimmed.startsWith('X-SOCIAL:')) {
+        social = trimmed.substring(9);
       } else if (trimmed.startsWith('NOTE:')) {
         note = trimmed.substring(5);
       } else if (trimmed.startsWith('PHOTO;')) {
@@ -119,6 +137,9 @@ class VCardUtils {
       note: note,
       photo: photo,
       linkedin: linkedin,
+      facebook: facebook,
+      x: x,
+      social: social,
     );
   }
 

@@ -123,6 +123,68 @@ class ProfileHeader extends StatelessWidget {
               ],
             ),
           ],
+          if (profile.facebook != null &&
+              profile.facebook!.isNotEmpty) ...[
+            const SizedBox(height: 4),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.facebook,
+                  size: 16,
+                  color: Colors.grey[600],
+                ),
+                const SizedBox(width: 6),
+                Text(
+                  profile.facebook!,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: Colors.grey[600],
+                  ),
+                ),
+              ],
+            ),
+          ],
+          if (profile.x != null && profile.x!.isNotEmpty) ...[
+            const SizedBox(height: 4),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.alternate_email,
+                  size: 16,
+                  color: Colors.grey[600],
+                ),
+                const SizedBox(width: 6),
+                Text(
+                  profile.x!,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: Colors.grey[600],
+                  ),
+                ),
+              ],
+            ),
+          ],
+          if (profile.social != null &&
+              profile.social!.isNotEmpty) ...[
+            const SizedBox(height: 4),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.link,
+                  size: 16,
+                  color: Colors.grey[600],
+                ),
+                const SizedBox(width: 6),
+                Text(
+                  profile.social!,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: Colors.grey[600],
+                  ),
+                ),
+              ],
+            ),
+          ],
           if (profile.website != null &&
               profile.website!.isNotEmpty) ...[
             const SizedBox(height: 4),
