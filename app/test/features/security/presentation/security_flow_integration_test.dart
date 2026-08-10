@@ -245,4 +245,55 @@ void main() {
       await _pumpUntilFound(tester, find.text('Meu Cartão'));
     });
   });
+
+  group('PIN storage recovery', () {
+    testWidgets('settings claim PIN but storage is missing shows setup again',
+        (tester) async {
+      await _pumpApp(
+        tester,
+        _secureSettings().copyWith(pinEnabled: true),
+      );
+
+      await _pumpUntilFound(tester, find.text('Definir um PIN'));
+      expect(find.text('Autentique-se para continuar'), findsNothing);
+      expect(find.text('Meu Cartão'), findsNothing);
+    });
+
+    testWidgets('new PIN can be registered after recovery', (tester) async {
+      await _pumpApp(
+        tester,
+        _secureSettings().copyWith(pinEnabled: true),
+      );
+
+      await _pumpUntilFound(tester, find.text('Definir um PIN'));
+      await tester.tap(find.text('Definir um PIN'));
+      await _pumpUntilFound(tester, find.text('Digite o PIN'));
+
+      await _enterPin(tester, '123456');
+      await _pumpUntilFound(tester, find.text('Confirme o PIN'));
+      await _enterPin(tester, '123456');
+
+      await _pumpUntilFound(
+        tester,
+        find.text('Autentique-se para continuar'),
+      );
+    });
+
+    testWidgets('biometric unlock still works when PIN storage is missing',
+        (tester) async {
+      env.biometricAvailable = true;
+      env.biometricAuthenticateResult = true;
+
+      await _pumpApp(
+        tester,
+        _secureSettings().copyWith(pinEnabled: true, biometricEnabled: true),
+      );
+
+      await _pumpUntilFound(
+        tester,
+        find.text('Autenticar com Biometria'),
+      );
+      expect(find.text('Definir um PIN'), findsNothing);
+    });
+  });
 }

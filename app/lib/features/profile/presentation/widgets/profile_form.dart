@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import '../../../../core/utils/image_utils.dart';
 import '../../domain/entities/profile.dart';
 import '../../../../../core/utils/device_contacts_service.dart';
 
@@ -219,7 +220,13 @@ class _ProfileFormState extends State<ProfileForm> {
     );
 
     if (picked != null) {
-      setState(() => _photoPath = picked.path);
+      final saved = await ImageUtils.savePhotoLocally(
+        File(picked.path),
+        'photo_${DateTime.now().millisecondsSinceEpoch}.jpg',
+      );
+      if (mounted) {
+        setState(() => _photoPath = saved.path);
+      }
     }
   }
 

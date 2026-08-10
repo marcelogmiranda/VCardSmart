@@ -41,43 +41,46 @@ class _PinInputState extends State<PinInput> {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: List.generate(widget.length, (index) {
-        return Container(
-          width: 56,
-          height: 56,
-          margin: const EdgeInsets.symmetric(horizontal: 8),
-          child: TextField(
-            controller: _controllers[index],
-            focusNode: _focusNodes[index],
-            textAlign: TextAlign.center,
-            obscureText: true,
-            keyboardType: TextInputType.number,
-            maxLength: 1,
-            style: const TextStyle(fontSize: 24),
-            decoration: InputDecoration(
-              counterText: '',
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
+    return FittedBox(
+      fit: BoxFit.scaleDown,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: List.generate(widget.length, (index) {
+          return Container(
+            width: 56,
+            height: 56,
+            margin: const EdgeInsets.symmetric(horizontal: 8),
+            child: TextField(
+              controller: _controllers[index],
+              focusNode: _focusNodes[index],
+              textAlign: TextAlign.center,
+              obscureText: true,
+              keyboardType: TextInputType.number,
+              maxLength: 1,
+              style: const TextStyle(fontSize: 24),
+              decoration: InputDecoration(
+                counterText: '',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
               ),
-            ),
-            onChanged: (value) {
-              if (value.isNotEmpty && index < widget.length - 1) {
-                _focusNodes[index + 1].requestFocus();
-              }
-              if (value.isEmpty && index > 0) {
-                _focusNodes[index - 1].requestFocus();
-              }
+              onChanged: (value) {
+                if (value.isNotEmpty && index < widget.length - 1) {
+                  _focusNodes[index + 1].requestFocus();
+                }
+                if (value.isEmpty && index > 0) {
+                  _focusNodes[index - 1].requestFocus();
+                }
 
-              final pin = _controllers.map((c) => c.text).join();
-              if (pin.length == widget.length) {
-                widget.onCompleted(pin);
-              }
-            },
-          ),
-        );
-      }),
+                final pin = _controllers.map((c) => c.text).join();
+                if (pin.length == widget.length) {
+                  widget.onCompleted(pin);
+                }
+              },
+            ),
+          );
+        }),
+      ),
     );
   }
 }

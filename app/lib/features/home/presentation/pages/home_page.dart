@@ -136,22 +136,17 @@ class _ActionGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GridView.count(
-      crossAxisCount: 2,
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      mainAxisSpacing: 12,
-      crossAxisSpacing: 12,
-      childAspectRatio: 1.1,
+    return Column(
       children: [
         _ActionCard(
           icon: Icons.qr_code,
           title: 'Meu QR Code',
-          subtitle: 'Gerar para compartilhar',
+          subtitle: 'Gerar e compartilhar meu cartão',
           color: colorScheme.primaryContainer,
           iconColor: colorScheme.onPrimaryContainer,
-          onTap: () => context.push('/qr/share'),
+          onTap: onShare,
         ),
+        const SizedBox(height: 12),
         _ActionCard(
           icon: Icons.qr_code_scanner,
           title: 'Escanear',
@@ -160,6 +155,7 @@ class _ActionGrid extends StatelessWidget {
           iconColor: colorScheme.onSecondaryContainer,
           onTap: () => context.push('/qr/scan'),
         ),
+        const SizedBox(height: 12),
         _ActionCard(
           icon: Icons.file_upload_outlined,
           title: 'Importar',
@@ -167,14 +163,6 @@ class _ActionGrid extends StatelessWidget {
           color: colorScheme.tertiaryContainer,
           iconColor: colorScheme.onTertiaryContainer,
           onTap: () => context.push('/contacts/import'),
-        ),
-        _ActionCard(
-          icon: Icons.share_outlined,
-          title: 'Compartilhar',
-          subtitle: 'Enviar meu cartão',
-          color: colorScheme.errorContainer,
-          iconColor: colorScheme.onErrorContainer,
-          onTap: onShare,
         ),
       ],
     );
@@ -202,6 +190,7 @@ class _ActionCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       elevation: 0,
+      margin: EdgeInsets.zero,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
       ),
@@ -210,27 +199,46 @@ class _ActionCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         onTap: onTap,
         child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          child: Row(
             children: [
-              Icon(icon, size: 36, color: iconColor),
-              const SizedBox(height: 8),
-              Text(
-                title,
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: iconColor,
-                  fontSize: 15,
+              Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  color: iconColor.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(icon, size: 24, color: iconColor),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      title,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: iconColor,
+                        fontSize: 15,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      subtitle,
+                      style: TextStyle(
+                        color: iconColor.withValues(alpha: 0.7),
+                        fontSize: 13,
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(height: 2),
-              Text(
-                subtitle,
-                style: TextStyle(
-                  color: iconColor.withValues(alpha: 0.7),
-                  fontSize: 12,
-                ),
+              Icon(
+                Icons.chevron_right,
+                color: iconColor.withValues(alpha: 0.6),
               ),
             ],
           ),

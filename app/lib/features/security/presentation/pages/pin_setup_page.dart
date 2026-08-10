@@ -2,10 +2,24 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../settings/presentation/providers/settings_provider.dart';
 import '../providers/auth_provider.dart';
+import '../security_setup_completion.dart';
 import '../widgets/pin_input.dart';
 
+class PinSetupOnboardingFlow {
+  const PinSetupOnboardingFlow({this.enableBiometric = false});
+
+  final bool enableBiometric;
+}
+
 class PinSetupPage extends ConsumerStatefulWidget {
-  const PinSetupPage({super.key});
+  const PinSetupPage({
+    super.key,
+    this.completeOnboarding = false,
+    this.enableBiometric = false,
+  });
+
+  final bool completeOnboarding;
+  final bool enableBiometric;
 
   @override
   ConsumerState<PinSetupPage> createState() => _PinSetupPageState();
@@ -103,6 +117,18 @@ class _PinSetupPageState extends ConsumerState<PinSetupPage> {
   Future<void> _confirmPin(String pin) async {
     if (pin == _firstPin) {
       await ref.read(authProvider.notifier).setPin(pin, length: _length);
+      if (widget.completeOnboarding) {
+        if (mounted) {
+          await completeSecuritySetup(
+            ref,
+            context,
+            enableBiometric: widget.enableBiometric,
+            enablePin: true,
+            pinLength: _length,
+          );
+        }
+        return;
+      }
       await ref.read(settingsProvider.notifier).updatePinLength(_length);
       await ref.read(settingsProvider.notifier).updatePin(true);
       if (mounted) {

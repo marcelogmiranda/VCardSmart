@@ -24,20 +24,18 @@ String? authRedirect(AuthStatus status, String location) {
   final isSetupPage = location == AppConstants.securitySetupRoute;
   final isPinSetupPage = location == AppConstants.pinSetupRoute;
 
+  String? result;
   if (status.needsSetup) {
     final isSetupFlow = isSetupPage || isPinSetupPage;
-    return isSetupFlow ? null : AppConstants.securitySetupRoute;
+    result = isSetupFlow ? null : AppConstants.securitySetupRoute;
+  } else if (status.state == AuthState.checking) {
+    result = isAuthPage ? null : AppConstants.authRoute;
+  } else if (status.state == AuthState.authenticated) {
+    result = (isAuthPage || isSetupPage) ? AppConstants.homeRoute : null;
+  } else {
+    result = isAuthPage ? null : AppConstants.authRoute;
   }
-
-  if (status.state == AuthState.checking) {
-    return isAuthPage ? null : AppConstants.authRoute;
-  }
-
-  if (status.state == AuthState.authenticated) {
-    return (isAuthPage || isSetupPage) ? AppConstants.homeRoute : null;
-  }
-
-  return isAuthPage ? null : AppConstants.authRoute;
+  return result;
 }
 
 final appRouterProvider = Provider<GoRouter>((ref) {
@@ -121,7 +119,14 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: AppConstants.pinSetupRoute,
-        builder: (context, state) => const PinSetupPage(),
+        builder: (context, state) {
+          final flow = state.extra;
+          final onboarding = flow is PinSetupOnboardingFlow;
+          return PinSetupPage(
+            completeOnboarding: onboarding,
+            enableBiometric: onboarding && flow.enableBiometric,
+          );
+        },
       ),
     ],
   );

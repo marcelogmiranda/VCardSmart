@@ -3,9 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/security/biometric_service.dart';
-import '../../../settings/presentation/providers/settings_provider.dart';
 import '../../../../shared/widgets/app_button.dart';
-import '../providers/auth_provider.dart';
+import '../security_setup_completion.dart';
+import 'pin_setup_page.dart';
 
 class SecuritySetupPage extends ConsumerStatefulWidget {
   const SecuritySetupPage({super.key});
@@ -39,30 +39,20 @@ class _SecuritySetupPageState extends ConsumerState<SecuritySetupPage> {
     bool enablePin = false,
     int? pinLength,
   }) async {
-    final settingsNotifier = ref.read(settingsProvider.notifier);
-    if (enableBiometric) {
-      await settingsNotifier.updateBiometric(true);
-    }
-    if (enablePin) {
-      await settingsNotifier.updatePin(true);
-      if (pinLength != null) {
-        await settingsNotifier.updatePinLength(pinLength);
-      }
-    }
-    await settingsNotifier.markSecurityAsked();
-    final settings = ref.read(settingsProvider);
-    await ref.read(authProvider.notifier).checkAuth(settings);
-    if (mounted) {
-      context.go(AppConstants.homeRoute);
-    }
+    await completeSecuritySetup(
+      ref,
+      context,
+      enableBiometric: enableBiometric,
+      enablePin: enablePin,
+      pinLength: pinLength,
+    );
   }
 
   Future<void> _setupPinOnly() async {
-    final configured = await context.push<bool>(AppConstants.pinSetupRoute);
-    if (configured == true && mounted) {
-      final settings = ref.read(settingsProvider);
-      await _finishSetup(enablePin: true, pinLength: settings.pinLength);
-    }
+    await context.push(
+      AppConstants.pinSetupRoute,
+      extra: const PinSetupOnboardingFlow(),
+    );
   }
 
   Future<void> _setupBiometric() async {
@@ -70,15 +60,10 @@ class _SecuritySetupPageState extends ConsumerState<SecuritySetupPage> {
   }
 
   Future<void> _setupBoth() async {
-    final configured = await context.push<bool>(AppConstants.pinSetupRoute);
-    if (configured == true && mounted) {
-      final settings = ref.read(settingsProvider);
-      await _finishSetup(
-        enableBiometric: true,
-        enablePin: true,
-        pinLength: settings.pinLength,
-      );
-    }
+    await context.push(
+      AppConstants.pinSetupRoute,
+      extra: const PinSetupOnboardingFlow(enableBiometric: true),
+    );
   }
 
   Future<void> _skip() async {

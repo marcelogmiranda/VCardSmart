@@ -4,6 +4,7 @@ import '../../domain/usecases/set_pin_usecase.dart';
 import '../../domain/usecases/verify_pin_usecase.dart';
 import '../../../../core/security/auth_service.dart';
 import '../../../settings/domain/entities/settings.dart';
+import '../../../settings/presentation/providers/settings_provider.dart';
 
 enum AuthState { unauthenticated, authenticated, checking, error }
 
@@ -59,22 +60,52 @@ class AuthNotifier extends StateNotifier<AuthStatus> {
   final AuthenticateUseCase _authenticate;
   final SetPinUseCase _setPin;
   final VerifyPinUseCase _verifyPin;
+  final SettingsNotifier? _settingsNotifier;
 
-  AuthNotifier(this._authenticate, this._setPin, this._verifyPin)
-      : super(const AuthStatus());
+  int _checkGeneration = 0;
+
+  AuthNotifier(
+    this._authenticate,
+    this._setPin,
+    this._verifyPin, [
+    this._settingsNotifier,
+  ]) : super(const AuthStatus());
+
+  void _invalidatePendingChecks() {
+    _checkGeneration++;
+  }
 
   Future<void> checkAuth(Settings settings) async {
+    final generation = ++_checkGeneration;
     state = state.copyWith(state: AuthState.checking);
     try {
-      final biometricEnabled = settings.biometricEnabled &&
-          await _authenticate.isBiometricAvailable();
-      final hasPin = settings.pinEnabled && await _setPin.hasPin();
-      final needsSetup = !settings.securitySetupAsked &&
+      bool biometricEnabled;
+      try {
+        biometricEnabled = settings.biometricEnabled &&
+            await _authenticate.isBiometricAvailable();
+      } catch (_) {
+        biometricEnabled = false;
+      }
+      bool hasPin;
+      try {
+        hasPin = settings.pinEnabled && await _setPin.hasPin();
+      } catch (_) {
+        hasPin = false;
+      }
+      var needsSetup = !settings.securitySetupAsked &&
           !biometricEnabled &&
           !hasPin;
+
+      final pinMissing = settings.pinEnabled && !hasPin;
+      if (pinMissing && !biometricEnabled) {
+        needsSetup = true;
+        await _settingsNotifier?.updatePin(false);
+      }
+
       final isAuth = await _authenticate.isCurrentlyAuthenticated() ||
           !(hasPin || biometricEnabled);
 
+      if (generation != _checkGeneration) return;
       state = state.copyWith(
         state: isAuth ? AuthState.authenticated : AuthState.unauthenticated,
         biometricAvailable: biometricEnabled,
@@ -83,6 +114,7 @@ class AuthNotifier extends StateNotifier<AuthStatus> {
         pinLength: settings.pinLength,
       );
     } catch (e) {
+      if (generation != _checkGeneration) return;
       state = state.copyWith(
         state: AuthState.error,
         error: e.toString(),
@@ -91,6 +123,7 @@ class AuthNotifier extends StateNotifier<AuthStatus> {
   }
 
   Future<void> authenticate() async {
+    _invalidatePendingChecks();
     state = state.copyWith(state: AuthState.checking);
     try {
       final result = await _authenticate();
@@ -106,6 +139,7 @@ class AuthNotifier extends StateNotifier<AuthStatus> {
   }
 
   Future<void> verifyPin(String pin) async {
+    _invalidatePendingChecks();
     state = state.copyWith(state: AuthState.checking);
     try {
       final result = await _verifyPin(pin);
@@ -124,6 +158,7 @@ class AuthNotifier extends StateNotifier<AuthStatus> {
   }
 
   Future<void> setPin(String pin, {int length = 6}) async {
+    _invalidatePendingChecks();
     try {
       await _setPin(pin, length: length);
       state = state.copyWith(hasPin: true, error: null);
@@ -136,6 +171,7 @@ class AuthNotifier extends StateNotifier<AuthStatus> {
   }
 
   Future<void> removePin() async {
+    _invalidatePendingChecks();
     try {
       await _setPin.removePin();
       state = state.copyWith(hasPin: false, error: null);
@@ -148,6 +184,7 @@ class AuthNotifier extends StateNotifier<AuthStatus> {
   }
 
   void logout() {
+    _invalidatePendingChecks();
     AuthService.logout();
     state = state.copyWith(state: AuthState.unauthenticated);
   }
@@ -158,5 +195,6 @@ final authProvider = StateNotifierProvider<AuthNotifier, AuthStatus>((ref) {
     ref.read(authenticateUseCaseProvider),
     ref.read(setPinUseCaseProvider),
     ref.read(verifyPinUseCaseProvider),
+    ref.read(settingsProvider.notifier),
   );
 });

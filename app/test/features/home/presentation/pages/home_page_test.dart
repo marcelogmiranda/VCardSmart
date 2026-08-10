@@ -48,7 +48,6 @@ void main() {
       expect(find.text('Meu QR Code'), findsOneWidget);
       expect(find.text('Escanear'), findsOneWidget);
       expect(find.text('Importar'), findsOneWidget);
-      expect(find.text('Compartilhar'), findsOneWidget);
     });
   });
 }
