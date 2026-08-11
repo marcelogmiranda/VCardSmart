@@ -23,7 +23,7 @@ App Flutter de cartões de visita digitais (vCard/QR/NFC). Fluxo atual: submiss�
 - OneDrive trava o cache Gradle (`app/android/.gradle`). `app/android/.gradle` agora é symlink para pasta local (mesmo esquema do `build/`). Não recriar como pasta real dentro do OneDrive.
 
 ## Testes
-- Suíte não-golden: `flutter test test/core test/features test/infrastructure test/shared test/l10n` → verde (456 testes).
+- Suíte não-golden: `flutter test test/core test/features test/shared test/l10n` → verde (456 testes). `test/infrastructure/` está vazio e fora do git (apenas local) — **não** incluí-lo em comandos de CI (o runner falha ao "loadar" um path inexistente: `❌ loading .../test/infrastructure`).
 - `test/golden/` tem ~29 falhas pré-existentes (AppAvatar etc.), não relacionadas a mudanças atuais. **A CI (`build.yml`) NÃO roda os goldens** — o job `test` usa a suíte determinística acima (golden é flaky entre macOS/Linux); goldens são só para uso local (`flutter test test/golden/`).
 - CI/CD GitHub Actions fixado (11/08): Flutter pin `3.44.7` em `build.yml` e `release.yml` (3.32.8 quebrava com `targetSdk 36`); removido `build_runner` da CD (projeto não usa codegen). CD Android agora monta `android/key.properties` a partir de secrets (`KEYSTORE_BASE64/KEYSTORE_PASSWORD/KEYSTORE_ALIAS/KEY_PASSWORD`). CD iOS instala cert p12 + mobileprovision no runner via secrets (`IOS_DISTRIBUTION_CERT_BASE64/IOS_CERT_PASSWORD/IOS_PROVISIONING_PROFILE_BASE64`). **Falta criar essas secrets no GitHub** (comandos de export: `base64 -i app/android/app/release-keystore.jks`; p12: `security export -k login.keychain-db -t identities -f pkcs12 -P <senha> -o dist.p12`; perfil: `base64 -i certificates/VCardSmart_App_Store.mobileprovision`).
 - `flutter analyze` → No issues found.
