@@ -98,10 +98,9 @@ Future<void> _pumpApp(WidgetTester tester, Settings initial) async {
 Future<void> _pumpUntilFound(
   WidgetTester tester,
   Finder finder, {
-  Duration timeout = const Duration(seconds: 5),
+  int maxPumps = 60,
 }) async {
-  final end = DateTime.now().add(timeout);
-  while (DateTime.now().isBefore(end)) {
+  for (var i = 0; i < maxPumps; i++) {
     await tester.pump(const Duration(milliseconds: 100));
     if (finder.evaluate().isNotEmpty) {
       await tester.pumpAndSettle();
