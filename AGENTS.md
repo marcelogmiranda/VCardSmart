@@ -48,7 +48,7 @@ App Flutter de cartões de visita digitais (vCard/QR/NFC). Fluxo atual: submiss�
 - **1.0.2 (10)** — IPA subido ao App Store Connect (Transporter) pelo usuário.
 - **1.0.3 (11)** — **atual** no pubspec (10/08): `targetSdk=36` (exigência Google Play 31/08/2026) + versão sincronizada Play/iOS.
 - Status iOS (10/08): **IPA 1.0.2/10 subido ao App Store Connect**; precisa de novo upload **1.0.3/11**.
-- Status Android (10/08): **AAB 1.0.3/11 (targetSdk 36) compilado** em `app/build/app/outputs/bundle/release/app-release.aab`; **aguarda upload à Play Console** para substituir o 1.0.0/8.
+- Status Android (11/08): **AAB 1.0.3/11 (targetSdk 36) recompilado** em `app/build/app/outputs/bundle/release/app-release.aab` (65.2MB, 17:25), já com os commits de hoje (SPM fix + suíte). Manifesto: `versionCode=11`, `versionName=1.0.3`, `targetSdk=36`, `minSdk=24`. **Aguarda upload à Play Console** para substituir o 1.0.0/8.
 - **Política de versão**: toda nova build (Play e iOS) deve subir **a mesma numeração** (`pubspec.yaml`) — iOS e Android derivam de `FLUTTER_BUILD_NAME/NUMBER` e `flutter.versionName/versionCode`.
 
 ## Pendências (próxima interação)
