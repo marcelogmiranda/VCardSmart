@@ -100,13 +100,16 @@
 
 ## Target SDK
 
+> Requisito Google Play (31/ago/2026): novas versões e updates devem ter como alvo
+> **Android 16 (API level 36)** ou superior. Migrado de 35 → 36 em 1.0.3+11.
+
 ```yaml
-# android/app/build.gradle
+# android/app/build.gradle.kts
 android {
-    compileSdkVersion 34
+    compileSdk = flutter.compileSdkVersion   # 36 (Flutter 3.44)
     defaultConfig {
-        targetSdkVersion 34
-        minSdkVersion 21
+        targetSdk = 36
+        minSdk = flutter.minSdkVersion       # 24
     }
 }
 ```
@@ -114,16 +117,11 @@ android {
 ## Versionamento
 
 ```yaml
-# pubspec.yaml
-version: 1.0.0+1
+# pubspec.yaml — versão única para Android (Play) e iOS (App Store)
+version: 1.0.3+11
 
-# android/app/build.gradle
-android {
-    defaultConfig {
-        versionCode 1
-        versionName "1.0.0"
-    }
-}
+# iOS: CFBundleShortVersionString=$(FLUTTER_BUILD_NAME) e CFBundleVersion=$(FLUTTER_BUILD_NUMBER)
+# Android: versionName/versionCode = flutter.versionName/versionCode
 ```
 
 ## Publishing
