@@ -47,13 +47,13 @@ App Flutter de cartões de visita digitais (vCard/QR/NFC). Fluxo atual: submiss�
 - **1.0.1 (9)** — build iOS em TestFlight (testes, já em andamento).
 - **1.0.2 (10)** — IPA subido ao App Store Connect (Transporter) pelo usuário.
 - **1.0.3 (11)** — **atual** no pubspec (10/08): `targetSdk=36` (exigência Google Play 31/08/2026) + versão sincronizada Play/iOS.
-- Status iOS (10/08): **IPA 1.0.2/10 subido ao App Store Connect**; precisa de novo upload **1.0.3/11**.
-- Status Android (11/08): **AAB 1.0.3/11 (targetSdk 36) recompilado** em `app/build/app/outputs/bundle/release/app-release.aab` (65.2MB, 17:25), já com os commits de hoje (SPM fix + suíte). Manifesto: `versionCode=11`, `versionName=1.0.3`, `targetSdk=36`, `minSdk=24`. **Aguarda upload à Play Console** para substituir o 1.0.0/8.
+- Status iOS (12/08): **IPA 1.0.3/11 entregue ao App Store Connect via Transporter** (substitui o 1.0.2/10) — `~/Downloads/VCardSmart-1.0.3-11.ipa` (33.8MB, SHA-256 `3f2304cd...11afd`). Aguarda processamento/validação.
+- Status Android (12/08): **AAB 1.0.3/11 (targetSdk 36) enviado à Google Play — Production** (substitui o 1.0.0/8, resposta à revisão do Google) — `~/Downloads/VCardSmart-1.0.3-11.aab` (65.2MB, SHA-256 `fa73da76...9a13`). Manifesto: `versionCode=11`, `versionName=1.0.3`, `targetSdk=36`, `minSdk=24`. Aguarda revisão/rollout.
 - **Política de versão**: toda nova build (Play e iOS) deve subir **a mesma numeração** (`pubspec.yaml`) — iOS e Android derivam de `FLUTTER_BUILD_NAME/NUMBER` e `flutter.versionName/versionCode`.
 
 ## Pendências (próxima interação)
-1. **Android: enviar AAB 1.0.3/11 (targetSdk 36)** à Play Console para substituir o 1.0.0/8 (resposta à revisão do Google). Validar no Redmi antes: selfie (fix da foto — câmera manual), NFC, contatos, ads.
-2. **iOS: gerar IPA 1.0.3/11** (`flutter build ipa --release`) e subir via Transporter (substitui o 1.0.2/10); validar visualmente splash + fluxo completo no device.
+1. **Aguardar validações das duas plataformas (1.0.3/11)**: Google Play (revisão do AAB) e App Store Connect (processamento do IPA). Se reprovado, corrigir e reenviar com numeração nova.
+2. **Validar no Redmi** (build 1.0.3/11 — mesmo APK/AAB da Play): selfie (fix da foto — câmera manual), NFC, contatos, ads.
 3. Contatos ("Preencher do dispositivo"): melhorado (permissão no foco + listar contatos), aguarda revalidação no aparelho.
 4. Nota: ao limpar dados do Redmi para testar first-run, backup via `run-as tar` (veja `/var/folders/.../opencode/vcardsmart_release_prebackup.tar`) e restore via `run-as cp`; dados do perfil foram restaurados. O PIN antigo NÃO é recuperável — é preciso re-cadastrar.
 
