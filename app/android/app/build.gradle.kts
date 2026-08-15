@@ -63,6 +63,20 @@ android {
     }
 }
 
+// Força versões com bibliotecas nativas alinhadas a 16 KB (requisito Google Play
+// para apps com targetSdk 35+). O mobile_scanner 3.5.7 traz MLKit barcode-scanning
+// 17.2.0 e CameraX 1.3.1, cujas libs (libbarhopper_v3.so, libimage_processing_util_jni.so)
+// têm segmentos ELF alinhados a 4 KB. MLKit 17.3.0 e CameraX 1.5.3 já emitem libs
+// alinhadas a 16 KB. Mantém-se android:extractNativeLibs="true" no manifest
+// (libs compactadas/extraídas) para preservar o fix de crash "VM snapshot invalid"
+// em Android 10/MIUI — o ELF-alignment das libs é o que o Play valida.
+dependencies {
+    implementation("com.google.mlkit:barcode-scanning:17.3.0")
+    implementation("androidx.camera:camera-core:1.5.3")
+    implementation("androidx.camera:camera-camera2:1.5.3")
+    implementation("androidx.camera:camera-lifecycle:1.5.3")
+}
+
 flutter {
     source = "../.."
 }
