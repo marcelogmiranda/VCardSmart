@@ -11,14 +11,19 @@ App Flutter de cartões de visita digitais (vCard/QR/NFC). Fluxo atual: submiss�
 - Launch: `xcrun devicectl device process launch --device <id> com.vcardsmart.app`
   - Erro `FBSOpenApplicationServiceErrorDomain RequestDenied/Locked`: aparelho bloqueado; tocar no ícone.
 - Assinatura App Store: cert `Apple Distribution: Marcelo Miranda (7775YGF9CJ)` já presente.
+- **NFC iOS (31/08)**: gravar/ler NFC exige a capability **"NFC Tag Reading"** habilitada no App ID `com.vcardsmart.app` (developer.apple.com) + profile de distribuição **regenerado** para incluir o entitlement `com.apple.developer.nfc.readersession.formats`. Sem ela, o archive de App Store FALHA (`Provisioning profile ... doesn't include the NFC Tag Reading capability`) e `isAvailable()` retorna false. **Decidiu-se NÃO habilitar por ora** (não vamos subir à loja) → o teste NFC real no iOS fica pendente até habilitar no portal; até lá a tela mostra "NFC não disponível". O entitlement NÃO deve ser adicionado ao `Runner.entitlements` sem o profile correspondente (quebra o archive).
 - Release build device: `flutter build ios --release`
 - IPA App Store: `flutter build ipa --release` → `app/build/ios/ipa/VCardSmart.ipa` (subir via Transporter)
 
 ## Android
 - Aparelho de teste: Redmi Note 8 (modelo `ginkgo`, Android 10/API 29, MIUI 12). ID adb: `11ae045e`.
+  - **ATENÇÃO (31/08): o Redmi Note 8 `ginkgo` NÃO tem NFC** (variante global sem o chip NFC). Confirmado por `pm list features` (sem `android.hardware.nfc`), `/sys/class/nfc` inexistente e `ro.hardware.nfc` vazio. **NÃO usar este aparelho para testar NFC.** Para teste NFC real usar outro Android físico com NFC.
+  - **ATENÇÃO (02/09): Galaxy Tab A9+ `SM-X210` (Wi-Fi) NÃO tem NFC** — id adb `R9XY50C2BWL`, modelo `SM_X210`/`gta9pwifi`. Confirmado: `pm list features` sem `android.hardware.nfc`, `/sys/class/nfc` inexistente, `dumpsys nfc` vazio (`ro.nfc.port` presente, mas é só driver, não indica hardware). A variante **SM-X216 (LTE/5G)** é a que tem chip NFC. **NÃO usar para teste NFC** — mostrará "NFC não disponível". Útil para testar migração .vcs / foto / ads / onboarding.
   - `adb` em: `/Users/mmiranda/Library/Android/sdk/platform-tools`
   - Build Android release já assinado: `android/key.properties` + `release-keystore.jks`.
   - Compile usa Java 11; build APK debug: `flutter build apk --debug`.
+  - **Assinatura**: APK debug (Flutter debug key) NÃO instala por cima de APK release assinado (`INSTALL_FAILED_UPDATE_INCOMPATIBLE: signatures do not match`). Para sobrescrever um release no device ou usar o mesmo APK, desinstalar (perde dados) ou instalar release.
+  - **Conexão USB (31/08)**: às vezes o adb fica `unauthorized` ou o device some — trocar de porta no Mac + confirmar o popup "Permitir depuração USB?" no Redmi costuma resolver. Confiram `adb devices` após reconectar.
 - MIUI 12 bloqueia instalação via USB: ao instalar, o Security Center mostra "Instalar este app via USB?" com botão "Recusar (5)" (auto-cancela em 5s). Workaround: durante `adb install`, monitorar foco com `dumpsys window | grep AdbInstallActivity` e tocar no botão "Instalar" (coordenadas ~300,2060) via `input tap`.
 - OneDrive trava o cache Gradle (`app/android/.gradle`). `app/android/.gradle` agora é symlink para pasta local (mesmo esquema do `build/`). Não recriar como pasta real dentro do OneDrive.
 
@@ -55,11 +60,88 @@ App Flutter de cartões de visita digitais (vCard/QR/NFC). Fluxo atual: submiss�
 - Status 1.0.4/12 (15/08): **AAB** `~/Downloads/VCardSmart-1.0.4-12.aab` (66.1MB, SHA-256 `968de106...c958`) e **IPA** `~/Downloads/VCardSmart-1.0.4-12.ipa` (34.0MB, SHA-256 `a567ee5d...70f0`). AAB verificado: todas as libs 64-bit com p_align ≥ 16384; merged manifest `versionCode=12`, `versionName=1.0.4`, `targetSdk=36`, `extractNativeLibs=true`. IPA: `Version 1.0.4, Build 12`. Home com cards unificados (3) nas duas plataformas — o AAB 1.0.3/11 na loja ainda era o build antigo de 4 cards (pré-unificação).
 - **Política de versão**: toda nova build (Play e iOS) deve subir **a mesma numeração** (`pubspec.yaml`) — iOS e Android derivam de `FLUTTER_BUILD_NAME/NUMBER` e `flutter.versionName/versionCode`.
 
+## Ronda de melhoria 31/08 (v1.0.5 — NÃO subir às lojas; testar via USB)
+Rodada de evolução focada em: (a) requisitos de qualidade do Play (memória), (b) padrão de migração de dispositivo do Play e (c) gravação de cartão NFC externo. **Nenhuma build subiu às lojas** — builds para teste direto em device via cabo USB.
+
+### 1. Otimizações de memória (req. Play "redução de uso de memória + bitmap")
+- `ImageUtils.compressImage` era **no-op** (não comprimia). O ganho real de memória veio de **não decodificar bitmap em resolução cheia**:
+  - `profile_header.dart` e `profile_form.dart`: `FileImage` envolto em `ResizeImage(..., width:224, height:224)` (avatar 56dp → 224px, 2x density). NOTA: `FileImage` NÃO aceita `cacheWidth/cacheHeight` (esses são do widget `Image`); o correto é `ResizeImage`.
+  - `local_ad_data_source.dart`: `MobileAds.initialize()` era chamado 2x (main.dart + datasource). Agora cacheia o future (`_initFuture ??=`) para rodar 1x por processo.
+  - `profile_photo_datasource.dart`: `getPhotoPath` usava `listSync` + `path.contains(profileId)` (lento e impreciso). Agora filtra por prefixo `{id}_` e pega o mais novo.
+- **NÃO** mexido em R8/proguard (já ativo).
+
+### 2. Migração de dispositivo (req. Play "experiência de migração segura")
+- Nova feature `features/migration/` (clean architecture): export/import de backup criptografado `.vcs` com senha do usuário.
+- Dados incluídos: **profiles + contacts + settings + hash do PIN** (o hash SHA-256 do PIN é device-independent — `verifyPin` recomputa `sha256(pin)` e compara, sem chave ligada ao aparelho → transferível). Fluxo: `BackupDataSource.collectBackup()` (Hive boxes + flutter_secure_storage key `app_pin`) → `LocalBackupRepository` (encrypt via `EncryptionService` AES + senha) → arquivo `.vcs` compartilhado via `share_plus`. Import: picker de arquivo (`file_picker`, **nova dependência** `^8.0.0`) → decrypt → `restoreBackup` (limpa Hive, recria, restaura settings + PIN).
+- UI: em `settings_page.dart` nova seção "Dados" → "Migração de Dispositivo" → `migration_page.dart` (rota `/settings/migration`).
+- Erro de senha errada: `LocalBackupRepository.importFromFile` captura a exceção do AES e relança `FormatException` amigável ("Verifique a senha").
+- **Segurança/limitação**: biometria NÃO é migrável (fica no secure storage do aparelho); precisa reconfigurar no novo device. `allowBackup=false` mantido (backup é por fricção manual, não auto).
+
+### 3. Cartão NFC externo (vCard padrão)
+- `LocalNFCRepository.send` agora escreve **vCard 3.0** (`text/vcard`) no lugar do JSON proprietário → cartão lido nativamente por **qualquer** celular (app de Contatos), não só usuários do VCardSmart.
+- Novo `features/nfc/data/models/profile_vcard_converter.dart`: `Profile↔vCard` (todos os campos: nome, telefone, email, site, linkedin, facebook, x, social, instagram, bio).
+- `receive` mantém retrocompat: detecta `BEGIN:VCARD` → converte; senão cai no JSON legado (`application/vcardsmart/profile`).
+- UI: `nfc_share_page.dart` renomeada para "Gravar em Cartão NFC" com texto explicando cartão gravável (NTAG213/215/216) + botão "Gravar no cartão".
+
+### 4. nfc_manager — NÃO atualizado (decisão)
+- `nfc_manager ^3.0.0` (lock 3.5.1). A 4.x (4.2.1) tem **muitas breaking changes** (remove `Ndef`, renomeia tech classes, `isAvailable→checkAvailability`) e exige `nfc_manager_ndef`, além de risco no build 16KB/AdMob/CocoaPods crítico para a loja. Mantido em 3.5.1; upgrade fica para quando o `google_mobile_ads` subir p/ ≥8.0.0 e SPM for reativado (ponte Dec/2026).
+
+### 5. Testes/estado
+- `flutter analyze` → **No issues found**.
+- Suíte determinística (não-golden): **467 testes verdes** (456 antigos + 11 novos: `profile_vcard_converter_test` (6), `backup_data_test` (2), `local_backup_repository_test` (3)). Após o fix do acesso NFC, rodei `test/features/nfc test/features/qr_code test/l10n` (113) → verde.
+- Debug APK compilou com `file_picker` (`app-debug.apk` OK, 96MB).
+- **Fix (31/08)**: a tela "Gravar em Cartão NFC" (`/nfc/share`) **não era acessível** — a rota existia no router mas nenhuma tela navegava até ela. Adicionei o botão **"Gravar em Cartão NFC"** no `QRSharePage` (card "Meu QR Code" no Home) via `context.push(AppConstants.nfcShareRoute)`; padronizei os AppBars do `NFCShareRoutePage` para "Gravar em Cartão NFC".
+- **IPhone testado (31/08)**: instalei **1.0.5/13** por cima (App Store signing, preserva dados Hive) via `devicectl device install app` usando o `.app` do archive. App abre com dados preservados. **NFC iOS:** mostrou "NFC não disponível" — causa: App ID sem capability "NFC Tag Reading" (ver seção iOS). **Decidiu-se NÃO habilitar por ora.**
+- **Redmi testado (31/08)**: o adb quase não pegou (problema físico/modo MTP + popup de depuração); conectou depois de trocar de porta + confirmar popup. **Confirmado: Redmi Note 8 `ginkgo` NÃO tem NFC** (`pm list features` sem `android.hardware.nfc`, `/sys/class/nfc` inexistente). App 1.0.4 instalado; APK debug **não** instala por cima (`INSTALL_FAILED_UPDATE_INCOMPATIBLE` — assinaturas diferentes). **Não usar para teste NFC.**
+- **Cartão NFC do usuário**: é o cartão de visita com link do Instagram (gravado com NFC Tools). Precisa validação real de `isWritable`/regravação em **outro Android físico com NFC** (ver Pendências).
+
+### Infra (ambiente)
+- `app/build` e `app/android/.gradle` são symlinks para `/var/folders/.../T/opencode/vcardsmart_build` e `vcardsmart_android_gradle`; os alvos tinham sumido (OneDrive) — recriados. Não recriar como pastas reais dentro do OneDrive.
+
+## Ronda v1.0.6 (09/09 — nova aba NFC + qualidade iOS Guideline 5.6)
+Rodada para: (a) mover NFC para **aba dedicada** na barra de navegação (posição 3, antes de Configurações) com **detecção automática**; (b) corrigir issues da rejeição iOS **Guideline 5.6.4 (qualidade)** encontradas na revisão (26 itens). **Não subiu às lojas** — validar em device antes.
+
+### Nova aba NFC (sempre visível, com detecção automática)
+- `nfc_main_page.dart` (`/nfc`): verifica `nfcProvider.checkAvailability()`; se OK mostra "Gravar Cartão" (→`/nfc/share`) e "Receber Contato" (→`/nfc/receive`); se indisponível mostra ícone `Icons.contactless` + "NFC não disponível" + botão "Voltar ao Início" full-width.
+- `shell_page.dart`: 4ª `NavigationDestination` (Icons.contactless_outlined/contactless) no índice 2; `_calculateSelectedIndex`: contacts=1, nfc=2, settings=3; `_onItemTapped` case 2 → `context.go('/nfc')`.
+- `app_router.dart`: `GoRoute(/nfc)` dentro do `ShellRoute`; `/nfc/share` e `/nfc/receive` permanecem fora (push).
+- `app_constants.dart`: `nfcRoute = '/nfc'`. Botão "Gravar em Cartão NFC" removido do `qr_share_page.dart`.
+- Testes: 5 novos de `NFCMainPage` em `nfc_pages_test.dart`.
+
+### Qualidade iOS — fixes aplicados (HIGH e parte dos MEDIUM)
+- **Versão**: `package_info_plus ^8.0.0` + `app_version_provider.dart` (FutureProvider); `settings_page.dart` mostra `${version}+${buildNumber}` via `_AppVersionTile` (fallback `AppConstants.appVersion`). Atualizado para 1.0.6+14.
+- **Migração** (`migration_page.dart`): erros técnicos → `_friendlyError` (senha incorreta/arquivo corrompido, caminho inacessível, erro inesperado); diálogo de senha com toggle mostrar/esconder (ícone olho).
+- **Home** (`home_page.dart`): `_ProfileCard` → ConsumerWidget usando `homeProfilesProvider` (novo FutureProvider em `profile_provider.dart`); mostra nome/foto/email/telefone reais quando há perfil; `_shareProfile` com try/catch amigável.
+- **Auth** (`auth_page.dart`): dead-end sem PIN/biometria resolvido com botão "Configurar Segurança" (`unmarkSecurityAsked()` novo em `settings_provider.dart` → `checkAuth` → home); cores via theme.
+- **Settings**: desativar PIN/biometria agora pede confirmação (`_confirmDisable` AlertDialog Cancelar/Desativar); typo "cartão".
+- **NFC receive** (`nfc_receive_page.dart`): removido `NfcManager` duplicado; botão "Voltar" só em success/error (não durante o polling); corpo scrollável; botões full-width. "Voltar" não interrompe mais a sessão NFC no meio.
+- **NFC widgets**: cores → `AppColors.*` (não Colors hardcoded); idle text "Toque no botão para iniciar".
+- **Contatos** (`contacts_page.dart`): SnackBar "Contato importado com sucesso!" (ref.listen loading→success); lista ordenada alfabeticamente; **excluir por swipe** (Dismissible) com confirmação + SnackBar; empty state com CTA "Importar contato" (ícone `Icons.add`); erro com detalhe + "Tentar novamente"; **pull-to-refresh (RefreshIndicator)** no list vazio e preenchido; `_DetailRow` cor `onSurfaceVariant`.
+- **Banner ad** (`banner_ad_widget.dart`): `_loadFailed` → `SizedBox.shrink()` (não ocupa 50px quando falha).
+- **Perfil** (`profile_header.dart`): 17x `Colors.grey[600]` → `colorScheme.onSurfaceVariant`.
+- **PIN** (`pin_setup_page.dart`/`pin_input.dart`): estado `_saving` (bloqueia input + spinner); SafeArea; cores theme; `PinInput(enabled:)`.
+- **Security setup** (`security_setup_page.dart`): cores theme; `AppButton` em `SizedBox(width: double.infinity)`.
+- **ADiADO (fora de escopo desta rodada)**: localização completa das telas (NFC/contatos/settings têm strings pt hardcoded; test wrapper não tem delegates l10n — migrar quebraria testes); **link de privacy policy** (não há URL no projeto — decisão de produto). Demais MEDIUM já cobertos acima.
+
+### Estado v1.0.6 (09/09)
+- pubspec **1.0.6+14** (numeração única Play/iOS); `AppConstants.appVersion` = '1.0.6+14' (e teste).
+- `flutter analyze` → **No issues found**; suíte determinística **472 testes verdes**.
+- **`dart format` aplicado** em lib+test (54 arquivos). O lint customizado `require_trailing_commas` foi **removido** do `analysis_options.yaml` porque conflita com o `dart format` (dart fix adiciona vírgulas que o format colapsa → loop). `dart format` agora é o canônico: `dart format lib test` limpo + analyze limpo juntos.
+- **Artifacts finais (09/09, após formatação + purpose strings iOS)**: `~/Downloads/VCardSmart-1.0.6-14.aab` (65MB, SHA-256 `c8a65775…813dd`; versionCode=14, versionName=1.0.6, targetSdk=36, libs 64-bit p_align≥16384) e `~/Downloads/VCardSmart-1.0.6-14.ipa` (34MB, SHA-256 `0f358883…93052`; CFBundle 1.0.6/14, sem entitlement NFC). **Android 1.0.6-14 já na Play (testes aberto/fechado); iOS aguardando submissão.**
+- **iOS purpose strings (Info.plist)**: App Review ITMS-90683 exigiu `NSPhotoLibraryUsageDescription` (image_picker). Adicionadas **todas** de uma vez para evitar rejeição em cascata: NSCamera/NSPhotoLibrary/NSContacts/NSFaceID/NSMicrophone/NFCReader. Validar presença no IPA via `plutil -p Payload/Runner.app/Info.plist | grep UsageDescription`.
+- **Export Compliance (App Store, 09/09) RESOLVIDO**: o ASC pediu documentação de criptografia; usuário marcou no ASC **"uses only standard encryption and qualifies under an exemption"** (mass-market / ENC, 15 CFR §740.17(b)(2)) e **NÃO precisou subir documento** (pendência removida da versão). Template de carta de self-classification fica **guardado** em `docs/11_Legal/22_ExportCompliance.md` para eventual necessidade. Lembrete: **NÃO** marcar "no encryption" no futuro (falso — app usa AES-256 no backup `.vcs` + TLS/HTTPS no AdMob).
+- **Status lojas (09/09)**: **Android 1.0.6-14 na Google Play — testes aberto e fechado** (build `~/Downloads/VCardSmart-1.0.6-14.aab`); **iOS aguardando submissão** do `~/Downloads/VCardSmart-1.0.6-14.ipa` (Export Compliance respondido como exempt; version sem pendência de documento).
+- Docs: **CHANGELOG.md criado**; README atualizado (1.0.6+14 + migração); release checklist (`docs/08_Testing/19_ReleaseChecklist.md`) marcado com itens executados e specs corretas (minSdk 24, targetSdk 36, iOS min 15.0); `docs/11_Legal/22_ExportCompliance.md` criado com template de carta criptografia.
+
 ## Pendências (próxima interação)
-1. **Aguardar revisão do 1.0.4/12** (15/08): AAB `~/Downloads/VCardSmart-1.0.4-12.aab` subido à Google Play e IPA `~/Downloads/VCardSmart-1.0.4-12.ipa` subido ao App Store Connect via Transporter — ambos **em revisão** nas lojas. Se reprovado, corrigir e reenviar com numeração nova.
-2. **Validar no Redmi** (build 1.0.4/12): scanner (mobile_scanner com MLKit 17.3.0 + CameraX 1.5.3 forçados — conferir leitura de QR), selfie (fix da foto), NFC, contatos, ads e cold start.
-3. Contatos ("Preencher do dispositivo"): melhorado (permissão no foco + listar contatos), aguarda revalidação no aparelho.
-4. Nota: ao limpar dados do Redmi para testar first-run, backup via `run-as tar` (veja `/var/folders/.../opencode/vcardsmart_release_prebackup.tar`) e restore via `run-as cp`; dados do perfil foram restaurados. O PIN antigo NÃO é recuperável — é preciso re-cadastrar.
+1. **Validar NFC real em OUTRO Android físico com NFC** (Redmi Note 8 NÃO serve — sem chip NFC): conectar via USB, instalar `app-debug.apk`, tocar "Gravar em Cartão NFC" → "Gravar no cartão" com o cartão do usuário (link do Instagram) na mão. O app reporta `isWritable` (se regravável) e grava o vCard; validar leitura em app de Contatos de outro celular. **Se o cartão estiver write-locked, obter um NTAG213/215/216 em branco.**
+2. **Validar no iPhone**: migração (.vcs via share sheet/AirDrop) e — se um dia habilitar NFC no portal — gravação NFC externa (requer habilitar "NFC Tag Reading" no App ID + regenerar profile; NÃO subir loja agora).
+3. **Validar migração .vcs (export→import)** e foto/avatar (ResizeImage 224) e fluxo de ads — preferencialmente no aparelho com NFC / outro device.
+4. **Numeração**: **1.0.6+14** já está no pubspec e é o que está nas lojas (Android em teste aberto/fechado na Play; iOS a submeter). Para a próxima build, subir numeração única nova.
+5. **Validar v1.0.6 em device**: (a) Redmi — nova aba NFC mostra "NFC não disponível" (esperado, sem chip) e nada quebra; pull-to-refresh/excluir/importar em Contatos; versão dinâmica em Configurações; (b) iPhone — NFC tab, share/delete contacts, versão 1.0.6+14; (c) fluxos de PIN/segurança e Home com perfil real.
+6. **Aguardar revisão do 1.0.4/12** (15/08): AAB `~/Downloads/VCardSmart-1.0.4-12.aab` e IPA `~/Downloads/VCardSmart-1.0.4-12.ipa` — em revisão nas lojas.
+7. **App Store — Export Compliance (09/09) RESOLVIDO**: usuário marcou no ASC **"standard encryption / exempt"** e **NÃO precisou subir documento**. Template de carta fica guardado em `docs/11_Legal/22_ExportCompliance.md` para eventual necessidade. NÃO marcar "no encryption".
+8. Nota: ao limpar dados do Redmi para testar first-run, backup via `run-as tar` e restore via `run-as cp`; PIN antigo NÃO é recuperável (re-cadastrar) — exceto via `.vcs` de migração, que leva o hash do PIN.
 
 ## Histórico de Commits (recente)
 - `76cbfd9` feat: add facebook, x and generic social link fields to profile

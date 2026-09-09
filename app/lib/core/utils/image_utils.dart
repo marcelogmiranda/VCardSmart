@@ -14,7 +14,8 @@ class ImageUtils {
     );
 
     final bytes = await file.readAsBytes();
-    final compressedBytes = bytes; // Simplified - in production use image package
+    final compressedBytes =
+        bytes; // Simplified - in production use image package
 
     final compressedFile = File(targetPath);
     await compressedFile.writeAsBytes(compressedBytes);

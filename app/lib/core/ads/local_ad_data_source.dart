@@ -5,11 +5,16 @@ import 'ad_data_source.dart';
 class LocalAdDataSource implements AdDataSource {
   InterstitialAd? _interstitialAd;
 
+  static Future<void>? _initFuture;
+
   InterstitialAd? get interstitialAd => _interstitialAd;
 
   @override
   Future<void> initialize() async {
-    await MobileAds.instance.initialize();
+    // `main.dart` also initializes MobileAds at startup. `google_mobile_ads`
+    // returns a shared cached initialization future, and calling it twice is
+    // redundant work. Cache the future so it only runs once per process.
+    return _initFuture ??= MobileAds.instance.initialize();
   }
 
   @override

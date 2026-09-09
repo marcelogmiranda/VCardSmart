@@ -83,8 +83,12 @@ class VCardDataSource {
         lastName = parts.length > 1 ? parts.sublist(1).join(' ') : null;
       } else if (trimmed.startsWith('N:')) {
         final nParts = trimmed.substring(2).split(';');
-        if (nParts.isNotEmpty) firstName = nParts[0].isNotEmpty ? nParts[0] : firstName;
-        if (nParts.length > 1) lastName = nParts[1].isNotEmpty ? nParts[1] : lastName;
+        if (nParts.isNotEmpty) {
+          firstName = nParts[0].isNotEmpty ? nParts[0] : firstName;
+        }
+        if (nParts.length > 1) {
+          lastName = nParts[1].isNotEmpty ? nParts[1] : lastName;
+        }
       } else if (trimmed.startsWith('ORG:')) {
         organization = trimmed.substring(4);
       } else if (trimmed.startsWith('TITLE:')) {

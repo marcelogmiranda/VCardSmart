@@ -83,7 +83,9 @@ void main() {
       await tester.pumpAndSettle();
       await expectLater(
         find.byType(SecuritySettings),
-        matchesGoldenFile('golden_files/components/security_settings_enabled_light.png'),
+        matchesGoldenFile(
+          'golden_files/components/security_settings_enabled_light.png',
+        ),
       );
     });
 
@@ -104,7 +106,9 @@ void main() {
       await tester.pumpAndSettle();
       await expectLater(
         find.byType(SecuritySettings),
-        matchesGoldenFile('golden_files/components/security_settings_disabled_light.png'),
+        matchesGoldenFile(
+          'golden_files/components/security_settings_disabled_light.png',
+        ),
       );
     });
   });
@@ -125,7 +129,9 @@ void main() {
       await tester.pumpAndSettle();
       await expectLater(
         find.byType(PrivacySettings),
-        matchesGoldenFile('golden_files/components/privacy_settings_enabled_light.png'),
+        matchesGoldenFile(
+          'golden_files/components/privacy_settings_enabled_light.png',
+        ),
       );
     });
 
@@ -144,7 +150,9 @@ void main() {
       await tester.pumpAndSettle();
       await expectLater(
         find.byType(PrivacySettings),
-        matchesGoldenFile('golden_files/components/privacy_settings_disabled_light.png'),
+        matchesGoldenFile(
+          'golden_files/components/privacy_settings_disabled_light.png',
+        ),
       );
     });
   });

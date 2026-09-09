@@ -2,7 +2,7 @@
 
 ## Cartão de Visita Digital
 
-**Versão:** 1.0.0
+**Versão:** 1.0.6+14
 
 ---
 
@@ -34,6 +34,7 @@ O aplicativo foi concebido utilizando o conceito **Offline First**.
 - vCard (Formato padrão de contato)
 - Biometria + PIN (Autenticação)
 - Internacionalização (pt-BR, en, es)
+- Migração de dispositivo (backup `.vcs` criptografado)
 - AdMob (Monetização)
 
 ---

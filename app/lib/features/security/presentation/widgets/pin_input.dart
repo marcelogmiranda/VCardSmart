@@ -3,11 +3,13 @@ import 'package:flutter/material.dart';
 class PinInput extends StatefulWidget {
   final Function(String) onCompleted;
   final int length;
+  final bool enabled;
 
   const PinInput({
     super.key,
     required this.onCompleted,
     this.length = 4,
+    this.enabled = true,
   });
 
   @override
@@ -53,6 +55,7 @@ class _PinInputState extends State<PinInput> {
             child: TextField(
               controller: _controllers[index],
               focusNode: _focusNodes[index],
+              enabled: widget.enabled,
               textAlign: TextAlign.center,
               obscureText: true,
               keyboardType: TextInputType.number,

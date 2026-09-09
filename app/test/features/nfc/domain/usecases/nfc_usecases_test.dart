@@ -64,12 +64,13 @@ class _FakeNFCRepository implements NFCRepository {
   @override
   Future<Profile> receive() async {
     wasReceived = true;
-    return receivedProfile ?? Profile(
-      id: '0',
-      name: 'Default',
-      createdAt: DateTime(2024),
-      updatedAt: DateTime(2024),
-    );
+    return receivedProfile ??
+        Profile(
+          id: '0',
+          name: 'Default',
+          createdAt: DateTime(2024),
+          updatedAt: DateTime(2024),
+        );
   }
 
   @override

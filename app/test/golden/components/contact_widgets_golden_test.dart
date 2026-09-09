@@ -84,7 +84,9 @@ void main() {
       await tester.pumpAndSettle();
       await expectLater(
         find.byType(ContactCard),
-        matchesGoldenFile('golden_files/components/contact_card_vcard_light.png'),
+        matchesGoldenFile(
+          'golden_files/components/contact_card_vcard_light.png',
+        ),
       );
     });
 

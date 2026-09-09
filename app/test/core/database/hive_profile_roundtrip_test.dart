@@ -21,8 +21,7 @@ void main() {
     await Hive.deleteFromDisk();
   });
 
-  test('should persist and retrieve profile with all social fields',
-      () async {
+  test('should persist and retrieve profile with all social fields', () async {
     final profile = Profile(
       id: '1',
       name: 'John Doe',

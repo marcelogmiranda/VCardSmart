@@ -69,7 +69,10 @@ void main() {
 
     group('getLanguageName', () {
       test('should return Português for pt', () {
-        expect(LocaleUtils.getLanguageName(const Locale('pt', 'BR')), 'Português');
+        expect(
+          LocaleUtils.getLanguageName(const Locale('pt', 'BR')),
+          'Português',
+        );
       });
 
       test('should return English for en', () {
@@ -108,17 +111,20 @@ void main() {
 
   group('AppLocalizations', () {
     test('should provide translations for pt-BR', () async {
-      final localizations = await AppLocalizations.delegate.load(const Locale('pt', 'BR'));
+      final localizations =
+          await AppLocalizations.delegate.load(const Locale('pt', 'BR'));
       expect(localizations, isA<AppLocalizations>());
     });
 
     test('should provide translations for en', () async {
-      final localizations = await AppLocalizations.delegate.load(const Locale('en'));
+      final localizations =
+          await AppLocalizations.delegate.load(const Locale('en'));
       expect(localizations, isA<AppLocalizations>());
     });
 
     test('should have correct pt-BR translations', () async {
-      final localizations = await AppLocalizations.delegate.load(const Locale('pt', 'BR'));
+      final localizations =
+          await AppLocalizations.delegate.load(const Locale('pt', 'BR'));
       expect(localizations.settingsTitle, 'Configurações');
       expect(localizations.appearanceSection, 'Aparência');
       expect(localizations.securitySection, 'Segurança');
@@ -130,7 +136,8 @@ void main() {
     });
 
     test('should have correct en translations', () async {
-      final localizations = await AppLocalizations.delegate.load(const Locale('en'));
+      final localizations =
+          await AppLocalizations.delegate.load(const Locale('en'));
       expect(localizations.settingsTitle, 'Settings');
       expect(localizations.appearanceSection, 'Appearance');
       expect(localizations.securitySection, 'Security');
@@ -142,37 +149,43 @@ void main() {
     });
 
     test('should have correct es translations', () async {
-      final localizations = await AppLocalizations.delegate.load(const Locale('es'));
+      final localizations =
+          await AppLocalizations.delegate.load(const Locale('es'));
       expect(localizations.settingsTitle, 'Configuración');
       expect(localizations.appearanceSection, 'Apariencia');
     });
 
     test('should have correct fr translations', () async {
-      final localizations = await AppLocalizations.delegate.load(const Locale('fr'));
+      final localizations =
+          await AppLocalizations.delegate.load(const Locale('fr'));
       expect(localizations.settingsTitle, 'Paramètres');
       expect(localizations.appearanceSection, 'Apparence');
     });
 
     test('should have correct de translations', () async {
-      final localizations = await AppLocalizations.delegate.load(const Locale('de'));
+      final localizations =
+          await AppLocalizations.delegate.load(const Locale('de'));
       expect(localizations.settingsTitle, 'Einstellungen');
       expect(localizations.appearanceSection, 'Erscheinungsbild');
     });
 
     test('should have correct ja translations', () async {
-      final localizations = await AppLocalizations.delegate.load(const Locale('ja'));
+      final localizations =
+          await AppLocalizations.delegate.load(const Locale('ja'));
       expect(localizations.settingsTitle, '設定');
       expect(localizations.appearanceSection, '外観');
     });
 
     test('should have correct zh translations', () async {
-      final localizations = await AppLocalizations.delegate.load(const Locale('zh'));
+      final localizations =
+          await AppLocalizations.delegate.load(const Locale('zh'));
       expect(localizations.settingsTitle, '设置');
       expect(localizations.appearanceSection, '外观');
     });
 
     test('should have correct it translations', () async {
-      final localizations = await AppLocalizations.delegate.load(const Locale('it'));
+      final localizations =
+          await AppLocalizations.delegate.load(const Locale('it'));
       expect(localizations.settingsTitle, 'Impostazioni');
       expect(localizations.appearanceSection, 'Aspetto');
     });

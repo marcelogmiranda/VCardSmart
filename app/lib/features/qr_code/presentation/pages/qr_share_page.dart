@@ -23,8 +23,7 @@ class _QRSharePageState extends ConsumerState<QRSharePage> {
   }
 
   Future<void> _loadProfileAndGenerate() async {
-    final profiles =
-        await ref.read(getAllProfilesUseCaseProvider).call();
+    final profiles = await ref.read(getAllProfilesUseCaseProvider).call();
     if (profiles.isEmpty) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(

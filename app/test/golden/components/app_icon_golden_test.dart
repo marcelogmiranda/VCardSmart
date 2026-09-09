@@ -85,7 +85,9 @@ void main() {
       await tester.pumpAndSettle();
       await expectLater(
         find.byType(AppStatusIcon),
-        matchesGoldenFile('golden_files/components/status_icon_success_light.png'),
+        matchesGoldenFile(
+          'golden_files/components/status_icon_success_light.png',
+        ),
       );
     });
 
@@ -106,7 +108,9 @@ void main() {
       await tester.pumpAndSettle();
       await expectLater(
         find.byType(AppStatusIcon),
-        matchesGoldenFile('golden_files/components/status_icon_error_light.png'),
+        matchesGoldenFile(
+          'golden_files/components/status_icon_error_light.png',
+        ),
       );
     });
 
@@ -127,7 +131,9 @@ void main() {
       await tester.pumpAndSettle();
       await expectLater(
         find.byType(AppStatusIcon),
-        matchesGoldenFile('golden_files/components/status_icon_warning_light.png'),
+        matchesGoldenFile(
+          'golden_files/components/status_icon_warning_light.png',
+        ),
       );
     });
 

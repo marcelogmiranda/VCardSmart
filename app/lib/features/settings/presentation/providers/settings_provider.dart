@@ -61,6 +61,11 @@ class SettingsNotifier extends StateNotifier<Settings> {
     await _updateSettings(state);
   }
 
+  Future<void> unmarkSecurityAsked() async {
+    state = state.copyWith(securitySetupAsked: false);
+    await _updateSettings(state);
+  }
+
   Future<void> updateAds(bool enabled) async {
     state = state.copyWith(adsEnabled: enabled);
     await _updateSettings(state);
@@ -72,7 +77,8 @@ class SettingsNotifier extends StateNotifier<Settings> {
   }
 }
 
-final settingsProvider = StateNotifierProvider<SettingsNotifier, Settings>((ref) {
+final settingsProvider =
+    StateNotifierProvider<SettingsNotifier, Settings>((ref) {
   return SettingsNotifier(
     ref.read(getSettingsUseCaseProvider),
     ref.read(updateSettingsUseCaseProvider),

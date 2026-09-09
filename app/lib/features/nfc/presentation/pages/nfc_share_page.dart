@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../providers/nfc_provider.dart';
 import '../widgets/nfc_status_widget.dart';
 import '../widgets/nfc_instruction_widget.dart';
 import '../../../profile/domain/entities/profile.dart';
 import '../../../profile/presentation/providers/profile_provider.dart';
+import '../../../../core/constants/app_constants.dart';
 
 class NFCShareRoutePage extends ConsumerStatefulWidget {
   const NFCShareRoutePage({super.key});
@@ -35,7 +37,7 @@ class _NFCShareRoutePageState extends ConsumerState<NFCShareRoutePage> {
   Widget build(BuildContext context) {
     if (_nfcAvailable == null) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Compartilhar via NFC')),
+        appBar: AppBar(title: const Text('Gravar em Cartão NFC')),
         body: const Center(child: CircularProgressIndicator()),
       );
     }
@@ -43,7 +45,7 @@ class _NFCShareRoutePageState extends ConsumerState<NFCShareRoutePage> {
     if (_nfcAvailable == false) {
       final theme = Theme.of(context);
       return Scaffold(
-        appBar: AppBar(title: const Text('Compartilhar via NFC')),
+        appBar: AppBar(title: const Text('Gravar em Cartão NFC')),
         body: Center(
           child: Padding(
             padding: const EdgeInsets.all(32),
@@ -81,14 +83,58 @@ class _NFCShareRoutePageState extends ConsumerState<NFCShareRoutePage> {
       builder: (context, ref, child) {
         final profiles = ref.watch(profileListProvider);
         return profiles.when(
-          data: (list) => list.isEmpty
-              ? _NoProfile()
-              : NFCSharePage(profile: list.first),
-          loading: () =>
-              const Scaffold(body: Center(child: CircularProgressIndicator())),
-          error: (e, st) => _NoProfile(),
+          data: (list) =>
+              list.isEmpty ? _NoProfile() : NFCSharePage(profile: list.first),
+          loading: () => const Scaffold(
+            body: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CircularProgressIndicator(),
+                  SizedBox(height: 16),
+                  Text('Carregando perfil...'),
+                ],
+              ),
+            ),
+          ),
+          error: (e, st) => _LoadError(),
         );
       },
+    );
+  }
+}
+
+class _LoadError extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Gravar em Cartão NFC')),
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.error_outline,
+                size: 64,
+                color: Theme.of(context).colorScheme.error,
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'Não foi possível carregar seu perfil.',
+                style: Theme.of(context).textTheme.titleMedium,
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 16),
+              FilledButton(
+                onPressed: () => context.go(AppConstants.homeRoute),
+                child: const Text('Voltar'),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
@@ -97,25 +143,38 @@ class _NoProfile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Compartilhar via NFC')),
+      appBar: AppBar(title: const Text('Gravar em Cartão NFC')),
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.person_off, size: 64, color: Colors.grey[400]),
-            const SizedBox(height: 16),
-            Text(
-              'Nenhum perfil encontrado',
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Crie seu perfil para compartilhar via NFC',
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  ),
-            ),
-          ],
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.person_off,
+                size: 64,
+                color: Theme.of(context).colorScheme.outline,
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'Nenhum perfil encontrado',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Crie seu perfil para compartilhar via NFC',
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
+              ),
+              const SizedBox(height: 24),
+              FilledButton.icon(
+                onPressed: () => context.push(AppConstants.profileRoute),
+                icon: const Icon(Icons.person_add),
+                label: const Text('Criar perfil'),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -147,32 +206,59 @@ class NFCSharePage extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Compartilhar via NFC'),
+        title: const Text('Gravar em Cartão NFC'),
         centerTitle: true,
       ),
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            NFCStatusWidget(isAvailable: nfcStatus.isAvailable),
-            const SizedBox(height: 32),
-            NFCInstructionWidget(state: nfcStatus.state),
-            const SizedBox(height: 32),
-            if (nfcStatus.state == NFCState.idle)
-              ElevatedButton(
-                onPressed: () {
-                  ref.read(nfcProvider.notifier).send(profile);
-                },
-                child: const Text('Iniciar envio'),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              NFCStatusWidget(isAvailable: nfcStatus.isAvailable),
+              const SizedBox(height: 16),
+              Text(
+                'Aproxime o celular de um cartão NFC gravável (ex.: NTAG213/215/216). '
+                'O contato será gravado em formato vCard padrão, lido por '
+                'qualquer celular.',
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
               ),
-            if (nfcStatus.state == NFCState.success)
-              ElevatedButton(
-                onPressed: () {
-                  ref.read(nfcProvider.notifier).reset();
-                },
-                child: const Text('Enviar novamente'),
-              ),
-          ],
+              const SizedBox(height: 32),
+              NFCInstructionWidget(state: nfcStatus.state),
+              const SizedBox(height: 32),
+              if (nfcStatus.state == NFCState.idle)
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                      ref.read(nfcProvider.notifier).send(profile);
+                    },
+                    icon: const Icon(Icons.contactless),
+                    label: const Text('Gravar no cartão'),
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                    ),
+                  ),
+                ),
+              if (nfcStatus.state == NFCState.success)
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                      ref.read(nfcProvider.notifier).reset();
+                    },
+                    icon: const Icon(Icons.replay),
+                    label: const Text('Gravar novamente'),
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                    ),
+                  ),
+                ),
+            ],
+          ),
         ),
       ),
     );

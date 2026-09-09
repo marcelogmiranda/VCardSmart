@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:nfc_manager/nfc_manager.dart';
 import '../providers/nfc_provider.dart';
 import '../widgets/nfc_status_widget.dart';
 import '../widgets/nfc_instruction_widget.dart';
@@ -20,7 +19,9 @@ class _NFCReceivePageState extends ConsumerState<NFCReceivePage> {
   @override
   void initState() {
     super.initState();
-    _checkNFC();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkNFC();
+    });
   }
 
   Future<void> _showProfileReceived(Profile profile) async {
@@ -82,12 +83,8 @@ class _NFCReceivePageState extends ConsumerState<NFCReceivePage> {
 
   Future<void> _checkNFC() async {
     await ref.read(nfcProvider.notifier).checkAvailability();
-    final available = await NfcManager.instance.isAvailable();
     if (mounted) {
-      setState(() => _nfcAvailable = available);
-      if (!available) {
-        ref.read(nfcProvider.notifier).setUnavailable();
-      }
+      setState(() => _nfcAvailable = ref.read(nfcProvider).isAvailable);
     }
   }
 
@@ -158,30 +155,47 @@ class _NFCReceivePageState extends ConsumerState<NFCReceivePage> {
     return Scaffold(
       appBar: AppBar(title: const Text('Receber via NFC'), centerTitle: true),
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            NFCStatusWidget(isAvailable: nfcStatus.isAvailable),
-            const SizedBox(height: 32),
-            NFCInstructionWidget(state: nfcStatus.state),
-            const SizedBox(height: 32),
-            if (nfcStatus.state == NFCState.idle)
-              ElevatedButton(
-                onPressed: () {
-                  ref.read(nfcProvider.notifier).receive();
-                },
-                child: const Text('Iniciar recebimento'),
-              ),
-            if (nfcStatus.state != NFCState.idle)
-              OutlinedButton.icon(
-                onPressed: () {
-                  ref.read(nfcProvider.notifier).reset();
-                  Navigator.of(context).pop();
-                },
-                icon: const Icon(Icons.arrow_back),
-                label: const Text('Voltar'),
-              ),
-          ],
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              NFCStatusWidget(isAvailable: nfcStatus.isAvailable),
+              const SizedBox(height: 32),
+              NFCInstructionWidget(state: nfcStatus.state),
+              const SizedBox(height: 32),
+              if (nfcStatus.state == NFCState.idle)
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                      ref.read(nfcProvider.notifier).receive();
+                    },
+                    icon: const Icon(Icons.nfc),
+                    label: const Text('Iniciar recebimento'),
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                    ),
+                  ),
+                ),
+              if (nfcStatus.state == NFCState.success ||
+                  nfcStatus.state == NFCState.error)
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton.icon(
+                    onPressed: () {
+                      ref.read(nfcProvider.notifier).reset();
+                      Navigator.of(context).pop();
+                    },
+                    icon: const Icon(Icons.arrow_back),
+                    label: const Text('Voltar'),
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                    ),
+                  ),
+                ),
+            ],
+          ),
         ),
       ),
     );

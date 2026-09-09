@@ -16,7 +16,8 @@ void main() {
       expect(find.text('AB'), findsOneWidget);
     });
 
-    testWidgets('should display question mark when no initials', (tester) async {
+    testWidgets('should display question mark when no initials',
+        (tester) async {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(

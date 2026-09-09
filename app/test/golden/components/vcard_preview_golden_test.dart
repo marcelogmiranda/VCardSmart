@@ -32,7 +32,9 @@ void main() {
       await tester.pumpAndSettle();
       await expectLater(
         find.byType(VCardPreview),
-        matchesGoldenFile('golden_files/components/vcard_preview_full_light.png'),
+        matchesGoldenFile(
+          'golden_files/components/vcard_preview_full_light.png',
+        ),
       );
     });
 
@@ -62,7 +64,9 @@ void main() {
       await tester.pumpAndSettle();
       await expectLater(
         find.byType(VCardPreview),
-        matchesGoldenFile('golden_files/components/vcard_preview_full_dark.png'),
+        matchesGoldenFile(
+          'golden_files/components/vcard_preview_full_dark.png',
+        ),
       );
     });
 
@@ -84,7 +88,9 @@ void main() {
       await tester.pumpAndSettle();
       await expectLater(
         find.byType(VCardPreview),
-        matchesGoldenFile('golden_files/components/vcard_preview_minimal_light.png'),
+        matchesGoldenFile(
+          'golden_files/components/vcard_preview_minimal_light.png',
+        ),
       );
     });
   });

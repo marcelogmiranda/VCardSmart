@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:vcardsmart/features/nfc/presentation/providers/nfc_provider.dart';
 import 'package:vcardsmart/features/nfc/presentation/pages/nfc_share_page.dart';
 import 'package:vcardsmart/features/nfc/presentation/pages/nfc_receive_page.dart';
+import 'package:vcardsmart/features/nfc/presentation/pages/nfc_main_page.dart';
 import 'package:vcardsmart/features/nfc/presentation/widgets/nfc_status_widget.dart';
 import 'package:vcardsmart/features/nfc/presentation/widgets/nfc_instruction_widget.dart';
 import 'package:vcardsmart/features/profile/domain/entities/profile.dart';
@@ -70,7 +71,7 @@ void main() {
           child: MaterialApp(home: NFCSharePage(profile: profile)),
         ),
       );
-      expect(find.text('Compartilhar via NFC'), findsOneWidget);
+      expect(find.text('Gravar em Cartão NFC'), findsOneWidget);
     });
 
     testWidgets('should display start button when idle', (tester) async {
@@ -79,7 +80,7 @@ void main() {
           child: MaterialApp(home: NFCSharePage(profile: profile)),
         ),
       );
-      expect(find.text('Iniciar envio'), findsOneWidget);
+      expect(find.text('Gravar no cartão'), findsOneWidget);
     });
 
     testWidgets('should display NFC icon', (tester) async {
@@ -125,8 +126,79 @@ void main() {
     });
   });
 
+  group('NFCMainPage', () {
+    testWidgets('should display appBar title when NFC available',
+        (tester) async {
+      final mock = NfcChannelMock()..available = true;
+      mock.install();
+      await tester.pumpWidget(
+        const ProviderScope(
+          child: MaterialApp(home: NFCMainPage()),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(find.text('NFC'), findsOneWidget);
+    });
+
+    testWidgets('should display gravar cartao button when NFC available',
+        (tester) async {
+      final mock = NfcChannelMock()..available = true;
+      mock.install();
+      await tester.pumpWidget(
+        const ProviderScope(
+          child: MaterialApp(home: NFCMainPage()),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(find.text('Gravar Cartão'), findsOneWidget);
+    });
+
+    testWidgets('should display receber contato button when NFC available',
+        (tester) async {
+      final mock = NfcChannelMock()..available = true;
+      mock.install();
+      await tester.pumpWidget(
+        const ProviderScope(
+          child: MaterialApp(home: NFCMainPage()),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(find.text('Receber Contato'), findsOneWidget);
+    });
+
+    testWidgets('should display unavailable message when NFC not available',
+        (tester) async {
+      final mock = NfcChannelMock()..available = false;
+      mock.install();
+      await tester.pumpWidget(
+        const ProviderScope(
+          child: MaterialApp(home: NFCMainPage()),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(find.text('NFC não disponível'), findsOneWidget);
+    });
+
+    testWidgets('should display unavailable detail when NFC not available',
+        (tester) async {
+      final mock = NfcChannelMock()..available = false;
+      mock.install();
+      await tester.pumpWidget(
+        const ProviderScope(
+          child: MaterialApp(home: NFCMainPage()),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(
+        find.textContaining('não possui funcionalidade NFC'),
+        findsOneWidget,
+      );
+    });
+  });
+
   group('NFCStatusWidget', () {
-    testWidgets('should display available icon when NFC is available', (tester) async {
+    testWidgets('should display available icon when NFC is available',
+        (tester) async {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(body: NFCStatusWidget(isAvailable: true)),
@@ -136,7 +208,8 @@ void main() {
       expect(find.text('NFC disponível'), findsOneWidget);
     });
 
-    testWidgets('should display unavailable when NFC not available', (tester) async {
+    testWidgets('should display unavailable when NFC not available',
+        (tester) async {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(body: NFCStatusWidget(isAvailable: false)),
@@ -154,7 +227,7 @@ void main() {
           home: Scaffold(body: NFCInstructionWidget(state: NFCState.idle)),
         ),
       );
-      expect(find.text('Toque para iniciar'), findsOneWidget);
+      expect(find.text('Toque no botão para iniciar'), findsOneWidget);
     });
 
     testWidgets('should display sending instruction', (tester) async {

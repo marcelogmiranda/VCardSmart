@@ -11,7 +11,8 @@ import 'package:vcardsmart/features/contacts/presentation/widgets/contact_card.d
 import 'package:vcardsmart/features/contacts/domain/entities/contact.dart';
 import 'package:vcardsmart/core/database/hive_boxes.dart';
 
-Contact _testContact({String name = 'Test Contact', String source = 'qr'}) => Contact(
+Contact _testContact({String name = 'Test Contact', String source = 'qr'}) =>
+    Contact(
       id: '1',
       name: name,
       source: source,
@@ -19,9 +20,9 @@ Contact _testContact({String name = 'Test Contact', String source = 'qr'}) => Co
     );
 
 Widget wrap(Widget child, {List<Override>? overrides}) => ProviderScope(
-  overrides: overrides ?? [],
-  child: MaterialApp(home: Scaffold(body: child)),
-);
+      overrides: overrides ?? [],
+      child: MaterialApp(home: Scaffold(body: child)),
+    );
 
 Widget wrapWithRouter(Widget dialog) => ProviderScope(
       child: MaterialApp.router(
@@ -246,7 +247,8 @@ void main() {
       expect(find.byIcon(Icons.description), findsOneWidget);
     });
 
-    testWidgets('should display person icon for unknown source', (tester) async {
+    testWidgets('should display person icon for unknown source',
+        (tester) async {
       final card = ContactCard(
         contact: _testContact(source: 'unknown'),
         onTap: () {},

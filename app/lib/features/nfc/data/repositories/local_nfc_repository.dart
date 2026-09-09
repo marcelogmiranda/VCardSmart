@@ -1,6 +1,8 @@
 import '../../domain/repositories/nfc_repository.dart';
+import '../../domain/entities/nfc_data.dart';
 import '../datasources/nfc_datasource.dart';
 import '../models/nfc_payload.dart';
+import '../models/profile_vcard_converter.dart';
 import '../../../profile/domain/entities/profile.dart';
 
 class LocalNFCRepository implements NFCRepository {
@@ -15,14 +17,25 @@ class LocalNFCRepository implements NFCRepository {
 
   @override
   Future<void> send(Profile profile) async {
-    final nfcData = NFCPayload.encodeToNFC(profile);
+    final vcard = ProfileVCardConverter.encodeProfile(profile);
+    final nfcData = NFCData(
+      type: 'profile',
+      payload: vcard,
+      timestamp: DateTime.now(),
+    );
     await _dataSource.sendData(nfcData);
   }
 
   @override
   Future<Profile> receive() async {
     final nfcData = await _dataSource.receiveData();
-    return NFCPayload.decodeProfile(nfcData.payload);
+    final payload = nfcData.payload;
+    // Support both the new standard vCard format and the legacy JSON format
+    // written by older VCardSmart builds.
+    if (ProfileVCardConverter.isVCardPayload(payload)) {
+      return ProfileVCardConverter.decodeVCard(payload);
+    }
+    return NFCPayload.decodeProfile(payload);
   }
 
   @override

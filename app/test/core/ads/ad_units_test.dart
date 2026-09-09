@@ -5,11 +5,17 @@ void main() {
   group('AdUnits', () {
     group('banner', () {
       test('should return bannerAndroid for Android', () {
-        expect(AdUnits.banner(isAndroid: true, isIOS: false), AdUnits.bannerAndroid);
+        expect(
+          AdUnits.banner(isAndroid: true, isIOS: false),
+          AdUnits.bannerAndroid,
+        );
       });
 
       test('should return bannerIOS for iOS', () {
-        expect(AdUnits.banner(isAndroid: false, isIOS: true), AdUnits.bannerIOS);
+        expect(
+          AdUnits.banner(isAndroid: false, isIOS: true),
+          AdUnits.bannerIOS,
+        );
       });
 
       test('should return bannerAndroid as default', () {
@@ -19,11 +25,17 @@ void main() {
 
     group('interstitial', () {
       test('should return interstitialAndroid for Android', () {
-        expect(AdUnits.interstitial(isAndroid: true, isIOS: false), AdUnits.interstitialAndroid);
+        expect(
+          AdUnits.interstitial(isAndroid: true, isIOS: false),
+          AdUnits.interstitialAndroid,
+        );
       });
 
       test('should return interstitialIOS for iOS', () {
-        expect(AdUnits.interstitial(isAndroid: false, isIOS: true), AdUnits.interstitialIOS);
+        expect(
+          AdUnits.interstitial(isAndroid: false, isIOS: true),
+          AdUnits.interstitialIOS,
+        );
       });
 
       test('should return interstitialAndroid as default', () {

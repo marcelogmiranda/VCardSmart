@@ -30,7 +30,9 @@ void main() {
       await tester.pumpAndSettle();
       await expectLater(
         find.byType(ProfileHeader),
-        matchesGoldenFile('golden_files/components/profile_header_full_light.png'),
+        matchesGoldenFile(
+          'golden_files/components/profile_header_full_light.png',
+        ),
       );
     });
 
@@ -57,7 +59,9 @@ void main() {
       await tester.pumpAndSettle();
       await expectLater(
         find.byType(ProfileHeader),
-        matchesGoldenFile('golden_files/components/profile_header_full_dark.png'),
+        matchesGoldenFile(
+          'golden_files/components/profile_header_full_dark.png',
+        ),
       );
     });
 
@@ -82,7 +86,9 @@ void main() {
       await tester.pumpAndSettle();
       await expectLater(
         find.byType(ProfileHeader),
-        matchesGoldenFile('golden_files/components/profile_header_minimal_light.png'),
+        matchesGoldenFile(
+          'golden_files/components/profile_header_minimal_light.png',
+        ),
       );
     });
   });
@@ -137,7 +143,9 @@ void main() {
       await tester.pumpAndSettle();
       await expectLater(
         find.byType(ProfileCard),
-        matchesGoldenFile('golden_files/components/profile_card_no_email_light.png'),
+        matchesGoldenFile(
+          'golden_files/components/profile_card_no_email_light.png',
+        ),
       );
     });
 

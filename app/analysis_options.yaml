@@ -7,7 +7,6 @@ linter:
     - prefer_final_locals
     - avoid_print
     - prefer_single_quotes
-    - require_trailing_commas
     - always_declare_return_types
     - annotate_overrides
     - use_key_in_widget_constructors

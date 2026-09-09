@@ -234,26 +234,31 @@ void main() {
 
   group('PinInput', () {
     testWidgets('should display correct number of fields', (tester) async {
-      await tester.pumpWidget(MaterialApp(
-        home: Scaffold(
-          body: PinInput(onCompleted: (pin) {}, length: 4),
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: PinInput(onCompleted: (pin) {}, length: 4),
+          ),
         ),
-      ),);
+      );
 
       expect(find.byType(TextField), findsNWidgets(4));
     });
 
-    testWidgets('should call onCompleted when all fields filled', (tester) async {
+    testWidgets('should call onCompleted when all fields filled',
+        (tester) async {
       String? completedPin;
 
-      await tester.pumpWidget(MaterialApp(
-        home: Scaffold(
-          body: PinInput(
-            onCompleted: (pin) => completedPin = pin,
-            length: 4,
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: PinInput(
+              onCompleted: (pin) => completedPin = pin,
+              length: 4,
+            ),
           ),
         ),
-      ),);
+      );
 
       final fields = find.byType(TextField);
       await tester.enterText(fields.at(0), '1');
@@ -266,21 +271,25 @@ void main() {
     });
 
     testWidgets('should support custom length', (tester) async {
-      await tester.pumpWidget(MaterialApp(
-        home: Scaffold(
-          body: PinInput(onCompleted: (pin) {}, length: 6),
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: PinInput(onCompleted: (pin) {}, length: 6),
+          ),
         ),
-      ),);
+      );
 
       expect(find.byType(TextField), findsNWidgets(6));
     });
 
     testWidgets('should handle backspace by clearing field', (tester) async {
-      await tester.pumpWidget(MaterialApp(
-        home: Scaffold(
-          body: PinInput(onCompleted: (pin) {}, length: 4),
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: PinInput(onCompleted: (pin) {}, length: 4),
+          ),
         ),
-      ),);
+      );
 
       final fields = find.byType(TextField);
       await tester.enterText(fields.at(0), '1');

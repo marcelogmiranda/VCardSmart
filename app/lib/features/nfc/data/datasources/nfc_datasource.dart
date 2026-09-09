@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:nfc_manager/nfc_manager.dart';
 
 import '../../domain/entities/nfc_data.dart';
+import '../models/profile_vcard_converter.dart';
 
 abstract class NFCDataSource {
   Future<bool> checkAvailability();
@@ -13,8 +14,6 @@ abstract class NFCDataSource {
 }
 
 class LocalNFCDataSource implements NFCDataSource {
-  static const String _mimeType = 'application/vcardsmart/profile';
-
   @override
   Future<bool> checkAvailability() async {
     try {
@@ -27,9 +26,12 @@ class LocalNFCDataSource implements NFCDataSource {
   @override
   Future<void> sendData(NFCData data) async {
     final completer = Completer<void>();
-    final message = NdefMessage([
-      NdefRecord.createMime(_mimeType, utf8.encode(data.payload)),
-    ]);
+    // Write a standard vCard so the tag is readable by any phone's Contacts app.
+    final record = NdefRecord.createMime(
+      ProfileVCardConverter.mimeType,
+      utf8.encode(data.payload),
+    );
+    final message = NdefMessage([record]);
 
     try {
       await NfcManager.instance.startSession(
@@ -77,17 +79,17 @@ class LocalNFCDataSource implements NFCDataSource {
             if (ndef == null) {
               throw Exception('Tag NFC não suportada');
             }
-            final message =
-                ndef.cachedMessage ?? await ndef.read();
+            final message = ndef.cachedMessage ?? await ndef.read();
             if (message.records.isEmpty) {
               throw Exception('Nenhum dado encontrado na tag NFC');
             }
-            final payload = utf8.decode(message.records.first.payload);
+            final rawPayload = utf8.decode(message.records.first.payload);
+            // Preserve the raw payload; the repository decodes it into a Profile.
             if (!completer.isCompleted) {
               completer.complete(
                 NFCData(
                   type: 'profile',
-                  payload: payload,
+                  payload: rawPayload,
                   timestamp: DateTime.now(),
                 ),
               );

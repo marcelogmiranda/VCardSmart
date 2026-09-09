@@ -36,6 +36,10 @@
 	<string>VCardSmart precisa acessar seus contatos para importar e exportar cartões de visita.</string>
 	<key>NSFaceIDUsageDescription</key>
 	<string>VCardSmart usa Face ID para autenticação biométrica.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>VCardSmart usa o microfone ao gravar vídeos ou mídia pela câmera.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>VCardSmart acessa sua galeria para escolher fotos do seu cartão de visita.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

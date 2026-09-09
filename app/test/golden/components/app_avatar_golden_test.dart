@@ -105,7 +105,9 @@ void main() {
       await tester.pumpAndSettle();
       await expectLater(
         find.byType(AppAvatar),
-        matchesGoldenFile('golden_files/components/avatar_no_initials_light.png'),
+        matchesGoldenFile(
+          'golden_files/components/avatar_no_initials_light.png',
+        ),
       );
     });
   });

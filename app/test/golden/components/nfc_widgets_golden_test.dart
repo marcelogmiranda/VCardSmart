@@ -21,7 +21,9 @@ void main() {
       await tester.pumpAndSettle();
       await expectLater(
         find.byType(NFCStatusWidget),
-        matchesGoldenFile('golden_files/components/nfc_status_available_light.png'),
+        matchesGoldenFile(
+          'golden_files/components/nfc_status_available_light.png',
+        ),
       );
     });
 
@@ -39,7 +41,9 @@ void main() {
       await tester.pumpAndSettle();
       await expectLater(
         find.byType(NFCStatusWidget),
-        matchesGoldenFile('golden_files/components/nfc_status_unavailable_light.png'),
+        matchesGoldenFile(
+          'golden_files/components/nfc_status_unavailable_light.png',
+        ),
       );
     });
 
@@ -57,7 +61,9 @@ void main() {
       await tester.pumpAndSettle();
       await expectLater(
         find.byType(NFCStatusWidget),
-        matchesGoldenFile('golden_files/components/nfc_status_available_dark.png'),
+        matchesGoldenFile(
+          'golden_files/components/nfc_status_available_dark.png',
+        ),
       );
     });
   });
@@ -77,7 +83,9 @@ void main() {
       await tester.pumpAndSettle();
       await expectLater(
         find.byType(NFCInstructionWidget),
-        matchesGoldenFile('golden_files/components/nfc_instruction_idle_light.png'),
+        matchesGoldenFile(
+          'golden_files/components/nfc_instruction_idle_light.png',
+        ),
       );
     });
 
@@ -95,7 +103,9 @@ void main() {
       await tester.pumpAndSettle();
       await expectLater(
         find.byType(NFCInstructionWidget),
-        matchesGoldenFile('golden_files/components/nfc_instruction_sending_light.png'),
+        matchesGoldenFile(
+          'golden_files/components/nfc_instruction_sending_light.png',
+        ),
       );
     });
 
@@ -113,7 +123,9 @@ void main() {
       await tester.pumpAndSettle();
       await expectLater(
         find.byType(NFCInstructionWidget),
-        matchesGoldenFile('golden_files/components/nfc_instruction_success_light.png'),
+        matchesGoldenFile(
+          'golden_files/components/nfc_instruction_success_light.png',
+        ),
       );
     });
 
@@ -131,7 +143,9 @@ void main() {
       await tester.pumpAndSettle();
       await expectLater(
         find.byType(NFCInstructionWidget),
-        matchesGoldenFile('golden_files/components/nfc_instruction_error_light.png'),
+        matchesGoldenFile(
+          'golden_files/components/nfc_instruction_error_light.png',
+        ),
       );
     });
   });

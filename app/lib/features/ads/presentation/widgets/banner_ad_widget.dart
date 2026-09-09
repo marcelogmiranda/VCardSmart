@@ -55,7 +55,7 @@ class _BannerAdWidgetState extends ConsumerState<BannerAdWidget> {
   Widget build(BuildContext context) {
     final adsEnabled = ref.watch(settingsProvider).adsEnabled;
 
-    if (!adsEnabled || !AdConfig.showBanner) {
+    if (!adsEnabled || !AdConfig.showBanner || _loadFailed) {
       return const SizedBox.shrink();
     }
 

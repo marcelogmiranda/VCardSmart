@@ -8,9 +8,11 @@ import '../../../features/qr_code/presentation/pages/qr_scan_page.dart';
 import '../../../features/qr_code/presentation/pages/qr_share_page.dart';
 import '../../../features/nfc/presentation/pages/nfc_receive_page.dart';
 import '../../../features/nfc/presentation/pages/nfc_share_page.dart';
+import '../../../features/nfc/presentation/pages/nfc_main_page.dart';
 import '../../../features/contacts/presentation/pages/contacts_page.dart';
 import '../../../features/contacts/presentation/pages/import_page.dart';
 import '../../../features/settings/presentation/pages/settings_page.dart';
+import '../../../features/migration/presentation/pages/migration_page.dart';
 import '../../../features/security/presentation/pages/auth_page.dart';
 import '../../../features/security/presentation/pages/pin_setup_page.dart';
 import '../../../features/security/presentation/pages/security_setup_page.dart';
@@ -49,6 +51,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
     final settings = await ref.read(getSettingsUseCaseProvider)();
     await authNotifier.checkAuth(settings);
   }
+
   Future.microtask(runCheckAuth);
 
   ref.onDispose(() {
@@ -79,6 +82,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: AppConstants.contactsRoute,
             builder: (context, state) => const ContactsPage(),
+          ),
+          GoRoute(
+            path: AppConstants.nfcRoute,
+            builder: (context, state) => const NFCMainPage(),
           ),
           GoRoute(
             path: AppConstants.settingsRoute,
@@ -127,6 +134,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             enableBiometric: onboarding && flow.enableBiometric,
           );
         },
+      ),
+      GoRoute(
+        path: AppConstants.migrationRoute,
+        builder: (context, state) => const MigrationPage(),
       ),
     ],
   );

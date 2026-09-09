@@ -21,7 +21,9 @@ class DeviceContactsService {
     return status.isGranted;
   }
 
-  static Future<List<DeviceContactSuggestion>> searchContacts(String query) async {
+  static Future<List<DeviceContactSuggestion>> searchContacts(
+    String query,
+  ) async {
     if (query.isEmpty) return [];
 
     final hasPermission = await Permission.contacts.isGranted;

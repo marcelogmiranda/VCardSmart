@@ -33,6 +33,11 @@ class ShellPage extends StatelessWidget {
                 label: 'Contatos',
               ),
               NavigationDestination(
+                icon: Icon(Icons.contactless_outlined),
+                selectedIcon: Icon(Icons.contactless),
+                label: 'NFC',
+              ),
+              NavigationDestination(
                 icon: Icon(Icons.settings_outlined),
                 selectedIcon: Icon(Icons.settings),
                 label: 'Configurações',
@@ -47,7 +52,8 @@ class ShellPage extends StatelessWidget {
   int _calculateSelectedIndex(BuildContext context) {
     final location = GoRouterState.of(context).uri.toString();
     if (location.startsWith('/contacts')) return 1;
-    if (location.startsWith('/settings')) return 2;
+    if (location.startsWith('/nfc')) return 2;
+    if (location.startsWith('/settings')) return 3;
     return 0;
   }
 
@@ -60,6 +66,9 @@ class ShellPage extends StatelessWidget {
         context.go('/contacts');
         break;
       case 2:
+        context.go('/nfc');
+        break;
+      case 3:
         context.go('/settings');
         break;
     }

@@ -33,7 +33,10 @@ void main() {
 
     test('redirects to auth page when unauthenticated', () {
       expect(authRedirect(unauthenticated, '/'), AppConstants.authRoute);
-      expect(authRedirect(unauthenticated, '/settings'), AppConstants.authRoute);
+      expect(
+        authRedirect(unauthenticated, '/settings'),
+        AppConstants.authRoute,
+      );
     });
 
     test('keeps auth page when unauthenticated', () {

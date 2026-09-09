@@ -5,8 +5,10 @@ class AdUnits {
 
   static const String bannerAndroid = 'ca-app-pub-8091341581687367/4010700646';
   static const String bannerIOS = 'ca-app-pub-8091341581687367/4010700646';
-  static const String interstitialAndroid = 'ca-app-pub-8091341581687367/5452875875';
-  static const String interstitialIOS = 'ca-app-pub-8091341581687367/5452875875';
+  static const String interstitialAndroid =
+      'ca-app-pub-8091341581687367/5452875875';
+  static const String interstitialIOS =
+      'ca-app-pub-8091341581687367/5452875875';
 
   static String banner({
     bool isAndroid = const bool.fromEnvironment('dart.library.io'),

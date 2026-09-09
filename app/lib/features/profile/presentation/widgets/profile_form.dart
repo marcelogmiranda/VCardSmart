@@ -43,10 +43,8 @@ class _ProfileFormState extends State<ProfileForm> {
   void initState() {
     super.initState();
     _nameController = TextEditingController(text: widget.profile?.name ?? '');
-    _emailController =
-        TextEditingController(text: widget.profile?.email ?? '');
-    _phoneController =
-        TextEditingController(text: widget.profile?.phone ?? '');
+    _emailController = TextEditingController(text: widget.profile?.email ?? '');
+    _phoneController = TextEditingController(text: widget.profile?.phone ?? '');
     _linkedinController = TextEditingController(
       text: _linkedinHandle(widget.profile?.linkedin),
     );
@@ -91,8 +89,8 @@ class _ProfileFormState extends State<ProfileForm> {
   static String _linkedinHandle(String? value) {
     if (value == null || value.isEmpty) return '';
     final v = value.trim();
-    final match = RegExp(r'(?:https?://)?(?:www\.)?linkedin\.com/in/(.+)')
-        .firstMatch(v);
+    final match =
+        RegExp(r'(?:https?://)?(?:www\.)?linkedin\.com/in/(.+)').firstMatch(v);
     if (match != null) return match.group(1)!;
     return v.replaceFirst(RegExp(r'^@'), '');
   }
@@ -122,8 +120,8 @@ class _ProfileFormState extends State<ProfileForm> {
   static String _facebookHandle(String? value) {
     if (value == null || value.isEmpty) return '';
     final v = value.trim();
-    final match = RegExp(r'(?:https?://)?(?:www\.)?facebook\.com/(.+)')
-        .firstMatch(v);
+    final match =
+        RegExp(r'(?:https?://)?(?:www\.)?facebook\.com/(.+)').firstMatch(v);
     if (match != null) return match.group(1)!;
     return v;
   }
@@ -141,8 +139,8 @@ class _ProfileFormState extends State<ProfileForm> {
   static String _xHandle(String? value) {
     if (value == null || value.isEmpty) return '';
     final v = value.trim();
-    final match =
-        RegExp(r'(?:https?://)?(?:www\.)?(?:x|twitter)\.com/(.+)').firstMatch(v);
+    final match = RegExp(r'(?:https?://)?(?:www\.)?(?:x|twitter)\.com/(.+)')
+        .firstMatch(v);
     if (match != null) return match.group(1)!;
     return v.replaceFirst(RegExp(r'^@'), '');
   }
@@ -332,8 +330,13 @@ class _ProfileFormState extends State<ProfileForm> {
               child: CircleAvatar(
                 radius: 56,
                 backgroundColor: theme.colorScheme.primaryContainer,
-                backgroundImage:
-                    _photoPath != null ? FileImage(File(_photoPath!)) : null,
+                backgroundImage: _photoPath != null
+                    ? ResizeImage(
+                        FileImage(File(_photoPath!)),
+                        width: 224,
+                        height: 224,
+                      )
+                    : null,
                 child: _photoPath == null
                     ? Icon(
                         Icons.camera_alt,
@@ -349,7 +352,8 @@ class _ProfileFormState extends State<ProfileForm> {
             child: TextButton.icon(
               onPressed: _pickImage,
               icon: const Icon(Icons.photo_camera, size: 18),
-              label: Text(_photoPath == null ? 'Adicionar foto' : 'Trocar foto'),
+              label:
+                  Text(_photoPath == null ? 'Adicionar foto' : 'Trocar foto'),
             ),
           ),
           const SizedBox(height: 16),
@@ -424,8 +428,7 @@ class _ProfileFormState extends State<ProfileForm> {
                       child: ListView.separated(
                         shrinkWrap: true,
                         itemCount: _suggestions.length,
-                        separatorBuilder: (_, __) =>
-                            const Divider(height: 1),
+                        separatorBuilder: (_, __) => const Divider(height: 1),
                         itemBuilder: (context, index) {
                           final suggestion = _suggestions[index];
                           return ListTile(
@@ -444,15 +447,12 @@ class _ProfileFormState extends State<ProfileForm> {
                               style: const TextStyle(fontSize: 14),
                             ),
                             subtitle: Text(
-                              suggestion.email ??
-                                  suggestion.phone ??
-                                  '',
+                              suggestion.email ?? suggestion.phone ?? '',
                               style: const TextStyle(fontSize: 12),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                             ),
-                            onTap: () =>
-                                _applySuggestion(suggestion),
+                            onTap: () => _applySuggestion(suggestion),
                           );
                         },
                       ),
@@ -609,10 +609,8 @@ class _ProfileFormState extends State<ProfileForm> {
         id: widget.profile?.id ??
             DateTime.now().millisecondsSinceEpoch.toString(),
         name: _nameController.text,
-        email:
-            _emailController.text.isEmpty ? null : _emailController.text,
-        phone:
-            _phoneController.text.isEmpty ? null : _phoneController.text,
+        email: _emailController.text.isEmpty ? null : _emailController.text,
+        phone: _phoneController.text.isEmpty ? null : _phoneController.text,
         linkedin: _linkedinController.text.isEmpty
             ? null
             : _fullLinkedin(_linkedinController.text),
@@ -629,8 +627,7 @@ class _ProfileFormState extends State<ProfileForm> {
         website: _websiteController.text.isEmpty
             ? null
             : _fullWebsite(_websiteController.text),
-        bio:
-            _bioController.text.isEmpty ? null : _bioController.text,
+        bio: _bioController.text.isEmpty ? null : _bioController.text,
         photoPath: _photoPath,
         createdAt: widget.profile?.createdAt ?? now,
         updatedAt: now,

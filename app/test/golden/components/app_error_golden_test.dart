@@ -116,7 +116,9 @@ void main() {
       await tester.pumpAndSettle();
       await expectLater(
         find.byType(AppEmpty),
-        matchesGoldenFile('golden_files/components/empty_with_action_light.png'),
+        matchesGoldenFile(
+          'golden_files/components/empty_with_action_light.png',
+        ),
       );
     });
   });

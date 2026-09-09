@@ -35,7 +35,8 @@ void main() {
     });
 
     test('decodeProfile should parse JSON string into Profile', () {
-      const json = '{"name":"Jane","email":"jane@test.com","phone":"999","website":"https://jane.com","linkedin":"linkedin.com/in/jane","instagram":"@jane","facebook":"facebook.com/jane","x":"x.com/jane","social":"https://jane.social","bio":"Designer"}';
+      const json =
+          '{"name":"Jane","email":"jane@test.com","phone":"999","website":"https://jane.com","linkedin":"linkedin.com/in/jane","instagram":"@jane","facebook":"facebook.com/jane","x":"x.com/jane","social":"https://jane.social","bio":"Designer"}';
 
       final profile = NFCPayload.decodeProfile(json);
 

@@ -13,6 +13,7 @@ class ProfileHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final subtitleColor = theme.colorScheme.onSurfaceVariant;
 
     return Container(
       width: double.infinity,
@@ -22,12 +23,15 @@ class ProfileHeader extends StatelessWidget {
           CircleAvatar(
             radius: 56,
             backgroundColor: theme.colorScheme.primaryContainer,
-            backgroundImage: profile.photoPath != null &&
-                    profile.photoPath!.isNotEmpty
-                ? FileImage(File(profile.photoPath!))
-                : null,
-            child: profile.photoPath == null ||
-                    profile.photoPath!.isEmpty
+            backgroundImage:
+                profile.photoPath != null && profile.photoPath!.isNotEmpty
+                    ? ResizeImage(
+                        FileImage(File(profile.photoPath!)),
+                        width: 224,
+                        height: 224,
+                      )
+                    : null,
+            child: profile.photoPath == null || profile.photoPath!.isEmpty
                 ? Text(
                     profile.name.isNotEmpty
                         ? profile.name[0].toUpperCase()
@@ -49,13 +53,13 @@ class ProfileHeader extends StatelessWidget {
                 Icon(
                   Icons.email_outlined,
                   size: 16,
-                  color: Colors.grey[600],
+                  color: subtitleColor,
                 ),
                 const SizedBox(width: 6),
                 Text(
                   profile.email!,
                   style: theme.textTheme.bodyLarge?.copyWith(
-                    color: Colors.grey[600],
+                    color: subtitleColor,
                   ),
                 ),
               ],
@@ -69,20 +73,19 @@ class ProfileHeader extends StatelessWidget {
                 Icon(
                   Icons.phone_outlined,
                   size: 16,
-                  color: Colors.grey[600],
+                  color: subtitleColor,
                 ),
                 const SizedBox(width: 6),
                 Text(
                   profile.phone!,
                   style: theme.textTheme.bodyMedium?.copyWith(
-                    color: Colors.grey[600],
+                    color: subtitleColor,
                   ),
                 ),
               ],
             ),
           ],
-          if (profile.linkedin != null &&
-              profile.linkedin!.isNotEmpty) ...[
+          if (profile.linkedin != null && profile.linkedin!.isNotEmpty) ...[
             const SizedBox(height: 4),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -90,20 +93,19 @@ class ProfileHeader extends StatelessWidget {
                 Icon(
                   Icons.work_outline,
                   size: 16,
-                  color: Colors.grey[600],
+                  color: subtitleColor,
                 ),
                 const SizedBox(width: 6),
                 Text(
                   profile.linkedin!,
                   style: theme.textTheme.bodyMedium?.copyWith(
-                    color: Colors.grey[600],
+                    color: subtitleColor,
                   ),
                 ),
               ],
             ),
           ],
-          if (profile.instagram != null &&
-              profile.instagram!.isNotEmpty) ...[
+          if (profile.instagram != null && profile.instagram!.isNotEmpty) ...[
             const SizedBox(height: 4),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -111,20 +113,19 @@ class ProfileHeader extends StatelessWidget {
                 Icon(
                   Icons.camera_alt_outlined,
                   size: 16,
-                  color: Colors.grey[600],
+                  color: subtitleColor,
                 ),
                 const SizedBox(width: 6),
                 Text(
                   profile.instagram!,
                   style: theme.textTheme.bodyMedium?.copyWith(
-                    color: Colors.grey[600],
+                    color: subtitleColor,
                   ),
                 ),
               ],
             ),
           ],
-          if (profile.facebook != null &&
-              profile.facebook!.isNotEmpty) ...[
+          if (profile.facebook != null && profile.facebook!.isNotEmpty) ...[
             const SizedBox(height: 4),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -132,13 +133,13 @@ class ProfileHeader extends StatelessWidget {
                 Icon(
                   Icons.facebook,
                   size: 16,
-                  color: Colors.grey[600],
+                  color: subtitleColor,
                 ),
                 const SizedBox(width: 6),
                 Text(
                   profile.facebook!,
                   style: theme.textTheme.bodyMedium?.copyWith(
-                    color: Colors.grey[600],
+                    color: subtitleColor,
                   ),
                 ),
               ],
@@ -152,20 +153,19 @@ class ProfileHeader extends StatelessWidget {
                 Icon(
                   Icons.alternate_email,
                   size: 16,
-                  color: Colors.grey[600],
+                  color: subtitleColor,
                 ),
                 const SizedBox(width: 6),
                 Text(
                   profile.x!,
                   style: theme.textTheme.bodyMedium?.copyWith(
-                    color: Colors.grey[600],
+                    color: subtitleColor,
                   ),
                 ),
               ],
             ),
           ],
-          if (profile.social != null &&
-              profile.social!.isNotEmpty) ...[
+          if (profile.social != null && profile.social!.isNotEmpty) ...[
             const SizedBox(height: 4),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -173,20 +173,19 @@ class ProfileHeader extends StatelessWidget {
                 Icon(
                   Icons.link,
                   size: 16,
-                  color: Colors.grey[600],
+                  color: subtitleColor,
                 ),
                 const SizedBox(width: 6),
                 Text(
                   profile.social!,
                   style: theme.textTheme.bodyMedium?.copyWith(
-                    color: Colors.grey[600],
+                    color: subtitleColor,
                   ),
                 ),
               ],
             ),
           ],
-          if (profile.website != null &&
-              profile.website!.isNotEmpty) ...[
+          if (profile.website != null && profile.website!.isNotEmpty) ...[
             const SizedBox(height: 4),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -194,13 +193,13 @@ class ProfileHeader extends StatelessWidget {
                 Icon(
                   Icons.language,
                   size: 16,
-                  color: Colors.grey[600],
+                  color: subtitleColor,
                 ),
                 const SizedBox(width: 6),
                 Text(
                   profile.website!,
                   style: theme.textTheme.bodyMedium?.copyWith(
-                    color: Colors.grey[600],
+                    color: subtitleColor,
                   ),
                 ),
               ],

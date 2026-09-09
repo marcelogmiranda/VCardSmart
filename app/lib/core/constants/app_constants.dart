@@ -2,7 +2,7 @@ class AppConstants {
   AppConstants._();
 
   static const String appName = 'VCardSmart';
-  static const String appVersion = '1.0.0';
+  static const String appVersion = '1.0.6+14';
 
   static const String profileBox = 'profiles';
   static const String contactBox = 'contacts';
@@ -14,6 +14,7 @@ class AppConstants {
   static const String settingsRoute = '/settings';
   static const String qrShareRoute = '/qr/share';
   static const String qrScanRoute = '/qr/scan';
+  static const String nfcRoute = '/nfc';
   static const String nfcShareRoute = '/nfc/share';
   static const String nfcReceiveRoute = '/nfc/receive';
   static const String contactsRoute = '/contacts';
@@ -21,4 +22,5 @@ class AppConstants {
   static const String authRoute = '/auth';
   static const String pinSetupRoute = '/pin-setup';
   static const String securitySetupRoute = '/security-setup';
+  static const String migrationRoute = '/settings/migration';
 }

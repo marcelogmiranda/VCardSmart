@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../core/theme/app_colors.dart';
 
 class NFCStatusWidget extends StatelessWidget {
   final bool isAvailable;
@@ -15,10 +16,13 @@ class NFCStatusWidget extends StatelessWidget {
       children: [
         Icon(
           isAvailable ? Icons.nfc : Icons.nfc_outlined,
-          color: isAvailable ? Colors.green : Colors.red,
+          color: isAvailable ? AppColors.success : AppColors.error,
         ),
         const SizedBox(width: 8),
-        Text(isAvailable ? 'NFC disponível' : 'NFC indisponível'),
+        Text(
+          isAvailable ? 'NFC disponível' : 'NFC indisponível',
+          style: Theme.of(context).textTheme.bodyMedium,
+        ),
       ],
     );
   }

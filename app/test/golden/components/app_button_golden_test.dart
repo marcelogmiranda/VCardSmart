@@ -132,7 +132,8 @@ void main() {
       await expectLater(
         find.byType(AppButton),
         matchesGoldenFile(
-            'golden_files/components/primary_button_with_icon_light.png',),
+          'golden_files/components/primary_button_with_icon_light.png',
+        ),
       );
     });
 
@@ -153,7 +154,9 @@ void main() {
       await tester.pump();
       await expectLater(
         find.byType(AppButton),
-        matchesGoldenFile('golden_files/components/primary_button_loading_light.png'),
+        matchesGoldenFile(
+          'golden_files/components/primary_button_loading_light.png',
+        ),
       );
     });
   });

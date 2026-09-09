@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../core/theme/app_colors.dart';
 import '../providers/nfc_provider.dart';
 
 class NFCInstructionWidget extends StatelessWidget {
@@ -48,21 +49,21 @@ class NFCInstructionWidget extends StatelessWidget {
     switch (state) {
       case NFCState.idle:
       case NFCState.ready:
-        return Colors.blue;
+        return AppColors.info;
       case NFCState.sending:
       case NFCState.receiving:
-        return Colors.orange;
+        return AppColors.warning;
       case NFCState.success:
-        return Colors.green;
+        return AppColors.success;
       case NFCState.error:
-        return Colors.red;
+        return AppColors.error;
     }
   }
 
   String _getText(NFCState state) {
     switch (state) {
       case NFCState.idle:
-        return 'Toque para iniciar';
+        return 'Toque no botão para iniciar';
       case NFCState.ready:
         return 'Aproxime os dispositivos';
       case NFCState.sending:

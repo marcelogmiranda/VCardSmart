@@ -20,11 +20,13 @@ class LocalSettingsRepository implements SettingsRepository {
   Future<Settings> getSettings() async {
     final themeIndex = _box.get(_themeModeKey, defaultValue: 0) as int;
     final localeCode = _box.get(_localeKey, defaultValue: 'pt') as String;
-    final countryCode = _box.get(_localeCountryKey, defaultValue: 'BR') as String;
+    final countryCode =
+        _box.get(_localeCountryKey, defaultValue: 'BR') as String;
     final biometric = _box.get(_biometricKey, defaultValue: false) as bool;
     final pin = _box.get(_pinKey, defaultValue: false) as bool;
     final ads = _box.get(_adsKey, defaultValue: true) as bool;
-    final securityAsked = _box.get(_securityAskedKey, defaultValue: false) as bool;
+    final securityAsked =
+        _box.get(_securityAskedKey, defaultValue: false) as bool;
     final pinLength = _box.get(_pinLengthKey, defaultValue: 6) as int;
 
     return Settings(

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:vcardsmart/l10n/app_localizations.dart';
 import 'package:vcardsmart/core/constants/app_constants.dart';
+import 'package:vcardsmart/core/providers/app_version_provider.dart';
 import 'package:vcardsmart/core/security/biometric_service.dart';
 import 'package:vcardsmart/features/security/domain/usecases/set_pin_usecase.dart';
 import '../providers/settings_provider.dart';
@@ -59,6 +60,15 @@ class SettingsPage extends ConsumerWidget {
             },
           ),
           const Divider(),
+          const _SectionHeader(title: 'Dados'),
+          ListTile(
+            leading: const Icon(Icons.smartphone),
+            title: const Text('Migração de Dispositivo'),
+            subtitle: const Text('Exportar ou importar seus dados (backup)'),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => context.push(AppConstants.migrationRoute),
+          ),
+          const Divider(),
           const _SectionHeader(title: 'Sobre'),
           ListTile(
             leading: const Icon(Icons.help_outline),
@@ -67,11 +77,7 @@ class SettingsPage extends ConsumerWidget {
             trailing: const Icon(Icons.chevron_right),
             onTap: () => _showHowItWorks(context),
           ),
-          const ListTile(
-            leading: Icon(Icons.info_outline),
-            title: Text('Versão'),
-            subtitle: Text(AppConstants.appVersion),
-          ),
+          const _AppVersionTile(),
         ],
       ),
     );
@@ -94,8 +100,18 @@ class SettingsPage extends ConsumerWidget {
         }
         return;
       }
+      ref.read(settingsProvider.notifier).updateBiometric(enabled);
+      return;
     }
-    ref.read(settingsProvider.notifier).updateBiometric(enabled);
+
+    final confirmed = await _confirmDisable(
+      context,
+      title: 'Desativar biometria?',
+      message: 'A biometria não será mais usada para desbloquear o app.',
+    );
+    if (confirmed == true && context.mounted) {
+      ref.read(settingsProvider.notifier).updateBiometric(false);
+    }
   }
 
   Future<void> _onPinChanged(
@@ -109,10 +125,42 @@ class SettingsPage extends ConsumerWidget {
       if (result) {
         ref.read(settingsProvider.notifier).updatePin(true);
       }
-    } else {
+      return;
+    }
+
+    final confirmed = await _confirmDisable(
+      context,
+      title: 'Desativar PIN?',
+      message: 'Seu PIN não será mais usado para desbloquear o app.',
+    );
+    if (confirmed == true && context.mounted) {
       await SetPinUseCase().removePin();
       ref.read(settingsProvider.notifier).updatePin(false);
     }
+  }
+
+  Future<bool?> _confirmDisable(
+    BuildContext context, {
+    required String title,
+    required String message,
+  }) {
+    return showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(title),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: const Text('Cancelar'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            child: const Text('Desativar'),
+          ),
+        ],
+      ),
+    );
   }
 
   void _showHowItWorks(BuildContext context) {
@@ -134,7 +182,7 @@ class SettingsPage extends ConsumerWidget {
             _StepRow(
               step: '2',
               title: 'Gere seu QR Code',
-              description: 'Gere um QR Code com seu cartao',
+              description: 'Gere um QR Code com seu cartão',
               colorScheme: colorScheme,
             ),
             const SizedBox(height: 16),
@@ -174,6 +222,20 @@ class _SectionHeader extends StatelessWidget {
           color: Theme.of(context).colorScheme.primary,
         ),
       ),
+    );
+  }
+}
+
+class _AppVersionTile extends ConsumerWidget {
+  const _AppVersionTile();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final version = ref.watch(appVersionProvider);
+    return ListTile(
+      leading: const Icon(Icons.info_outline),
+      title: const Text('Versão'),
+      subtitle: Text(version.valueOrNull ?? AppConstants.appVersion),
     );
   }
 }

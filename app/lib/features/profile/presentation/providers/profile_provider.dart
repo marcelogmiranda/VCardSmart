@@ -46,6 +46,10 @@ final profileListProvider =
   return ProfileListNotifier(ref);
 });
 
+final homeProfilesProvider = FutureProvider.autoDispose<List<Profile>>((ref) {
+  return ref.watch(getAllProfilesUseCaseProvider).call();
+});
+
 class ProfileNotifier extends StateNotifier<AsyncValue<Profile?>> {
   final Ref ref;
 

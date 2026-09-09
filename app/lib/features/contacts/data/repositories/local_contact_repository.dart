@@ -7,7 +7,8 @@ import '../../../../core/database/hive_boxes.dart';
 class LocalContactRepository implements ContactRepository {
   final Box<Contact> _box;
 
-  LocalContactRepository([Box<Contact>? box]) : _box = box ?? Hive.box<Contact>(HiveBoxes.contacts);
+  LocalContactRepository([Box<Contact>? box])
+      : _box = box ?? Hive.box<Contact>(HiveBoxes.contacts);
 
   @override
   Future<List<Contact>> getAllContacts() async {

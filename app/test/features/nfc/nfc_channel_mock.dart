@@ -31,9 +31,8 @@ class NfcChannelMock {
           case 'Ndef#write':
             final message = (call.arguments as Map)['message'] as Map;
             final records = (message['records'] as List).cast<Map>();
-            final payloadBytes = records.isEmpty
-                ? null
-                : records.first['payload'] as Uint8List;
+            final payloadBytes =
+                records.isEmpty ? null : records.first['payload'] as Uint8List;
             if (payloadBytes != null) {
               writtenPayloads.add(utf8.decode(payloadBytes));
             }
@@ -52,8 +51,8 @@ class NfcChannelMock {
       writtenPayloads.isEmpty ? null : writtenPayloads.last;
 
   Future<void> dispatchOnDiscovered() async {
-    final messenger = TestDefaultBinaryMessengerBinding.instance
-        .defaultBinaryMessenger;
+    final messenger =
+        TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger;
     final payload = lastPayload();
     final tag = <String, dynamic>{
       'handle': 'test-tag',

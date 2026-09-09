@@ -18,9 +18,7 @@ class PhotoViewer extends StatelessWidget {
       child: CircleAvatar(
         radius: 50,
         backgroundColor: Colors.grey[300],
-        backgroundImage: photoPath != null
-            ? FileImage(File(photoPath!))
-            : null,
+        backgroundImage: photoPath != null ? FileImage(File(photoPath!)) : null,
         child: photoPath == null
             ? const Icon(Icons.person, size: 50, color: Colors.grey)
             : null,

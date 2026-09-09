@@ -14,7 +14,7 @@ void main() {
         ),
       );
 
-      expect(find.text('Toque para iniciar'), findsOneWidget);
+      expect(find.text('Toque no botão para iniciar'), findsOneWidget);
       expect(find.byIcon(Icons.nfc), findsOneWidget);
     });
 

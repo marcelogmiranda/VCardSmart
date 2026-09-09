@@ -6,23 +6,23 @@ void main() {
   group('QRPayload', () {
     late Profile testProfile;
 
-  setUp(() {
-    testProfile = Profile(
-      id: '1',
-      name: 'João Silva',
-      email: 'joao@email.com',
-      phone: '+5511999999999',
-      website: 'https://joao.com',
-      linkedin: 'linkedin.com/in/joaosilva',
-      instagram: '@joaosilva',
-      facebook: 'facebook.com/joaosilva',
-      x: 'x.com/joaosilva',
-      social: 'https://joao.social',
-      bio: 'Desenvolvedor Flutter',
-      createdAt: DateTime(2024),
-      updatedAt: DateTime(2024),
-    );
-  });
+    setUp(() {
+      testProfile = Profile(
+        id: '1',
+        name: 'João Silva',
+        email: 'joao@email.com',
+        phone: '+5511999999999',
+        website: 'https://joao.com',
+        linkedin: 'linkedin.com/in/joaosilva',
+        instagram: '@joaosilva',
+        facebook: 'facebook.com/joaosilva',
+        x: 'x.com/joaosilva',
+        social: 'https://joao.social',
+        bio: 'Desenvolvedor Flutter',
+        createdAt: DateTime(2024),
+        updatedAt: DateTime(2024),
+      );
+    });
 
     group('encodeVCard', () {
       test('should encode profile to vCard format', () {

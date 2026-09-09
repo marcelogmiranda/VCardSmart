@@ -120,7 +120,8 @@ void main() {
 
   group('importFromVCard', () {
     test('should parse valid vCard', () async {
-      const vcard = 'BEGIN:VCARD\nVERSION:3.0\nFN:VCard User\nEMAIL:vc@test.com\nTEL:555\nEND:VCARD';
+      const vcard =
+          'BEGIN:VCARD\nVERSION:3.0\nFN:VCard User\nEMAIL:vc@test.com\nTEL:555\nEND:VCARD';
       await repository.importFromVCard(vcard);
 
       final contacts = await repository.getAllContacts();
@@ -139,7 +140,8 @@ void main() {
     });
 
     test('should parse vCard with LinkedIn', () async {
-      const vcard = 'BEGIN:VCARD\nFN:LinkedIn User\nX-LINKEDIN:linkedin.com/in/user\nEND:VCARD';
+      const vcard =
+          'BEGIN:VCARD\nFN:LinkedIn User\nX-LINKEDIN:linkedin.com/in/user\nEND:VCARD';
       await repository.importFromVCard(vcard);
 
       final contacts = await repository.getAllContacts();
@@ -159,7 +161,8 @@ void main() {
 
   group('importFromQR', () {
     test('should import QR JSON data', () async {
-      await repository.importFromQR('{"name":"QR Import","email":"qr@test.com"}');
+      await repository
+          .importFromQR('{"name":"QR Import","email":"qr@test.com"}');
 
       final contacts = await repository.getAllContacts();
       expect(contacts.length, 1);

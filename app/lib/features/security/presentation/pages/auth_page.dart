@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import '../../../../core/constants/app_constants.dart';
+import '../../../settings/presentation/providers/settings_provider.dart';
 import '../providers/auth_provider.dart';
 import '../widgets/biometric_button.dart';
 import '../widgets/pin_input.dart';
@@ -10,6 +13,7 @@ class AuthPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final authStatus = ref.watch(authProvider);
+    final theme = Theme.of(context);
 
     return Scaffold(
       body: SafeArea(
@@ -24,7 +28,7 @@ class AuthPage extends ConsumerWidget {
                       Icon(
                         Icons.lock_outline,
                         size: 80,
-                        color: Theme.of(context).primaryColor,
+                        color: theme.colorScheme.primary,
                       ),
                       const SizedBox(height: 24),
                       const Text(
@@ -35,9 +39,12 @@ class AuthPage extends ConsumerWidget {
                         ),
                       ),
                       const SizedBox(height: 8),
-                      const Text(
+                      Text(
                         'Autentique-se para continuar',
-                        style: TextStyle(fontSize: 16, color: Colors.grey),
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
                       ),
                       const SizedBox(height: 48),
                       if (authStatus.biometricAvailable) ...[
@@ -54,9 +61,28 @@ class AuthPage extends ConsumerWidget {
                       ],
                       if (!authStatus.biometricAvailable &&
                           !authStatus.hasPin) ...[
-                        const Text(
+                        const SizedBox(height: 8),
+                        Text(
                           'Nenhuma autenticação configurada',
-                          style: TextStyle(color: Colors.grey),
+                          style: TextStyle(
+                            color: theme.colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        FilledButton.icon(
+                          onPressed: () async {
+                            await ref
+                                .read(settingsProvider.notifier)
+                                .unmarkSecurityAsked();
+                            await ref.read(authProvider.notifier).checkAuth(
+                                  ref.read(settingsProvider),
+                                );
+                            if (context.mounted) {
+                              context.go(AppConstants.homeRoute);
+                            }
+                          },
+                          icon: const Icon(Icons.security),
+                          label: const Text('Configurar Segurança'),
                         ),
                       ],
                       if (authStatus.state == AuthState.error &&
@@ -64,7 +90,7 @@ class AuthPage extends ConsumerWidget {
                         const SizedBox(height: 16),
                         Text(
                           authStatus.error!,
-                          style: const TextStyle(color: Colors.red),
+                          style: TextStyle(color: theme.colorScheme.error),
                         ),
                       ],
                     ],

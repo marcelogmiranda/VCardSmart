@@ -72,6 +72,7 @@ class _SecuritySetupPageState extends ConsumerState<SecuritySetupPage> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
       body: SafeArea(
         child: Center(
@@ -86,7 +87,7 @@ class _SecuritySetupPageState extends ConsumerState<SecuritySetupPage> {
                         Icon(
                           Icons.security,
                           size: 80,
-                          color: Theme.of(context).primaryColor,
+                          color: colorScheme.primary,
                         ),
                         const SizedBox(height: 24),
                         const Text(
@@ -97,49 +98,61 @@ class _SecuritySetupPageState extends ConsumerState<SecuritySetupPage> {
                           ),
                         ),
                         const SizedBox(height: 8),
-                        const Text(
+                        Text(
                           'Proteja seu app para começar',
                           style: TextStyle(
                             fontSize: 16,
-                            color: Colors.grey,
+                            color: colorScheme.onSurfaceVariant,
                           ),
                         ),
                         const SizedBox(height: 8),
-                        const Text(
+                        Text(
                           'Escolha como deseja proteger o acesso aos seus cartões.',
                           style: TextStyle(
                             fontSize: 13,
-                            color: Colors.grey,
+                            color: colorScheme.onSurfaceVariant,
                           ),
                           textAlign: TextAlign.center,
                         ),
                         const SizedBox(height: 48),
                         if (_biometricAvailable) ...[
-                          AppButton(
-                            label: 'Usar biometria + PIN',
-                            icon: Icons.fingerprint,
-                            onPressed: _setupBoth,
+                          SizedBox(
+                            width: double.infinity,
+                            child: AppButton(
+                              label: 'Usar biometria + PIN',
+                              icon: Icons.fingerprint,
+                              onPressed: _setupBoth,
+                            ),
                           ),
                           const SizedBox(height: 12),
-                          AppButton(
-                            label: 'Usar biometria',
-                            icon: Icons.fingerprint,
-                            type: ButtonType.secondary,
-                            onPressed: _setupBiometric,
+                          SizedBox(
+                            width: double.infinity,
+                            child: AppButton(
+                              label: 'Usar biometria',
+                              icon: Icons.fingerprint,
+                              type: ButtonType.secondary,
+                              onPressed: _setupBiometric,
+                            ),
                           ),
                           const SizedBox(height: 12),
                         ],
-                        AppButton(
-                          label: 'Definir um PIN',
-                          icon: Icons.pin,
-                          type: ButtonType.secondary,
-                          onPressed: _setupPinOnly,
+                        SizedBox(
+                          width: double.infinity,
+                          child: AppButton(
+                            label: 'Definir um PIN',
+                            icon: Icons.pin,
+                            type: ButtonType.secondary,
+                            onPressed: _setupPinOnly,
+                          ),
                         ),
                         const SizedBox(height: 12),
-                        AppButton(
-                          label: 'Agora não',
-                          type: ButtonType.text,
-                          onPressed: _skip,
+                        SizedBox(
+                          width: double.infinity,
+                          child: AppButton(
+                            label: 'Agora não',
+                            type: ButtonType.text,
+                            onPressed: _skip,
+                          ),
                         ),
                       ],
                     ),

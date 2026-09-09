@@ -92,9 +92,8 @@ class AuthNotifier extends StateNotifier<AuthStatus> {
       } catch (_) {
         hasPin = false;
       }
-      var needsSetup = !settings.securitySetupAsked &&
-          !biometricEnabled &&
-          !hasPin;
+      var needsSetup =
+          !settings.securitySetupAsked && !biometricEnabled && !hasPin;
 
       final pinMissing = settings.pinEnabled && !hasPin;
       if (pinMissing && !biometricEnabled) {

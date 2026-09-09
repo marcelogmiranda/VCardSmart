@@ -35,7 +35,9 @@ void main() {
       await tester.pump();
       await expectLater(
         find.byType(AppLoading),
-        matchesGoldenFile('golden_files/components/loading_with_message_light.png'),
+        matchesGoldenFile(
+          'golden_files/components/loading_with_message_light.png',
+        ),
       );
     });
 

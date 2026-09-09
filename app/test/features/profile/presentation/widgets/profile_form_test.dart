@@ -21,12 +21,9 @@ void main() {
     await tester.pumpAndSettle();
   }
 
-  Finder linkedinField() =>
-      find.widgetWithText(TextFormField, 'LinkedIn');
-  Finder instagramField() =>
-      find.widgetWithText(TextFormField, 'Instagram');
-  Finder facebookField() =>
-      find.widgetWithText(TextFormField, 'Facebook');
+  Finder linkedinField() => find.widgetWithText(TextFormField, 'LinkedIn');
+  Finder instagramField() => find.widgetWithText(TextFormField, 'Instagram');
+  Finder facebookField() => find.widgetWithText(TextFormField, 'Facebook');
   Finder xField() => find.widgetWithText(TextFormField, 'X (Twitter)');
   Finder socialField() =>
       find.widgetWithText(TextFormField, 'Outra Rede Social');
@@ -43,8 +40,7 @@ void main() {
   }
 
   group('ProfileForm social prefixes', () {
-    testWidgets('shows fixed prefixes that cannot be deleted',
-        (tester) async {
+    testWidgets('shows fixed prefixes that cannot be deleted', (tester) async {
       await pumpForm(tester);
 
       await scrollTo(tester, find.text('linkedin.com/in/'));
@@ -59,8 +55,7 @@ void main() {
       expect(find.text('https://'), findsOneWidget);
     });
 
-    testWidgets('saves prefixed values when only handle typed',
-        (tester) async {
+    testWidgets('saves prefixed values when only handle typed', (tester) async {
       await pumpForm(tester);
 
       await tester.enterText(nameField(), 'John Doe');
@@ -105,10 +100,8 @@ void main() {
 
       await pumpForm(tester, profile: profile);
 
-      String controllerText(Finder field) => tester
-          .widget<TextFormField>(field)
-          .controller!
-          .text;
+      String controllerText(Finder field) =>
+          tester.widget<TextFormField>(field).controller!.text;
 
       await scrollTo(tester, linkedinField());
       expect(controllerText(linkedinField()), 'johndoe');
@@ -124,8 +117,7 @@ void main() {
       expect(controllerText(websiteField()), 'example.com');
     });
 
-    testWidgets('keeps full URL when user types it entirely',
-        (tester) async {
+    testWidgets('keeps full URL when user types it entirely', (tester) async {
       await pumpForm(tester);
 
       await tester.enterText(nameField(), 'John Doe');

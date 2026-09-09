@@ -16,7 +16,8 @@ void main() {
       expect(find.text('Something went wrong'), findsOneWidget);
     });
 
-    testWidgets('should display retry button when onRetry provided', (tester) async {
+    testWidgets('should display retry button when onRetry provided',
+        (tester) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(

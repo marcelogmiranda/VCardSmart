@@ -27,6 +27,7 @@ class PinSetupPage extends ConsumerStatefulWidget {
 
 class _PinSetupPageState extends ConsumerState<PinSetupPage> {
   bool _isConfirming = false;
+  bool _saving = false;
   String _firstPin = '';
   late int _length;
 
@@ -38,42 +39,50 @@ class _PinSetupPageState extends ConsumerState<PinSetupPage> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
       appBar: AppBar(
         title: const Text('Configurar PIN'),
       ),
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(32),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                _isConfirming ? Icons.pin : Icons.pin_outlined,
-                size: 64,
-                color: Theme.of(context).primaryColor,
-              ),
-              const SizedBox(height: 24),
-              Text(
-                _isConfirming ? 'Confirme o PIN' : 'Digite o PIN',
-                style: const TextStyle(fontSize: 20),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                _isConfirming
-                    ? 'Digite novamente para confirmar'
-                    : 'PIN com $_length dígitos',
-                style: const TextStyle(color: Colors.grey),
-              ),
-              const SizedBox(height: 24),
-              if (!_isConfirming) _buildLengthSelector(),
-              const SizedBox(height: 32),
-              PinInput(
-                key: ValueKey('$_isConfirming-$_length'),
-                length: _length,
-                onCompleted: _isConfirming ? _confirmPin : _firstPinEntered,
-              ),
-            ],
+      body: SafeArea(
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(32),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  _isConfirming ? Icons.pin : Icons.pin_outlined,
+                  size: 64,
+                  color: colorScheme.primary,
+                ),
+                const SizedBox(height: 24),
+                Text(
+                  _isConfirming ? 'Confirme o PIN' : 'Digite o PIN',
+                  style: const TextStyle(fontSize: 20),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  _isConfirming
+                      ? 'Digite novamente para confirmar'
+                      : 'PIN com $_length dígitos',
+                  style: TextStyle(color: colorScheme.onSurfaceVariant),
+                ),
+                const SizedBox(height: 24),
+                if (!_isConfirming) _buildLengthSelector(),
+                const SizedBox(height: 32),
+                PinInput(
+                  key: ValueKey('$_isConfirming-$_length'),
+                  length: _length,
+                  enabled: !_saving,
+                  onCompleted: _isConfirming ? _confirmPin : _firstPinEntered,
+                ),
+                if (_saving) ...[
+                  const SizedBox(height: 24),
+                  const CircularProgressIndicator(),
+                ],
+              ],
+            ),
           ),
         ),
       ),
@@ -86,7 +95,8 @@ class _PinSetupPageState extends ConsumerState<PinSetupPage> {
       children: [
         Text(
           'Tamanho: ',
-          style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
+          style:
+              TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
         ),
         for (final size in [4, 6])
           Padding(
@@ -116,6 +126,7 @@ class _PinSetupPageState extends ConsumerState<PinSetupPage> {
 
   Future<void> _confirmPin(String pin) async {
     if (pin == _firstPin) {
+      setState(() => _saving = true);
       await ref.read(authProvider.notifier).setPin(pin, length: _length);
       if (widget.completeOnboarding) {
         if (mounted) {
@@ -129,6 +140,7 @@ class _PinSetupPageState extends ConsumerState<PinSetupPage> {
         }
         return;
       }
+      setState(() => _saving = false);
       await ref.read(settingsProvider.notifier).updatePinLength(_length);
       await ref.read(settingsProvider.notifier).updatePin(true);
       if (mounted) {
@@ -141,6 +153,8 @@ class _PinSetupPageState extends ConsumerState<PinSetupPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('PINs não coincidem')),
       );
+      await Future<void>.delayed(const Duration(milliseconds: 400));
+      if (!mounted) return;
       setState(() {
         _isConfirming = false;
         _firstPin = '';

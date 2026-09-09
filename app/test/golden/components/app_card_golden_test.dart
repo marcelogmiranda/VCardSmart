@@ -65,7 +65,9 @@ void main() {
       await tester.pumpAndSettle();
       await expectLater(
         find.byType(AppCard),
-        matchesGoldenFile('golden_files/components/card_custom_padding_light.png'),
+        matchesGoldenFile(
+          'golden_files/components/card_custom_padding_light.png',
+        ),
       );
     });
   });

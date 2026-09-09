@@ -13,7 +13,8 @@ class LocalProfilePhotoDataSource implements ProfilePhotoDataSource {
 
   @override
   Future<String> savePhoto(File photo, String profileId) async {
-    final fileName = '${profileId}_${DateTime.now().millisecondsSinceEpoch}.jpg';
+    final fileName =
+        '${profileId}_${DateTime.now().millisecondsSinceEpoch}.jpg';
     final targetPath = '${_photosDirectory.path}/$fileName';
     final savedFile = await photo.copy(targetPath);
     return savedFile.path;
@@ -29,12 +30,13 @@ class LocalProfilePhotoDataSource implements ProfilePhotoDataSource {
 
   @override
   Future<String?> getPhotoPath(String profileId) async {
-    final files = _photosDirectory.listSync();
-    for (final file in files) {
-      if (file.path.contains(profileId) && file is File) {
-        return file.path;
-      }
-    }
-    return null;
+    final prefix = '${profileId}_';
+    final candidates = _photosDirectory
+        .listSync()
+        .whereType<File>()
+        .where((f) => f.path.split('/').last.startsWith(prefix))
+        .toList()
+      ..sort((a, b) => b.path.compareTo(a.path));
+    return candidates.isEmpty ? null : candidates.first.path;
   }
 }

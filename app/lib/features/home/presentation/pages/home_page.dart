@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -28,7 +29,7 @@ class HomePage extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _ProfileCard(colorScheme: colorScheme),
+            const _ProfileCard(),
             const SizedBox(height: 24),
             Text(
               'Ações Rápidas',
@@ -48,28 +49,43 @@ class HomePage extends ConsumerWidget {
   }
 
   Future<void> _shareProfile(BuildContext context, WidgetRef ref) async {
-    final profiles = await ref.read(getAllProfilesUseCaseProvider).call();
-    if (!context.mounted) return;
+    try {
+      final profiles = await ref.read(getAllProfilesUseCaseProvider).call();
+      if (!context.mounted) return;
 
-    if (profiles.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Crie seu perfil primeiro')),
-      );
-      context.push('/profile');
-      return;
+      if (profiles.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Crie seu perfil primeiro')),
+        );
+        context.push('/profile');
+        return;
+      }
+
+      context.push('/qr/share');
+    } catch (_) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content:
+                Text('Não foi possível carregar seu perfil. Tente novamente.'),
+          ),
+        );
+      }
     }
-
-    context.push('/qr/share');
   }
 }
 
-class _ProfileCard extends StatelessWidget {
-  final ColorScheme colorScheme;
-
-  const _ProfileCard({required this.colorScheme});
+class _ProfileCard extends ConsumerWidget {
+  const _ProfileCard();
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final profilesAsync = ref.watch(homeProfilesProvider);
+    final profile = profilesAsync.valueOrNull?.isNotEmpty == true
+        ? profilesAsync.valueOrNull!.first
+        : null;
+
     return Card(
       elevation: 0,
       shape: RoundedRectangleBorder(
@@ -89,11 +105,24 @@ class _ProfileCard extends StatelessWidget {
               CircleAvatar(
                 radius: 32,
                 backgroundColor: colorScheme.primaryContainer,
-                child: Icon(
-                  Icons.person,
-                  size: 32,
-                  color: colorScheme.onPrimaryContainer,
-                ),
+                backgroundImage: profile != null &&
+                        profile.photoPath != null &&
+                        profile.photoPath!.isNotEmpty
+                    ? ResizeImage(
+                        FileImage(File(profile.photoPath!)),
+                        width: 128,
+                        height: 128,
+                      )
+                    : null,
+                child: (profile == null ||
+                        profile.photoPath == null ||
+                        profile.photoPath!.isEmpty)
+                    ? Icon(
+                        Icons.person,
+                        size: 32,
+                        color: colorScheme.onPrimaryContainer,
+                      )
+                    : null,
               ),
               const SizedBox(width: 16),
               Expanded(
@@ -101,14 +130,20 @@ class _ProfileCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Meu Cartão',
+                      profile?.name ?? 'Meu Cartão',
                       style: Theme.of(context).textTheme.titleLarge?.copyWith(
                             fontWeight: FontWeight.bold,
                           ),
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'Crie e compartilhe seu cartão digital',
+                      profile != null
+                          ? (profile.email ??
+                              profile.phone ??
+                              'Seu cartão digital')
+                          : 'Crie e compartilhe seu cartão digital',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                             color: colorScheme.onSurfaceVariant,
                           ),
@@ -247,5 +282,3 @@ class _ActionCard extends StatelessWidget {
     );
   }
 }
-
-
