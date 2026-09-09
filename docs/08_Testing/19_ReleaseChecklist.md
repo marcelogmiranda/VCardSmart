@@ -1,6 +1,6 @@
 # Checklist de Release — VCardSmart
 
-Situação atual: **ronda v1.0.6+14 (09/09)** — artifacts finais em `~/Downloads/VCardSmart-1.0.6-14.{aab,ipa}` (AAB SHA-256 `c8a65775…813dd`, IPA SHA-256 `0f358883…93052`). **Android na Play — testes aberto/fechado**; **iOS no ASC, Export Compliance resolvido como exempt** (sem upload de doc), aguardando submissão do IPA. Itens verificados marcados; demais pendentes de validação em device / formulários das lojas.
+Situação atual: **ronda v1.0.6+14 (09/09)** — artifacts finais em `~/Downloads/VCardSmart-1.0.6-14.{aab,ipa}` (AAB SHA-256 `c8a65775…813dd`, IPA SHA-256 `0f358883…93052`). **Android na Play — testes aberto/fechado**; **iOS submetido ao App Store Connect e disponível para testes (TestFlight)**, Export Compliance resolvido como exempt (sem upload de doc). Itens verificados marcados; demais pendentes de validação em device / formulários das lojas.
 
 ## Pré-Release
 
