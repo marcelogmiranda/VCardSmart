@@ -97,9 +97,14 @@ class _NFCReceivePageState extends ConsumerState<NFCReceivePage> {
       if (next.state == NFCState.success && next.profile != null) {
         _showProfileReceived(next.profile!);
       } else if (next.state == NFCState.error) {
+        final error = next.error;
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Não foi possível receber via NFC'),
+          SnackBar(
+            content: Text(
+              (error != null && error.isNotEmpty)
+                  ? error
+                  : 'Não foi possível receber via NFC',
+            ),
           ),
         );
       }
@@ -161,6 +166,15 @@ class _NFCReceivePageState extends ConsumerState<NFCReceivePage> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               NFCStatusWidget(isAvailable: nfcStatus.isAvailable),
+              const SizedBox(height: 16),
+              Text(
+                'No iPhone, encoste o cartão na parte de trás, próximo à câmera, '
+                'e mantenha até concluir.',
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+              ),
               const SizedBox(height: 32),
               NFCInstructionWidget(state: nfcStatus.state),
               const SizedBox(height: 32),

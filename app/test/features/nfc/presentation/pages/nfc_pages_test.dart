@@ -236,7 +236,12 @@ void main() {
           home: Scaffold(body: NFCInstructionWidget(state: NFCState.sending)),
         ),
       );
-      expect(find.text('Enviando perfil...'), findsOneWidget);
+      expect(
+        find.text(
+          'Segure o cartão na parte de trás do iPhone, próximo à câmera',
+        ),
+        findsOneWidget,
+      );
     });
 
     testWidgets('should display receiving instruction', (tester) async {
@@ -245,7 +250,12 @@ void main() {
           home: Scaffold(body: NFCInstructionWidget(state: NFCState.receiving)),
         ),
       );
-      expect(find.text('Recebendo perfil...'), findsOneWidget);
+      expect(
+        find.text(
+          'Segure o cartão na parte de trás do iPhone, próximo à câmera',
+        ),
+        findsOneWidget,
+      );
     });
 
     testWidgets('should display success instruction', (tester) async {

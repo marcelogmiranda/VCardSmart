@@ -67,9 +67,9 @@ class NFCInstructionWidget extends StatelessWidget {
       case NFCState.ready:
         return 'Aproxime os dispositivos';
       case NFCState.sending:
-        return 'Enviando perfil...';
+        return 'Segure o cartão na parte de trás do iPhone, próximo à câmera';
       case NFCState.receiving:
-        return 'Recebendo perfil...';
+        return 'Segure o cartão na parte de trás do iPhone, próximo à câmera';
       case NFCState.success:
         return 'Transferência concluída!';
       case NFCState.error:

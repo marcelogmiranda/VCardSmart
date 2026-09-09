@@ -125,6 +125,40 @@ class ProfileVCardConverter {
     return payload.trimLeft().toUpperCase().startsWith('BEGIN:VCARD');
   }
 
+  /// Builds a minimal [Profile] from raw text read off a tag (e.g. an Instagram
+  /// URL written by a tag-writing app). Keeps the value as the website field so
+  /// the "Receber Contato" flow can save it as a contact.
+  static Profile profileFromText(String text) {
+    final now = DateTime.now();
+    final trimmed = text.trim();
+    String? website;
+    String name = 'Contato';
+    if (trimmed.toLowerCase().startsWith('http://') ||
+        trimmed.toLowerCase().startsWith('https://')) {
+      website = trimmed;
+      name = _displayNameFromUrl(trimmed);
+    } else if (trimmed.isNotEmpty) {
+      name = trimmed.length > 60 ? trimmed.substring(0, 60) : trimmed;
+    }
+
+    return Profile(
+      id: now.millisecondsSinceEpoch.toString(),
+      name: name,
+      website: website,
+      createdAt: now,
+      updatedAt: now,
+    );
+  }
+
+  static String _displayNameFromUrl(String url) {
+    final withoutProtocol =
+        url.replaceFirst(RegExp(r'^https?://'), '');
+    final host = withoutProtocol.split('/').first;
+    final parts = host.split('.');
+    final hostName = parts.length >= 2 ? parts[parts.length - 2] : host;
+    return hostName.isEmpty ? 'Contato' : hostName;
+  }
+
   static String _sanitize(String value) {
     return value.replaceAll(RegExp(r'[\r\n]'), ' ').trim();
   }

@@ -35,17 +35,55 @@ class LocalNFCDataSource implements NFCDataSource {
 
     try {
       await NfcManager.instance.startSession(
-        alertMessage: 'Aproxime o celular de um cartão NFC para gravar',
+        alertMessage: 'Aproxime o iPhone de um cartão NFC para gravar',
         onDiscovered: (tag) async {
+          Ndef? ndef;
           try {
-            final ndef = Ndef.from(tag);
+            ndef = Ndef.from(tag);
             if (ndef == null || !ndef.isWritable) {
-              throw Exception('Tag NFC não suportada ou não gravável');
+              completer.completeError(
+                _nfcWriteUnsupported,
+              );
+            } else {
+              final maxSize = ndef.maxSize;
+              final byteLength = message.byteLength;
+              if (byteLength > maxSize) {
+                completer.completeError(
+                  Exception(
+                    'O perfil é grande demais para este cartão NFC '
+                    '(precisa de $byteLength bytes, o cartão aceita $maxSize). '
+                    'Use um cartão com mais capacidade (ex.: NTAG215/216).',
+                  ),
+                );
+              } else {
+                await ndef.write(message);
+                completer.complete();
+              }
             }
-            await ndef.write(message);
-            if (!completer.isCompleted) completer.complete();
-          } catch (e) {
-            if (!completer.isCompleted) completer.completeError(e);
+          } on Error catch (e) {
+            if (!completer.isCompleted) {
+              completer.completeError(
+                Exception('Falha ao gravar no cartão: ${e.runtimeType}.'),
+              );
+            }
+          } on Exception catch (e) {
+            // Writes to a locked/write-protected tag typically throw a
+            // "Tag is read only" style error from the platform.
+            final messageText = e.toString();
+            final isReadOnly =
+                messageText.toLowerCase().contains('read only') ||
+                    messageText.toLowerCase().contains('read-only') ||
+                    messageText.toLowerCase().contains('permission');
+            if (!completer.isCompleted) {
+              completer.completeError(
+                isReadOnly
+                    ? const LocalNFCException._(
+                        'Este cartão está protegido contra '
+                        'gravação. Use um cartão gravável (NTAG213/215/216).',
+                      )
+                    : e,
+              );
+            }
           }
           await NfcManager.instance.stopSession(
             alertMessage: 'Perfil gravado com sucesso!',
@@ -53,14 +91,24 @@ class LocalNFCDataSource implements NFCDataSource {
         },
         onError: (error) async {
           if (!completer.isCompleted) {
-            completer.completeError(
-              Exception('Sessão NFC cancelada ou indisponível.'),
-            );
+            completer.completeError(_mapSessionError(error, 'gravar'));
           }
         },
       );
     } catch (e) {
-      if (!completer.isCompleted) completer.completeError(e);
+      final messageText = e.toString();
+      final alreadyStarted =
+          messageText.toLowerCase().contains('already started') ||
+              messageText.toLowerCase().contains('in progress') ||
+              messageText.toLowerCase().contains('session');
+      if (!completer.isCompleted) {
+        completer.completeError(
+          alreadyStarted
+              ? const LocalNFCException._(
+                  'Outra sessão NFC ainda está ativa. Espere um instante e tente de novo.')
+              : e,
+        );
+      }
     }
 
     return completer.future;
@@ -72,38 +120,62 @@ class LocalNFCDataSource implements NFCDataSource {
 
     try {
       await NfcManager.instance.startSession(
-        alertMessage: 'Aproxime o celular de um cartão NFC para ler',
+        alertMessage: 'Aproxime o iPhone de um cartão NFC para ler',
         onDiscovered: (tag) async {
+          Ndef? ndef;
           try {
-            final ndef = Ndef.from(tag);
+            ndef = Ndef.from(tag);
             if (ndef == null) {
-              throw Exception('Tag NFC não suportada');
+              completer.completeError(
+                const LocalNFCException._(
+                  'Este cartão não suporta o formato NDEF usado pelo app.',
+                ),
+              );
+            } else {
+              final message = ndef.cachedMessage ?? await ndef.read();
+              if (message.records.isEmpty) {
+                completer.completeError(
+                  const LocalNFCException._(
+                    'Nenhum conteúdo encontrado neste cartão NFC.',
+                  ),
+                );
+              } else {
+                final payload = _extractPayload(message);
+                if (payload == null || payload.isEmpty) {
+                  completer.completeError(
+                    const LocalNFCException._(
+                      'Não foi possível ler o conteúdo deste cartão.',
+                    ),
+                  );
+                } else {
+                  completer.complete(
+                    NFCData(
+                      type: 'profile',
+                      payload: payload,
+                      timestamp: DateTime.now(),
+                    ),
+                  );
+                }
+              }
             }
-            final message = ndef.cachedMessage ?? await ndef.read();
-            if (message.records.isEmpty) {
-              throw Exception('Nenhum dado encontrado na tag NFC');
-            }
-            final rawPayload = utf8.decode(message.records.first.payload);
-            // Preserve the raw payload; the repository decodes it into a Profile.
+          } on Error catch (_) {
             if (!completer.isCompleted) {
-              completer.complete(
-                NFCData(
-                  type: 'profile',
-                  payload: rawPayload,
-                  timestamp: DateTime.now(),
+              completer.completeError(
+                const LocalNFCException._(
+                  'Falha ao ler o cartão. Segure-o firme e tente de novo.',
                 ),
               );
             }
-          } catch (e) {
-            if (!completer.isCompleted) completer.completeError(e);
+          } on Exception catch (e) {
+            if (!completer.isCompleted) {
+              completer.completeError(e);
+            }
           }
           await NfcManager.instance.stopSession();
         },
         onError: (error) async {
           if (!completer.isCompleted) {
-            completer.completeError(
-              Exception('Sessão NFC cancelada ou indisponível.'),
-            );
+            completer.completeError(_mapSessionError(error, 'ler'));
           }
         },
       );
@@ -118,4 +190,84 @@ class LocalNFCDataSource implements NFCDataSource {
   Future<void> stopSession() async {
     await NfcManager.instance.stopSession();
   }
+
+  /// Decodes the first NDEF record into a plain string, handling the well-known
+  /// URI and Text record types used by NFC tag writer apps (e.g. NFC Tools).
+  String? _extractPayload(NdefMessage message) {
+    final first = message.records.first;
+    switch (first.typeNameFormat) {
+      case NdefTypeNameFormat.nfcWellknown:
+        final recordType = String.fromCharCodes(first.type);
+        final payload = first.payload;
+        if (recordType == 'U') {
+          // URI record: first byte is the prefix index, the rest is the URI.
+          if (payload.isEmpty) return null;
+          final prefixIndex = payload.first;
+          final base =
+              prefixIndex < NdefRecord.URI_PREFIX_LIST.length
+                  ? NdefRecord.URI_PREFIX_LIST[prefixIndex]
+                  : '';
+          final rest = utf8.decode(payload.sublist(1), allowMalformed: true);
+          return '$base$rest';
+        }
+        if (recordType == 'T') {
+          // Text record: first byte has the language code length.
+          final languageLength = payload.first & 0x3F;
+          final text = payload.length > languageLength
+              ? utf8.decode(
+                  payload.sublist(languageLength + 1),
+                  allowMalformed: true,
+                )
+              : '';
+          return text;
+        }
+        return utf8.decode(payload, allowMalformed: true);
+      case NdefTypeNameFormat.media:
+      case NdefTypeNameFormat.nfcExternal:
+      case NdefTypeNameFormat.absoluteUri:
+        return utf8.decode(first.payload, allowMalformed: true);
+      case NdefTypeNameFormat.empty:
+      case NdefTypeNameFormat.unknown:
+      case NdefTypeNameFormat.unchanged:
+        return null;
+    }
+  }
+
+  Exception _mapSessionError(NfcError error, String operation) {
+    switch (error.type) {
+      case NfcErrorType.sessionTimeout:
+        return const LocalNFCException._(
+          'Nenhum cartão foi encontrado. Segure o cartão na parte de trás do '
+          'iPhone, próximo à câmera, e tente de novo.',
+        );
+      case NfcErrorType.userCanceled:
+        return const LocalNFCException._('Leitura cancelada.');
+      case NfcErrorType.systemIsBusy:
+        return const LocalNFCException._(
+          'O sistema está ocupado. Aguarde um instante e tente de novo.',
+        );
+      case NfcErrorType.unknown:
+        final detail = error.message;
+        return LocalNFCException._(
+          detail.isNotEmpty
+              ? 'Falha de NFC ($operation): $detail'
+              : 'Falha ao $operation via NFC. Tente de novo.',
+        );
+    }
+  }
+
+  static const Exception _nfcWriteUnsupported = LocalNFCException._(
+    'Este cartão não aceita a gravação de contatos (não é um NTAG gravável '
+    'ou está protegido). Use um NTAG213/215/216.',
+  );
+}
+
+/// A user-facing NFC error with a message safe to show in the UI.
+class LocalNFCException implements Exception {
+  final String message;
+
+  const LocalNFCException._(this.message);
+
+  @override
+  String toString() => message;
 }

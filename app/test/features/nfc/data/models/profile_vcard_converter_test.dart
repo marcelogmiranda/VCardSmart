@@ -98,5 +98,20 @@ void main() {
       final vcard = ProfileVCardConverter.encodeProfile(dirty);
       expect(vcard.split('\n').where((l) => l.contains('FN:Bad')).length, 1);
     });
+
+    test('profileFromText should turn a URL into a contact with the URL', () {
+      final profile =
+          ProfileVCardConverter.profileFromText('https://instagram.marcelo.com');
+
+      expect(profile.website, 'https://instagram.marcelo.com');
+      expect(profile.name, isNotEmpty);
+    });
+
+    test('profileFromText should keep plain text as the contact name', () {
+      final profile = ProfileVCardConverter.profileFromText('Minha Loja');
+
+      expect(profile.website, isNull);
+      expect(profile.name, 'Minha Loja');
+    });
   });
 }

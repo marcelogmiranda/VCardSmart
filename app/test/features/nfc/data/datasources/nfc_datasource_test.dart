@@ -40,6 +40,46 @@ void main() {
 
       expect(nfcMock.writtenPayloads, ['{"name":"Test"}']);
     });
+
+    test('should throw a friendly error when the tag is read-only', () async {
+      nfcMock.tagIsWritable = false;
+      final data = NFCData(
+        type: 'profile',
+        payload: '{"name":"Test"}',
+        timestamp: DateTime(2024),
+      );
+
+      await expectLater(
+        dataSource.sendData(data),
+        throwsA(
+          isA<LocalNFCException>().having(
+            (e) => e.message,
+            'message',
+            contains('é um NTAG gravável'),
+          ),
+        ),
+      );
+    });
+
+    test('should throw when the payload exceeds the tag capacity', () async {
+      nfcMock.tagMaxSize = 10;
+      final data = NFCData(
+        type: 'profile',
+        payload: '{"name":"Este perfil é grande demais para caber"}',
+        timestamp: DateTime(2024),
+      );
+
+      await expectLater(
+        dataSource.sendData(data),
+        throwsA(
+          isA<Exception>().having(
+            (e) => e.toString(),
+            'toString',
+            contains('precisa de'),
+          ),
+        ),
+      );
+    });
   });
 
   group('receiveData', () {
@@ -57,10 +97,70 @@ void main() {
       expect(received.payload, '{"name":"Received"}');
     });
 
-    test('should throw when the tag has no data', () async {
+    test('should read a URI record written by a tag writer app', () async {
+      nfcMock.cachedRecords = [
+        NfcRecordMock.uri('https://', 'instagram.com/marcelo'),
+      ];
+
+      final received = await dataSource.receiveData();
+
+      expect(received.type, 'profile');
+      expect(received.payload, 'https://instagram.com/marcelo');
+    });
+
+    test('should read a Text record written by a tag writer app', () async {
+      nfcMock.cachedRecords = [
+        NfcRecordMock.text('Olá, este é um cartão!'),
+      ];
+
+      final received = await dataSource.receiveData();
+
+      expect(received.payload, 'Olá, este é um cartão!');
+    });
+
+    test('should throw a friendly error when the session times out', () async {
+      nfcMock.failSession = true;
+      nfcMock.failSessionType = 'userCanceled';
+
+      await expectLater(
+        dataSource.receiveData(),
+        throwsA(
+          isA<LocalNFCException>().having(
+            (e) => e.message,
+            'message',
+            'Leitura cancelada.',
+          ),
+        ),
+      );
+    });
+
+    test('should throw a friendly error on session timeout', () async {
+      nfcMock.failSession = true;
+      nfcMock.failSessionType = 'sessionTimeout';
+      nfcMock.failSessionMessage = 'Session timed out';
+
+      await expectLater(
+        dataSource.receiveData(),
+        throwsA(
+          isA<LocalNFCException>().having(
+            (e) => e.message,
+            'message',
+            contains('Nenhum cartão foi encontrado'),
+          ),
+        ),
+      );
+    });
+
+    test('should throw a friendly error when the tag has no data', () async {
       expect(
         dataSource.receiveData(),
-        throwsException,
+        throwsA(
+          isA<LocalNFCException>().having(
+            (e) => e.message,
+            'message',
+            contains('Nenhum conteúdo encontrado'),
+          ),
+        ),
       );
     });
   });

@@ -27,7 +27,12 @@ void main() {
         ),
       );
 
-      expect(find.text('Enviando perfil...'), findsOneWidget);
+      expect(
+        find.text(
+          'Segure o cartão na parte de trás do iPhone, próximo à câmera',
+        ),
+        findsOneWidget,
+      );
       expect(find.byIcon(Icons.sync), findsOneWidget);
     });
 
@@ -40,7 +45,12 @@ void main() {
         ),
       );
 
-      expect(find.text('Recebendo perfil...'), findsOneWidget);
+      expect(
+        find.text(
+          'Segure o cartão na parte de trás do iPhone, próximo à câmera',
+        ),
+        findsOneWidget,
+      );
     });
 
     testWidgets('should show success text', (tester) async {

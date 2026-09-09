@@ -30,12 +30,19 @@ class LocalNFCRepository implements NFCRepository {
   Future<Profile> receive() async {
     final nfcData = await _dataSource.receiveData();
     final payload = nfcData.payload;
-    // Support both the new standard vCard format and the legacy JSON format
-    // written by older VCardSmart builds.
+    // Support the new standard vCard format, the legacy JSON format written by
+    // older VCardSmart builds, and arbitrary text/URL tags from other apps.
     if (ProfileVCardConverter.isVCardPayload(payload)) {
       return ProfileVCardConverter.decodeVCard(payload);
     }
-    return NFCPayload.decodeProfile(payload);
+    if (payload.trimLeft().startsWith('{')) {
+      try {
+        return NFCPayload.decodeProfile(payload);
+      } catch (_) {
+        // Fall through to the raw-text fallback below.
+      }
+    }
+    return ProfileVCardConverter.profileFromText(payload);
   }
 
   @override

@@ -196,9 +196,14 @@ class NFCSharePage extends ConsumerWidget {
           const SnackBar(content: Text('Perfil enviado com sucesso!')),
         );
       } else if (next.state == NFCState.error) {
+        final error = next.error;
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Não foi possível enviar via NFC'),
+          SnackBar(
+            content: Text(
+              (error != null && error.isNotEmpty)
+                  ? error
+                  : 'Não foi possível enviar via NFC',
+            ),
           ),
         );
       }
@@ -219,6 +224,7 @@ class NFCSharePage extends ConsumerWidget {
               const SizedBox(height: 16),
               Text(
                 'Aproxime o celular de um cartão NFC gravável (ex.: NTAG213/215/216). '
+                'No iPhone, encoste o cartão na parte de trás, próximo à câmera. '
                 'O contato será gravado em formato vCard padrão, lido por '
                 'qualquer celular.',
                 textAlign: TextAlign.center,
