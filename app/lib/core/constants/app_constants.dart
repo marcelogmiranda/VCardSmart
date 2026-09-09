@@ -2,7 +2,7 @@ class AppConstants {
   AppConstants._();
 
   static const String appName = 'VCardSmart';
-  static const String appVersion = '1.0.6+14';
+  static const String appVersion = '1.0.7+15';
 
   static const String profileBox = 'profiles';
   static const String contactBox = 'contacts';

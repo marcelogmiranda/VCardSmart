@@ -8,7 +8,7 @@ void main() {
     });
 
     test('should have correct app version', () {
-      expect(AppConstants.appVersion, '1.0.6+14');
+      expect(AppConstants.appVersion, '1.0.7+15');
     });
 
     test('should have correct hive box names', () {
