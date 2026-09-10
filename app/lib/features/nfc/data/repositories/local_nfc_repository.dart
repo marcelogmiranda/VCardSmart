@@ -23,7 +23,7 @@ class LocalNFCRepository implements NFCRepository {
       payload: vcard,
       timestamp: DateTime.now(),
     );
-    await _dataSource.sendData(nfcData);
+    await _dataSource.sendData(nfcData, profile: profile);
   }
 
   @override

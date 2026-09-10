@@ -42,6 +42,11 @@ post_install do |installer|
     flutter_additional_ios_build_settings(target)
   end
 
+  # Fix "non-modular header" error from google_mobile_ads 9.x with CocoaPods.
+  installer.pods_project.build_configuration_list.build_configurations.each do |configuration|
+    configuration.build_settings['CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES'] = 'YES'
+  end
+
   # Patch the frameworks script to clear extended attributes before codesigning.
   # This fixes "resource fork, Finder information, or similar detritus not allowed"
   # errors when building for iOS Simulator without a signing identity.

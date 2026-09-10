@@ -48,6 +48,55 @@ class ProfileVCardConverter {
     return buffer.toString();
   }
 
+  /// Encodes a minimal vCard with only the essential business-card fields
+  /// (name, phone, email, best URL) so it fits small NFC tags (e.g. an
+  /// NTAG213 holds only ~144 bytes of NDEF payload).
+  static String encodeMinimalVCard(Profile profile) {
+    final buffer = StringBuffer()
+      ..writeln('BEGIN:VCARD')
+      ..writeln('VERSION:3.0')
+      ..writeln('FN:${_sanitize(profile.name)}')
+      ..writeln('N:;${_sanitize(profile.name)};;;');
+
+    if (profile.phone != null && profile.phone!.isNotEmpty) {
+      buffer.writeln('TEL;TYPE=CELL:${_sanitize(profile.phone!)}');
+    }
+    if (profile.email != null && profile.email!.isNotEmpty) {
+      buffer.writeln('EMAIL:${_sanitize(profile.email!)}');
+    }
+    final url = profileUrl(profile);
+    if (url != null && url.isNotEmpty) {
+      buffer.writeln('URL:$url');
+    }
+
+    buffer.writeln('END:VCARD');
+    return buffer.toString();
+  }
+
+  /// Returns the best public URL for the profile (the fallback written to tags
+  /// too small for a vCard), or null when the profile has no linkable field.
+  /// Prefers the website, then Instagram, then the remaining social handles.
+  static String? profileUrl(Profile profile) {
+    for (final candidate in [
+      profile.website,
+      profile.instagram,
+      profile.linkedin,
+      profile.facebook,
+      profile.x,
+      profile.social,
+    ]) {
+      final value = candidate?.trim() ?? '';
+      if (value.isEmpty) continue;
+      if (value.contains('://')) return value;
+      if (value.startsWith('www.')) return 'https://$value';
+      if (value.startsWith('@')) {
+        return 'https://instagram.com/${value.substring(1)}';
+      }
+      return 'https://$value';
+    }
+    return null;
+  }
+
   /// Decodes a standard vCard string into a [Profile].
   static Profile decodeVCard(String vcard) {
     final now = DateTime.now();

@@ -38,6 +38,59 @@ void main() {
       expect(vcard.trimRight(), endsWith('END:VCARD'));
     });
 
+    test('encodeMinimalVCard should only include essential fields', () {
+      final vcard = ProfileVCardConverter.encodeMinimalVCard(profile);
+
+      expect(vcard, startsWith('BEGIN:VCARD'));
+      expect(vcard, contains('FN:John Doe'));
+      expect(vcard, contains('TEL;TYPE=CELL:+5511999999999'));
+      expect(vcard, contains('EMAIL:john@example.com'));
+      expect(vcard, contains('URL:https://johndoe.com'));
+      expect(vcard, isNot(contains('X-LINKEDIN')));
+      expect(vcard, isNot(contains('X-FACEBOOK')));
+      expect(vcard, isNot(contains('X-TWITTER')));
+      expect(vcard, isNot(contains('X-SOCIAL')));
+      expect(vcard, isNot(contains('X-INSTAGRAM')));
+      expect(vcard, isNot(contains('NOTE')));
+      expect(
+        ProfileVCardConverter.encodeMinimalVCard(profile).length,
+        lessThan(ProfileVCardConverter.encodeProfile(profile).length),
+      );
+    });
+
+    test('profileUrl should prefer the website over social handles', () {
+      expect(
+        ProfileVCardConverter.profileUrl(profile),
+        'https://johndoe.com',
+      );
+    });
+
+    test('profileUrl should build an Instagram URL from a bare @handle ', () {
+      final instaOnly = Profile(
+        id: '2',
+        name: 'Nat',
+        instagram: '@nat',
+        createdAt: DateTime(2024),
+        updatedAt: DateTime(2024),
+      );
+
+      expect(
+        ProfileVCardConverter.profileUrl(instaOnly),
+        'https://instagram.com/nat',
+      );
+    });
+
+    test('profileUrl should return null when nothing is linkable', () {
+      final bare = Profile(
+        id: '3',
+        name: 'No Links',
+        createdAt: DateTime(2024),
+        updatedAt: DateTime(2024),
+      );
+
+      expect(ProfileVCardConverter.profileUrl(bare), isNull);
+    });
+
     test('decodeVCard should parse all fields back', () {
       final vcard = ProfileVCardConverter.encodeProfile(profile);
       final decoded = ProfileVCardConverter.decodeVCard(vcard);
