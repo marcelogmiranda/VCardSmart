@@ -4,6 +4,7 @@ import '../../domain/usecases/receive_nfc_usecase.dart';
 import '../../data/datasources/nfc_datasource.dart';
 import '../../data/repositories/local_nfc_repository.dart';
 import '../../domain/repositories/nfc_repository.dart';
+import '../../data/models/nfc_write_option.dart';
 import '../../../profile/domain/entities/profile.dart';
 
 enum NFCState { idle, ready, sending, receiving, success, error }
@@ -66,10 +67,11 @@ class NFCNotifier extends StateNotifier<NFCStatus> {
     state = state.copyWith(isAvailable: available);
   }
 
-  Future<void> send(Profile profile) async {
+  Future<void> send(Profile profile,
+      {NfcContentSelector? contentSelector}) async {
     state = state.copyWith(state: NFCState.sending, error: null);
     try {
-      await _sendNFC(profile);
+      await _sendNFC(profile, contentSelector: contentSelector);
       state = state.copyWith(state: NFCState.success);
     } catch (e) {
       state = state.copyWith(state: NFCState.error, error: e.toString());

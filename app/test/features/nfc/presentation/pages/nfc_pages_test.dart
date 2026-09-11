@@ -7,6 +7,9 @@ import 'package:vcardsmart/features/nfc/presentation/pages/nfc_receive_page.dart
 import 'package:vcardsmart/features/nfc/presentation/pages/nfc_main_page.dart';
 import 'package:vcardsmart/features/nfc/presentation/widgets/nfc_status_widget.dart';
 import 'package:vcardsmart/features/nfc/presentation/widgets/nfc_instruction_widget.dart';
+import 'package:vcardsmart/features/nfc/presentation/widgets/nfc_write_option_sheet.dart';
+import 'package:vcardsmart/features/nfc/data/models/nfc_write_option.dart';
+import 'package:vcardsmart/features/nfc/data/models/profile_vcard_converter.dart';
 import 'package:vcardsmart/features/profile/domain/entities/profile.dart';
 
 import '../../nfc_channel_mock.dart';
@@ -217,6 +220,77 @@ void main() {
       );
       expect(find.byIcon(Icons.nfc_outlined), findsOneWidget);
       expect(find.text('NFC indisponível'), findsOneWidget);
+    });
+  });
+
+  group('NfcWriteOptionSheet', () {
+    final options = [
+      const NfcWriteOption(
+        field: ProfileField.email,
+        title: 'E-mail',
+        detail: 'a@b.com',
+        vCard: 'BEGIN:VCARD',
+      ),
+      const NfcWriteOption(
+        field: ProfileField.phone,
+        title: 'Telefone',
+        detail: '+55 11',
+        vCard: 'BEGIN:VCARD',
+      ),
+    ];
+
+    testWidgets('should list every option with its detail', (tester) async {
+      await tester.pumpWidget(MaterialApp(
+        home: Scaffold(
+          body: Builder(
+            builder: (context) => Center(
+              child: ElevatedButton(
+                onPressed: () => showNfcWriteOptionSheet(context, options),
+                child: const Text('abrir'),
+              ),
+            ),
+          ),
+        ),
+      ));
+
+      await tester.tap(find.text('abrir'));
+      await tester.pumpAndSettle();
+
+      expect(
+        find.text('O cartão é pequeno para o perfil completo'),
+        findsOneWidget,
+      );
+      expect(find.text('Escolha o que deseja gravar'), findsOneWidget);
+      expect(find.text('E-mail'), findsOneWidget);
+      expect(find.text('a@b.com'), findsOneWidget);
+      expect(find.text('Telefone'), findsOneWidget);
+      expect(find.text('+55 11'), findsOneWidget);
+    });
+
+    testWidgets('should return the tapped option', (tester) async {
+      late Future<NfcWriteOption?> result;
+      await tester.pumpWidget(MaterialApp(
+        home: Scaffold(
+          body: Builder(
+            builder: (context) => Center(
+              child: ElevatedButton(
+                onPressed: () =>
+                    result = showNfcWriteOptionSheet(context, options),
+                child: const Text('abrir'),
+              ),
+            ),
+          ),
+        ),
+      ));
+
+      await tester.tap(find.text('abrir'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Telefone'));
+      await tester.pumpAndSettle();
+
+      final chosen = await result;
+      expect(chosen?.title, 'Telefone');
+      expect(chosen?.field, ProfileField.phone);
     });
   });
 

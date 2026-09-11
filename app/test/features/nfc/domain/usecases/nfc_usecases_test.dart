@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:vcardsmart/features/nfc/data/models/nfc_write_option.dart';
 import 'package:vcardsmart/features/nfc/domain/usecases/send_nfc_usecase.dart';
 import 'package:vcardsmart/features/nfc/domain/usecases/receive_nfc_usecase.dart';
 import 'package:vcardsmart/features/nfc/domain/repositories/nfc_repository.dart';
@@ -26,6 +27,22 @@ void main() {
       expect(repository.wasSent, true);
       expect(repository.sentProfile?.name, 'Test User');
     });
+
+    test('should forward the content selector to the repository', () async {
+      final useCase = SendNFCUseCase(repository);
+      final profile = Profile(
+        id: '1',
+        name: 'Test User',
+        createdAt: DateTime(2024),
+        updatedAt: DateTime(2024),
+      );
+      Future<NfcWriteOption?> selector(List<NfcWriteOption> options) async =>
+          options.isEmpty ? null : options.first;
+
+      await useCase(profile, contentSelector: selector);
+
+      expect(repository.wasSentWithSelector, true);
+    });
   });
 
   group('ReceiveNFCUseCase', () {
@@ -48,6 +65,7 @@ void main() {
 
 class _FakeNFCRepository implements NFCRepository {
   bool wasSent = false;
+  bool wasSentWithSelector = false;
   bool wasReceived = false;
   Profile? sentProfile;
   Profile? receivedProfile;
@@ -56,9 +74,11 @@ class _FakeNFCRepository implements NFCRepository {
   Future<bool> isAvailable() async => true;
 
   @override
-  Future<void> send(Profile profile) async {
+  Future<void> send(Profile profile,
+      {NfcContentSelector? contentSelector}) async {
     wasSent = true;
     sentProfile = profile;
+    wasSentWithSelector = contentSelector != null;
   }
 
   @override

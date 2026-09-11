@@ -38,6 +38,62 @@ void main() {
       expect(vcard.trimRight(), endsWith('END:VCARD'));
     });
 
+    test('fieldValue should return the raw value of each field', () {
+      expect(
+        ProfileVCardConverter.fieldValue(profile, ProfileField.phone),
+        '+5511999999999',
+      );
+      expect(
+        ProfileVCardConverter.fieldValue(profile, ProfileField.email),
+        'john@example.com',
+      );
+      expect(
+        ProfileVCardConverter.fieldValue(profile, ProfileField.bio),
+        'Developer',
+      );
+    });
+
+    test('fieldValue should return null for empty fields', () {
+      final bare = Profile(
+        id: '2',
+        name: 'No Fields',
+        createdAt: DateTime(2024),
+        updatedAt: DateTime(2024),
+      );
+
+      for (final field in ProfileField.values) {
+        expect(ProfileVCardConverter.fieldValue(bare, field), isNull);
+      }
+    });
+
+    test('encodeFieldVCard should keep only the profile name plus one field',
+        () {
+      final vcard =
+          ProfileVCardConverter.encodeFieldVCard(profile, ProfileField.email);
+
+      expect(vcard, startsWith('BEGIN:VCARD'));
+      expect(vcard, contains('FN:John Doe'));
+      expect(vcard, contains('EMAIL:john@example.com'));
+      expect(vcard, isNot(contains('TEL;TYPE=CELL')));
+      expect(vcard, isNot(contains('X-LINKEDIN')));
+      expect(vcard, isNot(contains('NOTE')));
+      expect(vcard.trimRight(), endsWith('END:VCARD'));
+    });
+
+    test('encodeFieldVCard should encode each supported field', () {
+      final phoneVCard =
+          ProfileVCardConverter.encodeFieldVCard(profile, ProfileField.phone);
+      final siteVCard =
+          ProfileVCardConverter.encodeFieldVCard(profile, ProfileField.x);
+      final bioVCard =
+          ProfileVCardConverter.encodeFieldVCard(profile, ProfileField.bio);
+
+      expect(phoneVCard, contains('TEL;TYPE=CELL:+5511999999999'));
+      expect(phoneVCard, isNot(contains('EMAIL:')));
+      expect(siteVCard, contains('X-TWITTER:x.com/johndoe'));
+      expect(bioVCard, contains('NOTE:Developer'));
+    });
+
     test('encodeMinimalVCard should only include essential fields', () {
       final vcard = ProfileVCardConverter.encodeMinimalVCard(profile);
 
@@ -153,8 +209,8 @@ void main() {
     });
 
     test('profileFromText should turn a URL into a contact with the URL', () {
-      final profile =
-          ProfileVCardConverter.profileFromText('https://instagram.marcelo.com');
+      final profile = ProfileVCardConverter.profileFromText(
+          'https://instagram.marcelo.com');
 
       expect(profile.website, 'https://instagram.marcelo.com');
       expect(profile.name, isNotEmpty);

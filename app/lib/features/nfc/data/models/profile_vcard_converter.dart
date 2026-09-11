@@ -1,5 +1,18 @@
 import '../../../profile/domain/entities/profile.dart';
 
+/// Profile fields that can be individually written to a small NFC tag.
+enum ProfileField {
+  phone,
+  email,
+  website,
+  linkedin,
+  instagram,
+  facebook,
+  x,
+  social,
+  bio,
+}
+
 /// Converts between [Profile] and standard vCard 3.0 text so a profile can be
 /// written to an NFC tag in a format natively readable by any phone's Contacts
 /// app (not just VCardSmart users), and read back into a [Profile].
@@ -71,6 +84,74 @@ class ProfileVCardConverter {
 
     buffer.writeln('END:VCARD');
     return buffer.toString();
+  }
+
+  /// Returns the raw value of a [ProfileField] for the given [profile], or null
+  /// when the field is empty.
+  static String? fieldValue(Profile profile, ProfileField field) {
+    switch (field) {
+      case ProfileField.phone:
+        return profile.phone;
+      case ProfileField.email:
+        return profile.email;
+      case ProfileField.website:
+        return profile.website;
+      case ProfileField.linkedin:
+        return profile.linkedin;
+      case ProfileField.instagram:
+        return profile.instagram;
+      case ProfileField.facebook:
+        return profile.facebook;
+      case ProfileField.x:
+        return profile.x;
+      case ProfileField.social:
+        return profile.social;
+      case ProfileField.bio:
+        return profile.bio;
+    }
+  }
+
+  /// Encodes a minimal vCard containing only the profile name and a single
+  /// [field]. Used by the per-field selector when the full vCard does not fit
+  /// on a small NFC tag.
+  static String encodeFieldVCard(Profile profile, ProfileField field) {
+    final buffer = StringBuffer()
+      ..writeln('BEGIN:VCARD')
+      ..writeln('VERSION:3.0')
+      ..writeln('FN:${_sanitize(profile.name)}')
+      ..writeln('N:;${_sanitize(profile.name)};;;');
+
+    final value = fieldValue(profile, field);
+    if (value != null && value.trim().isNotEmpty) {
+      _appendField(buffer, field, _sanitize(value));
+    }
+
+    buffer.writeln('END:VCARD');
+    return buffer.toString();
+  }
+
+  static void _appendField(
+      StringBuffer buffer, ProfileField field, String value) {
+    switch (field) {
+      case ProfileField.phone:
+        buffer.writeln('TEL;TYPE=CELL:$value');
+      case ProfileField.email:
+        buffer.writeln('EMAIL:$value');
+      case ProfileField.website:
+        buffer.writeln('URL:$value');
+      case ProfileField.linkedin:
+        buffer.writeln('X-LINKEDIN:$value');
+      case ProfileField.instagram:
+        buffer.writeln('X-INSTAGRAM:$value');
+      case ProfileField.facebook:
+        buffer.writeln('X-FACEBOOK:$value');
+      case ProfileField.x:
+        buffer.writeln('X-TWITTER:$value');
+      case ProfileField.social:
+        buffer.writeln('X-SOCIAL:$value');
+      case ProfileField.bio:
+        buffer.writeln('NOTE:$value');
+    }
   }
 
   /// Returns the best public URL for the profile (the fallback written to tags
@@ -200,8 +281,7 @@ class ProfileVCardConverter {
   }
 
   static String _displayNameFromUrl(String url) {
-    final withoutProtocol =
-        url.replaceFirst(RegExp(r'^https?://'), '');
+    final withoutProtocol = url.replaceFirst(RegExp(r'^https?://'), '');
     final host = withoutProtocol.split('/').first;
     final parts = host.split('.');
     final hostName = parts.length >= 2 ? parts[parts.length - 2] : host;

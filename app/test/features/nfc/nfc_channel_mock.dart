@@ -128,9 +128,7 @@ class NfcChannelMock {
     final messenger =
         TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger;
     final records = cachedRecords ??
-        (writtenPayloads.isEmpty
-            ? []
-            : [_mimeRecord(writtenPayloads.last)]);
+        (writtenPayloads.isEmpty ? [] : [_mimeRecord(writtenPayloads.last)]);
     final tag = <String, dynamic>{
       'handle': 'test-tag',
       'ndef': {

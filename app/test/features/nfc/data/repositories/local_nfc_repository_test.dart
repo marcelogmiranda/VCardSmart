@@ -1,5 +1,9 @@
+import 'dart:convert';
+
 import 'package:flutter_test/flutter_test.dart';
+import 'package:nfc_manager/nfc_manager.dart';
 import 'package:vcardsmart/features/nfc/data/datasources/nfc_datasource.dart';
+import 'package:vcardsmart/features/nfc/data/models/profile_vcard_converter.dart';
 import 'package:vcardsmart/features/nfc/data/repositories/local_nfc_repository.dart';
 import 'package:vcardsmart/features/profile/domain/entities/profile.dart';
 
@@ -69,6 +73,41 @@ void main() {
       expect(received.website, 'https://full.com');
       expect(received.linkedin, 'linkedin.com/in/full');
       expect(received.bio, 'Full bio');
+    });
+    test('should forward the content selector to the datasource', () async {
+      final profile = Profile(
+        id: '4',
+        name: 'Marcelo Miranda',
+        phone: '+55 11 99999-0000',
+        email: 'marcelo@vcardsmart.app',
+        createdAt: DateTime(2024),
+        updatedAt: DateTime(2024),
+      );
+      final phoneMessage = NdefMessage([
+        NdefRecord.createMime(
+          ProfileVCardConverter.mimeType,
+          utf8.encode(
+            ProfileVCardConverter.encodeFieldVCard(profile, ProfileField.phone),
+          ),
+        ),
+      ]);
+      // Full vCard does not fit, but several single fields do.
+      nfcMock.tagMaxSize = phoneMessage.byteLength;
+      var selectorCalled = false;
+
+      await repository.send(
+        profile,
+        contentSelector: (options) async {
+          selectorCalled = true;
+          return options.first;
+        },
+      );
+
+      expect(selectorCalled, true);
+      expect(
+        nfcMock.lastPayload(),
+        ProfileVCardConverter.encodeFieldVCard(profile, ProfileField.phone),
+      );
     });
   });
 

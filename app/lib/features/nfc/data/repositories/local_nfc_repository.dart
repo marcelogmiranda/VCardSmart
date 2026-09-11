@@ -2,6 +2,7 @@ import '../../domain/repositories/nfc_repository.dart';
 import '../../domain/entities/nfc_data.dart';
 import '../datasources/nfc_datasource.dart';
 import '../models/nfc_payload.dart';
+import '../models/nfc_write_option.dart';
 import '../models/profile_vcard_converter.dart';
 import '../../../profile/domain/entities/profile.dart';
 
@@ -16,14 +17,19 @@ class LocalNFCRepository implements NFCRepository {
   }
 
   @override
-  Future<void> send(Profile profile) async {
+  Future<void> send(Profile profile,
+      {NfcContentSelector? contentSelector}) async {
     final vcard = ProfileVCardConverter.encodeProfile(profile);
     final nfcData = NFCData(
       type: 'profile',
       payload: vcard,
       timestamp: DateTime.now(),
     );
-    await _dataSource.sendData(nfcData, profile: profile);
+    await _dataSource.sendData(
+      nfcData,
+      profile: profile,
+      contentSelector: contentSelector,
+    );
   }
 
   @override

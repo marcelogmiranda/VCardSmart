@@ -1,5 +1,9 @@
+import 'dart:convert';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:nfc_manager/nfc_manager.dart';
+import 'package:vcardsmart/features/nfc/data/models/profile_vcard_converter.dart';
 import 'package:vcardsmart/features/nfc/presentation/providers/nfc_provider.dart';
 import 'package:vcardsmart/features/profile/domain/entities/profile.dart';
 
@@ -92,6 +96,46 @@ void main() {
       expect(notifier.state.state, NFCState.idle);
       expect(notifier.state.isAvailable, false);
       expect(notifier.state.profile, isNull);
+    });
+
+    test('send should let the user choose a field when the tag is small',
+        () async {
+      final notifier = container.read(nfcProvider.notifier);
+      final profile = Profile(
+        id: '3',
+        name: 'Marcelo Miranda',
+        phone: '+55 11 99999-0000',
+        email: 'marcelo@vcardsmart.app',
+        createdAt: DateTime(2024),
+        updatedAt: DateTime(2024),
+      );
+      final phoneMessage = NdefMessage([
+        NdefRecord.createMime(
+          ProfileVCardConverter.mimeType,
+          utf8.encode(
+            ProfileVCardConverter.encodeFieldVCard(profile, ProfileField.phone),
+          ),
+        ),
+      ]);
+      // The full vCard does not fit, but phone and e-mail both fit.
+      nfcMock.tagMaxSize = phoneMessage.byteLength;
+      var selectorCalled = false;
+
+      await notifier.send(
+        profile,
+        contentSelector: (options) async {
+          selectorCalled = true;
+          return options.firstWhere((o) => o.field == ProfileField.email);
+        },
+      );
+
+      expect(notifier.state.state, NFCState.success);
+      expect(notifier.state.error, isNull);
+      expect(selectorCalled, true);
+      expect(
+        nfcMock.lastPayload(),
+        ProfileVCardConverter.encodeFieldVCard(profile, ProfileField.email),
+      );
     });
 
     test('send then receive should work sequentially', () async {

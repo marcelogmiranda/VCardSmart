@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:nfc_manager/nfc_manager.dart';
 import 'package:vcardsmart/features/nfc/data/datasources/nfc_datasource.dart';
+import 'package:vcardsmart/features/nfc/data/models/nfc_write_option.dart';
 import 'package:vcardsmart/features/nfc/data/models/profile_vcard_converter.dart';
 import 'package:vcardsmart/features/nfc/domain/entities/nfc_data.dart';
 import 'package:vcardsmart/features/profile/domain/entities/profile.dart';
@@ -86,65 +87,131 @@ void main() {
       );
     });
 
-    test('should fall back to a minimal vCard when the full one does not fit',
+    test('should write the full vCard directly without asking when it fits',
         () async {
       final profile = Profile(
         id: 'p1',
         name: 'Marcelo Miranda',
         phone: '+55 11 99999-0000',
         email: 'marcelo@vcardsmart.app',
-        website: 'https://vcardsmart.app',
-        instagram: 'marcelo',
-        bio: List.filled(300, 'x').join(), // long bio bloats the full vCard
         createdAt: DateTime(2024),
         updatedAt: DateTime(2024),
       );
-      // Full vCard is too big, but the minimal one fits.
-      final full = NdefMessage([
-        NdefRecord.createMime(
-          ProfileVCardConverter.mimeType,
-          utf8.encode(ProfileVCardConverter.encodeProfile(profile)),
-        ),
-      ]);
-      final minimal = NdefMessage([
-        NdefRecord.createMime(
-          ProfileVCardConverter.mimeType,
-          utf8.encode(ProfileVCardConverter.encodeMinimalVCard(profile)),
-        ),
-      ]);
-      nfcMock.tagMaxSize = minimal.byteLength;
+      final fullVCard = ProfileVCardConverter.encodeProfile(profile);
+      nfcMock.tagMaxSize = _mimeMessage(fullVCard).byteLength;
       final data = NFCData(
         type: 'profile',
-        payload: ProfileVCardConverter.encodeProfile(profile),
+        payload: fullVCard,
         timestamp: DateTime(2024),
       );
+      var selectorCalls = 0;
 
-      await dataSource.sendData(data, profile: profile);
-
-      expect(nfcMock.writtenPayloads, isNotEmpty);
-      expect(
-        nfcMock.lastPayload(),
-        ProfileVCardConverter.encodeMinimalVCard(profile),
+      await dataSource.sendData(
+        data,
+        profile: profile,
+        contentSelector: (options) async {
+          selectorCalls++;
+          return options.first;
+        },
       );
-      expect(full.byteLength, greaterThan(nfcMock.tagMaxSize));
+
+      expect(selectorCalls, 0);
+      expect(nfcMock.writtenPayloads.single, fullVCard);
     });
 
-    test('should fall back to a URI link when even the minimal vCard does not fit',
+    test('should write the only fitting field directly without asking',
         () async {
       final profile = Profile(
         id: 'p1',
         name: 'Marcelo Miranda',
-        website: 'https://vcardsmart.app',
+        phone: '+55 11 99999-0000',
+        email: 'marcelo@vcardsmart.app',
         createdAt: DateTime(2024),
         updatedAt: DateTime(2024),
       );
-      final minimal = NdefMessage([
-        NdefRecord.createMime(
-          ProfileVCardConverter.mimeType,
-          utf8.encode(ProfileVCardConverter.encodeMinimalVCard(profile)),
-        ),
-      ]);
-      nfcMock.tagMaxSize = minimal.byteLength - 1;
+      final emailMessage = _mimeMessage(
+        ProfileVCardConverter.encodeFieldVCard(profile, ProfileField.email),
+      );
+      nfcMock.tagMaxSize = emailMessage.byteLength;
+      final data = NFCData(
+        type: 'profile',
+        payload: ProfileVCardConverter.encodeProfile(profile),
+        timestamp: DateTime(2024),
+      );
+      var selectorCalls = 0;
+
+      await dataSource.sendData(
+        data,
+        profile: profile,
+        contentSelector: (options) async {
+          selectorCalls++;
+          return options.first;
+        },
+      );
+
+      expect(selectorCalls, 0);
+      expect(
+        nfcMock.writtenPayloads.single,
+        ProfileVCardConverter.encodeFieldVCard(profile, ProfileField.email),
+      );
+    });
+
+    test('should ask the user through the selector when several fields fit',
+        () async {
+      final profile = Profile(
+        id: 'p1',
+        name: 'Marcelo Miranda',
+        phone: '+55 11 99999-0000',
+        email: 'marcelo@vcardsmart.app',
+        createdAt: DateTime(2024),
+        updatedAt: DateTime(2024),
+      );
+      final phoneMessage = _mimeMessage(
+        ProfileVCardConverter.encodeFieldVCard(profile, ProfileField.phone),
+      );
+      // The full vCard is too big, but the phone and e-mail both fit.
+      nfcMock.tagMaxSize = phoneMessage.byteLength;
+      final data = NFCData(
+        type: 'profile',
+        payload: ProfileVCardConverter.encodeProfile(profile),
+        timestamp: DateTime(2024),
+      );
+      List<String>? askedTitles;
+      NfcWriteOption? chosen;
+
+      await dataSource.sendData(
+        data,
+        profile: profile,
+        contentSelector: (options) async {
+          askedTitles = options.map((o) => o.title).toList();
+          chosen = options.firstWhere((o) => o.field == ProfileField.email);
+          return chosen;
+        },
+      );
+
+      expect(askedTitles, isNotNull);
+      expect(askedTitles, ['Telefone', 'E-mail']);
+      expect(
+        nfcMock.writtenPayloads.single,
+        ProfileVCardConverter.encodeFieldVCard(profile, ProfileField.email),
+      );
+      expect(chosen!.title, 'E-mail');
+    });
+
+    test('should write the first fitting field when no selector is provided',
+        () async {
+      final profile = Profile(
+        id: 'p1',
+        name: 'Marcelo Miranda',
+        phone: '+55 11 99999-0000',
+        email: 'marcelo@vcardsmart.app',
+        createdAt: DateTime(2024),
+        updatedAt: DateTime(2024),
+      );
+      final phoneMessage = _mimeMessage(
+        ProfileVCardConverter.encodeFieldVCard(profile, ProfileField.phone),
+      );
+      nfcMock.tagMaxSize = phoneMessage.byteLength;
       final data = NFCData(
         type: 'profile',
         payload: ProfileVCardConverter.encodeProfile(profile),
@@ -153,8 +220,81 @@ void main() {
 
       await dataSource.sendData(data, profile: profile);
 
-      expect(nfcMock.writtenPayloads, isNotEmpty);
-      expect(nfcMock.lastPayload(), contains('vcardsmart.app'));
+      // Options: [Telefone, E-mail] — the first one is written automatically.
+      expect(
+        nfcMock.writtenPayloads.single,
+        ProfileVCardConverter.encodeFieldVCard(profile, ProfileField.phone),
+      );
+    });
+
+    test('should present only options that actually fit', () async {
+      final profile = Profile(
+        id: 'p1',
+        name: 'Marcelo Miranda',
+        phone: '+55 11 99999-0000',
+        email: 'marcelo@vcardsmart.app',
+        instagram: List.filled(200, 'x').join(),
+        createdAt: DateTime(2024),
+        updatedAt: DateTime(2024),
+      );
+      final phoneMessage = _mimeMessage(
+        ProfileVCardConverter.encodeFieldVCard(profile, ProfileField.phone),
+      );
+      // Phone and e-mail fit; the bloated Instagram field does not.
+      nfcMock.tagMaxSize = phoneMessage.byteLength;
+      final data = NFCData(
+        type: 'profile',
+        payload: ProfileVCardConverter.encodeProfile(profile),
+        timestamp: DateTime(2024),
+      );
+      List<String>? askedTitles;
+
+      await dataSource.sendData(
+        data,
+        profile: profile,
+        contentSelector: (options) async {
+          askedTitles = options.map((o) => o.title).toList();
+          return options.first;
+        },
+      );
+
+      expect(askedTitles, ['Telefone', 'E-mail']);
+    });
+
+    test('should cancel cleanly when the selector returns null', () async {
+      final profile = Profile(
+        id: 'p1',
+        name: 'Marcelo Miranda',
+        phone: '+55 11 99999-0000',
+        email: 'marcelo@vcardsmart.app',
+        createdAt: DateTime(2024),
+        updatedAt: DateTime(2024),
+      );
+      final phoneMessage = _mimeMessage(
+        ProfileVCardConverter.encodeFieldVCard(profile, ProfileField.phone),
+      );
+      nfcMock.tagMaxSize = phoneMessage.byteLength;
+      final data = NFCData(
+        type: 'profile',
+        payload: ProfileVCardConverter.encodeProfile(profile),
+        timestamp: DateTime(2024),
+      );
+
+      await expectLater(
+        dataSource.sendData(
+          data,
+          profile: profile,
+          contentSelector: (options) async => null,
+        ),
+        throwsA(
+          isA<LocalNFCException>().having(
+            (e) => e.message,
+            'message',
+            'Gravação cancelada.',
+          ),
+        ),
+      );
+      expect(nfcMock.writtenPayloads, isEmpty);
     });
 
     test('should throw when the tag is too small for every candidate',
@@ -275,3 +415,10 @@ void main() {
     });
   });
 }
+
+NdefMessage _mimeMessage(String payload) => NdefMessage([
+      NdefRecord.createMime(
+        ProfileVCardConverter.mimeType,
+        utf8.encode(payload),
+      ),
+    ]);

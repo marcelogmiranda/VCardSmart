@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../providers/nfc_provider.dart';
 import '../widgets/nfc_status_widget.dart';
 import '../widgets/nfc_instruction_widget.dart';
+import '../widgets/nfc_write_option_sheet.dart';
 import '../../../profile/domain/entities/profile.dart';
 import '../../../profile/presentation/providers/profile_provider.dart';
 import '../../../../core/constants/app_constants.dart';
@@ -240,7 +241,11 @@ class NFCSharePage extends ConsumerWidget {
                   width: double.infinity,
                   child: ElevatedButton.icon(
                     onPressed: () {
-                      ref.read(nfcProvider.notifier).send(profile);
+                      ref.read(nfcProvider.notifier).send(
+                            profile,
+                            contentSelector: (options) =>
+                                showNfcWriteOptionSheet(context, options),
+                          );
                     },
                     icon: const Icon(Icons.contactless),
                     label: const Text('Gravar no cartão'),

@@ -1,4 +1,5 @@
 import '../../../profile/domain/entities/profile.dart';
+import '../../data/models/nfc_write_option.dart';
 import '../repositories/nfc_repository.dart';
 
 class SendNFCUseCase {
@@ -6,7 +7,7 @@ class SendNFCUseCase {
 
   SendNFCUseCase(this.repository);
 
-  Future<void> call(Profile profile) {
-    return repository.send(profile);
+  Future<void> call(Profile profile, {NfcContentSelector? contentSelector}) {
+    return repository.send(profile, contentSelector: contentSelector);
   }
 }

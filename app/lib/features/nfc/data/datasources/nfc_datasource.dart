@@ -6,11 +6,16 @@ import 'package:nfc_manager/nfc_manager.dart';
 
 import '../../../profile/domain/entities/profile.dart';
 import '../../domain/entities/nfc_data.dart';
+import '../models/nfc_write_option.dart';
 import '../models/profile_vcard_converter.dart';
 
 abstract class NFCDataSource {
   Future<bool> checkAvailability();
-  Future<void> sendData(NFCData data, {Profile? profile});
+  Future<void> sendData(
+    NFCData data, {
+    Profile? profile,
+    NfcContentSelector? contentSelector,
+  });
   Future<NFCData> receiveData();
   Future<void> stopSession();
 }
@@ -26,21 +31,89 @@ class LocalNFCDataSource implements NFCDataSource {
   }
 
   @override
-  Future<void> sendData(NFCData data, {Profile? profile}) async {
+  Future<void> sendData(
+    NFCData data, {
+    Profile? profile,
+    NfcContentSelector? contentSelector,
+  }) async {
     final completer = Completer<void>();
-    // Candidate NDEF messages in preference order. The full vCard is the most
-    // useful but often exceeds small tags (an NTAG213 holds ~144 bytes), so we
-    // progressively slim it down: full vCard -> minimal vCard -> a single URI
-    // record linking to the profile. The actual tag's capacity decides.
-    final candidates = <NdefMessage>[
-      _vcardMessage(data.payload),
-      if (profile != null) _vcardMessage(ProfileVCardConverter.encodeMinimalVCard(profile)),
-      if (profile != null) ..._uriMessages(profile),
-    ];
+    // The full vCard is the most useful content and, when it fits, is written
+    // directly. Small tags (an NTAG213 holds ~144 bytes) often can't hold it,
+    // so the tag's real capacity decides: if a single field fits we write it
+    // without asking; when several fields fit we stop the session, let the UI
+    // ask the user which one to write, then start a fresh session to write it.
+    final fullMessage = _vcardMessage(data.payload);
+    // Set when the choice flow already closed the first session (avoids a
+    // second stopSession call at the end of the first onDiscovered handler).
+    var sessionEndedByChoice = false;
+
+    // Starts a fresh session that writes [message] when a tag is discovered.
+    Future<void> writeInNewSession(
+        NdefMessage message, String debugLabel) async {
+      await NfcManager.instance.startSession(
+        alertMessage: 'Toque novamente o cartão NFC para gravar',
+        pollingOptions: {
+          NfcPollingOption.iso14443,
+          NfcPollingOption.iso15693,
+        },
+        onDiscovered: (tag) async {
+          Ndef? ndef;
+          try {
+            ndef = Ndef.from(tag);
+            if (ndef == null || !ndef.isWritable) {
+              if (!completer.isCompleted) {
+                completer.completeError(_nfcWriteUnsupported);
+              }
+            } else {
+              debugPrint(
+                '[NFC-send] writing ${message.byteLength} bytes ($debugLabel)',
+              );
+              await ndef.write(message);
+              if (!completer.isCompleted) completer.complete();
+            }
+          } on Error catch (e) {
+            debugPrint('[NFC-send] Error: $e');
+            if (!completer.isCompleted) {
+              completer.completeError(
+                Exception('Falha ao gravar no cartão: ${e.runtimeType}.'),
+              );
+            }
+          } on Exception catch (e) {
+            debugPrint('[NFC-send] Exception: $e');
+            final messageText = e.toString();
+            final isReadOnly =
+                messageText.toLowerCase().contains('read only') ||
+                    messageText.toLowerCase().contains('read-only') ||
+                    messageText.toLowerCase().contains('permission');
+            if (!completer.isCompleted) {
+              completer.completeError(
+                isReadOnly
+                    ? const LocalNFCException._(
+                        'Este cartão está protegido contra '
+                        'gravação. Use um cartão gravável (NTAG213/215/216).',
+                      )
+                    : e,
+              );
+            }
+          }
+          await NfcManager.instance.stopSession(
+            alertMessage: 'Perfil gravado com sucesso!',
+          );
+        },
+        onError: (error) async {
+          debugPrint(
+              '[NFC-send] sessionOnError: ${error.type} / ${error.message}');
+          if (!completer.isCompleted) {
+            completer.completeError(_mapSessionError(error, 'gravar'));
+          }
+        },
+      );
+    }
 
     try {
+      // First session: discover the tag and decide what to write.
       await NfcManager.instance.startSession(
-        alertMessage: 'Aproxime o iPhone de um cartão NFC para gravar',
+        alertMessage: 'Aproxime o celular de um cartão NFC para gravar',
         // Exclude iso18092 (FeliCa): on iOS it requires the
         // `felica.systemcodes` entitlement, otherwise the whole session
         // fails with "Missing required entitlement" (NFCError code 2) on
@@ -58,29 +131,63 @@ class LocalNFCDataSource implements NFCDataSource {
               completer.completeError(_nfcWriteUnsupported);
             } else {
               final maxSize = ndef.maxSize;
-              NdefMessage? toWrite;
-              for (final candidate in candidates) {
-                if (candidate.byteLength <= maxSize) {
-                  toWrite = candidate;
-                  break;
-                }
-              }
-              if (toWrite == null) {
+              if (fullMessage.byteLength <= maxSize) {
+                debugPrint(
+                  '[NFC-send] writing ${fullMessage.byteLength}/$maxSize bytes (full vCard)',
+                );
+                await ndef.write(fullMessage);
+                if (!completer.isCompleted) completer.complete();
+              } else if (profile == null) {
                 completer.completeError(
-                  Exception(
-                    'O perfil não cabe neste cartão NFC '
-                    '(precisa de ${candidates.first.byteLength} bytes, '
-                    'o cartão aceita $maxSize). '
-                    'Use um cartão com mais capacidade (ex.: NTAG215/216).',
-                  ),
+                  _capacityError(fullMessage.byteLength, maxSize),
                 );
               } else {
+                final fitOptions = buildNfcWriteOptions(profile)
+                    .where(
+                      (option) =>
+                          _vcardMessage(option.vCard).byteLength <= maxSize,
+                    )
+                    .toList();
                 debugPrint(
-                  '[NFC-send] writing ${toWrite.byteLength}/$maxSize bytes '
-                  '(${toWrite == candidates.first ? 'full vCard' : toWrite == candidates[1] ? 'minimal vCard' : 'URI link'})',
+                  '[NFC-send] full=${fullMessage.byteLength}B max=$maxSize '
+                  'fit=${fitOptions.length}',
                 );
-                await ndef.write(toWrite);
-                completer.complete();
+                if (fitOptions.isEmpty) {
+                  completer.completeError(
+                    _capacityError(fullMessage.byteLength, maxSize),
+                  );
+                } else if (fitOptions.length == 1 || contentSelector == null) {
+                  // Only one piece of data fits, or no selector was wired:
+                  // write it directly without asking.
+                  final singleMessage = _vcardMessage(fitOptions.first.vCard);
+                  debugPrint(
+                    '[NFC-send] writing ${singleMessage.byteLength}/$maxSize '
+                    'bytes (single field: ${fitOptions.first.title})',
+                  );
+                  await ndef.write(singleMessage);
+                  if (!completer.isCompleted) completer.complete();
+                } else {
+                  // Several options fit: close this session so the app UI is
+                  // visible again, ask the user which one to write, then open
+                  // a fresh session to write the chosen content.
+                  sessionEndedByChoice = true;
+                  await NfcManager.instance.stopSession(
+                    alertMessage: 'Continue no app para finalizar a gravação.',
+                  );
+                  final chosen = await contentSelector(fitOptions);
+                  if (chosen == null) {
+                    if (!completer.isCompleted) {
+                      completer.completeError(
+                        const LocalNFCException._('Gravação cancelada.'),
+                      );
+                    }
+                  } else {
+                    await writeInNewSession(
+                      _vcardMessage(chosen.vCard),
+                      'chosen: ${chosen.title}',
+                    );
+                  }
+                }
               }
             }
           } on Error catch (e) {
@@ -110,12 +217,15 @@ class LocalNFCDataSource implements NFCDataSource {
               );
             }
           }
-          await NfcManager.instance.stopSession(
-            alertMessage: 'Perfil gravado com sucesso!',
-          );
+          if (!sessionEndedByChoice) {
+            await NfcManager.instance.stopSession(
+              alertMessage: 'Perfil gravado com sucesso!',
+            );
+          }
         },
         onError: (error) async {
-          debugPrint('[NFC-send] sessionOnError: ${error.type} / ${error.message}');
+          debugPrint(
+              '[NFC-send] sessionOnError: ${error.type} / ${error.message}');
           if (!completer.isCompleted) {
             completer.completeError(_mapSessionError(error, 'gravar'));
           }
@@ -209,7 +319,8 @@ class LocalNFCDataSource implements NFCDataSource {
           await NfcManager.instance.stopSession();
         },
         onError: (error) async {
-          debugPrint('[NFC-read] sessionOnError: ${error.type} / ${error.message}');
+          debugPrint(
+              '[NFC-read] sessionOnError: ${error.type} / ${error.message}');
           if (!completer.isCompleted) {
             completer.completeError(_mapSessionError(error, 'ler'));
           }
@@ -240,10 +351,9 @@ class LocalNFCDataSource implements NFCDataSource {
           // URI record: first byte is the prefix index, the rest is the URI.
           if (payload.isEmpty) return null;
           final prefixIndex = payload.first;
-          final base =
-              prefixIndex < NdefRecord.URI_PREFIX_LIST.length
-                  ? NdefRecord.URI_PREFIX_LIST[prefixIndex]
-                  : '';
+          final base = prefixIndex < NdefRecord.URI_PREFIX_LIST.length
+              ? NdefRecord.URI_PREFIX_LIST[prefixIndex]
+              : '';
           final rest = utf8.decode(payload.sublist(1), allowMalformed: true);
           return '$base$rest';
         }
@@ -317,15 +427,11 @@ class LocalNFCDataSource implements NFCDataSource {
     ]);
   }
 
-  /// Builds a single URI-record message linking to the profile (fallback for
-  /// tags too small for even a minimal vCard).
-  List<NdefMessage> _uriMessages(Profile profile) {
-    final url = ProfileVCardConverter.profileUrl(profile);
-    if (url == null || url.isEmpty) return const [];
-    return [
-      NdefMessage([NdefRecord.createUri(Uri.parse(url))]),
-    ];
-  }
+  Exception _capacityError(int needed, int maxSize) => Exception(
+        'O perfil não cabe neste cartão NFC '
+        '(precisa de $needed bytes, o cartão aceita $maxSize). '
+        'Use um cartão com mais capacidade (ex.: NTAG215/216).',
+      );
 }
 
 /// A user-facing NFC error with a message safe to show in the UI.
