@@ -7,6 +7,7 @@
 .DS_Store
 
 # Flutter/Dart
+app/.dart_tool
 app/.dart_tool/
 app/.flutter-plugins
 app/.flutter-plugins-dependencies
